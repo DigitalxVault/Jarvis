@@ -8,6 +8,8 @@ interface UseAlertsOptions {
   rules?: AlertRule[]
   /** If false, hook processes telemetry but doesn't return alerts (muted) */
   enabled?: boolean
+  /** Enable debug logging to console (dev only) */
+  debug?: boolean
 }
 
 interface AlertState {
@@ -20,7 +22,7 @@ export function useAlerts(
   telemetry: TelemetryPacket | null,
   options: UseAlertsOptions = {}
 ): AlertState {
-  const { rules = DEFAULT_ALERT_RULES, enabled = true } = options
+  const { rules = DEFAULT_ALERT_RULES, enabled = true, debug = false } = options
 
   const [alerts, setAlerts] = useState<ActiveAlert[]>([])
   const triggeredRef = useRef<Map<string, number>>(new Map())
@@ -44,8 +46,21 @@ export function useAlerts(
     const newTriggered = new Map<string, number>()
     const newAlerts: ActiveAlert[] = []
 
+    if (debug) {
+      console.log('[useAlerts] Processing telemetry:', {
+        t_model: telemetry.t_model,
+        aoa: telemetry.aero?.aoa_rad,
+        aoa_deg: (telemetry.aero?.aoa_rad || 0) * (180 / Math.PI),
+        g_z: telemetry.aero?.g?.z
+      })
+    }
+
     rules.forEach((rule) => {
       const shouldTrigger = rule.test(telemetry)
+
+      if (debug && shouldTrigger) {
+        console.log(`[useAlerts] Rule triggered: ${rule.id} (${rule.severity})`)
+      }
 
       if (shouldTrigger) {
         // Check debounce
@@ -81,6 +96,9 @@ export function useAlerts(
     // Clear alerts that are no longer triggered
     triggeredRef.current.forEach((triggeredAt, ruleId) => {
       if (!newTriggered.has(ruleId)) {
+        if (debug) {
+          console.log(`[useAlerts] Rule cleared: ${ruleId}`)
+        }
         // Alert cleared, set up debounce to re-arm
         const rule = rules.find((r) => r.id === ruleId)
         if (rule?.debounceMs) {
@@ -98,6 +116,10 @@ export function useAlerts(
     newTriggered.forEach((time, ruleId) => {
       triggeredRef.current.set(ruleId, time)
     })
+
+    if (debug) {
+      console.log('[useAlerts] Final alerts:', newAlerts.map(a => a.ruleId))
+    }
 
     setAlerts(newAlerts)
   }, [telemetry, enabled, rules])

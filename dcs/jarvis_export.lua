@@ -11,6 +11,11 @@ local jarvis_interval = 0.1   -- 10 Hz = every 100ms
 local jarvis_last_send = 0
 local jarvis_JSON = nil
 
+-- Aircraft-specific normalization constants (F-16C Viper)
+local JARVIS_FUEL_INTERNAL_MAX = 3200   -- Internal tanks (kg)
+local JARVIS_FUEL_EXTERNAL_MAX = 1400   -- External tank (kg)
+local JARVIS_ENGINE_MAX_RPM = 10400     -- F110-GE-129 max RPM
+
 -- ── Chain existing Export.lua functions ──
 local _prev_LuaExportStart = LuaExportStart
 local _prev_LuaExportAfterNextFrame = LuaExportAfterNextFrame
@@ -92,11 +97,11 @@ function LuaExportAfterNextFrame()
         ang_vel = { x = angvel.x, y = angvel.y, z = angvel.z }
       },
       fuel    = {
-        internal = (LoGetFuelData and LoGetFuelData().fuel_internal) or 0,
-        external = (LoGetFuelData and LoGetFuelData().fuel_external) or 0
+        internal = math.min(1, ((LoGetFuelData and LoGetFuelData().fuel_internal) or 0) / JARVIS_FUEL_INTERNAL_MAX),
+        external = math.min(1, ((LoGetFuelData and LoGetFuelData().fuel_external) or 0) / JARVIS_FUEL_EXTERNAL_MAX)
       },
       eng     = {
-        rpm_pct  = eng1.RPM or 0,
+        rpm_pct  = math.min(100, ((eng1.RPM or 0) / JARVIS_ENGINE_MAX_RPM) * 100),
         fuel_con = eng1.fuel_consumption or 0
       }
     })
