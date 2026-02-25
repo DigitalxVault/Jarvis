@@ -92,30 +92,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | — | Pending |
-| CONN-02 | — | Pending |
-| CONN-03 | — | Pending |
-| CONN-04 | — | Pending |
-| TELEM-01 | — | Pending |
-| TELEM-02 | — | Pending |
-| TELEM-03 | — | Pending |
-| TELEM-04 | — | Pending |
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| RESIL-01 | — | Pending |
-| RESIL-02 | — | Pending |
-| RESIL-03 | — | Pending |
-| RESIL-04 | — | Pending |
-| DEBUG-01 | — | Pending |
-| DEBUG-02 | — | Pending |
-| DEBUG-03 | — | Pending |
+| CONN-01 | Phase 3 - DCS Export.lua | Pending |
+| CONN-02 | Phase 2 - Bridge Core | Pending |
+| CONN-03 | Phase 4 - Web UI Foundation | Pending |
+| CONN-04 | Phase 5 - Session Pairing | Pending |
+| TELEM-01 | Phase 6 - Telemetry UI | Pending |
+| TELEM-02 | Phase 6 - Telemetry UI | Pending |
+| TELEM-03 | Phase 6 - Telemetry UI | Pending |
+| TELEM-04 | Phase 6 - Telemetry UI | Pending |
+| AUTH-01 | Phase 4 - Web UI Foundation | Pending |
+| AUTH-02 | Phase 5 - Session Pairing | Pending |
+| AUTH-03 | Phase 4 - Web UI Foundation | Pending |
+| RESIL-01 | Phase 6 - Telemetry UI | Pending |
+| RESIL-02 | Phase 7 - Resilience and Stability | Pending |
+| RESIL-03 | Phase 7 - Resilience and Stability | Pending |
+| RESIL-04 | Phase 7 - Resilience and Stability | Pending |
+| DEBUG-01 | Phase 6 - Telemetry UI | Pending |
+| DEBUG-02 | Phase 2 - Bridge Core | Pending |
+| DEBUG-03 | Phase 6 - Telemetry UI | Pending |
 
 **Coverage:**
 - v1 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 after initial definition*
+*Last updated: 2026-02-25 after roadmap creation — all 18 requirements mapped*
