@@ -6,22 +6,31 @@ import type { Session } from '@jarvis-dcs/shared'
 interface SessionPanelProps {
   currentSession: Session | null
   onCreateSession: () => void
+  onDevMode: () => void
   isCreating: boolean
 }
 
-export function SessionPanel({ currentSession, onCreateSession, isCreating }: SessionPanelProps) {
+export function SessionPanel({ currentSession, onCreateSession, onDevMode, isCreating }: SessionPanelProps) {
   return (
     <div className="jarvis-panel">
       <div className="panel-title">▸ SESSION</div>
 
       {!currentSession ? (
-        <button
-          onClick={onCreateSession}
-          disabled={isCreating}
-          className="w-full mt-2 border border-jarvis-border rounded px-3 py-2 text-[13px] font-bold tracking-[3px] text-jarvis-primary hover:bg-jarvis-primary/10 transition-colors disabled:opacity-30 cursor-pointer"
-        >
-          {isCreating ? 'CREATING...' : 'START SESSION'}
-        </button>
+        <>
+          <button
+            onClick={onCreateSession}
+            disabled={isCreating}
+            className="w-full mt-2 border border-jarvis-border rounded px-3 py-2 text-[13px] font-bold tracking-[3px] text-jarvis-primary hover:bg-jarvis-primary/10 transition-colors disabled:opacity-30 cursor-pointer"
+          >
+            {isCreating ? 'CREATING...' : 'START SESSION'}
+          </button>
+          <button
+            onClick={onDevMode}
+            className="w-full mt-2 border border-jarvis-accent/40 rounded px-3 py-1.5 text-[11px] font-bold tracking-[3px] text-jarvis-accent hover:bg-jarvis-accent/10 transition-colors cursor-pointer"
+          >
+            DEV MODE
+          </button>
+        </>
       ) : (
         <div className="flex flex-col gap-3 mt-2">
           {/* Pairing Code */}

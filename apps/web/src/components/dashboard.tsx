@@ -56,6 +56,19 @@ export function Dashboard() {
     }
   }, [])
 
+  const handleDevMode = useCallback(() => {
+    setCurrentSession({
+      id: 'dev',
+      user_id: 'dev',
+      status: 'active',
+      pairing_code: null,
+      pairing_expires_at: null,
+      bridge_claimed: true,
+      created_at: new Date().toISOString(),
+      ended_at: null,
+    })
+  }, [])
+
   return (
     <div className="w-full h-screen flex flex-col">
       {/* Top Bar */}
@@ -68,6 +81,7 @@ export function Dashboard() {
           <SessionPanel
             currentSession={currentSession}
             onCreateSession={handleCreateSession}
+            onDevMode={handleDevMode}
             isCreating={isCreating}
           />
         </div>
