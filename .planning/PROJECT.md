@@ -2,32 +2,40 @@
 
 ## What This Is
 
-A Phase 1 prototype of JARVIS, a companion system for Digital Combat Simulator (DCS) that streams live gameplay telemetry from DCS through a local bridge to a cloud relay, then renders it on a JARVIS-themed web dashboard. The prototype proves the end-to-end connectivity pipeline works before building scoring, coaching, and injection layers.
+A companion system for Digital Combat Simulator (DCS) that streams live gameplay telemetry from DCS through a local Node.js bridge to Supabase Realtime, then renders it on a JARVIS-themed web dashboard. v1.0 MVP proves the end-to-end connectivity pipeline works with session pairing, resilience, and stability.
 
 ## Core Value
 
 Live telemetry from DCS appears on a web dashboard in under 500ms — the pipeline works end-to-end and stays stable for a 20-minute flight session.
 
+## Current State
+
+Shipped v1.0 MVP with ~1,847 LOC (TypeScript/TSX/Lua/CSS) across 65 files.
+Tech stack: Next.js 16 (App Router), Supabase (Realtime + Postgres), NextAuth v5, Node.js bridge, DCS Export.lua.
+Pipeline proven: DCS (10 Hz UDP) → bridge (2-5 Hz downsample) → Supabase Realtime → Web dashboard (<500ms).
+Google OAuth placeholders configured but not yet tested with real credentials.
+Supabase RLS disabled for prototype — re-enable when addressing auth integration.
+
 ## Requirements
 
 ### Validated
 
-(None yet — ship to validate)
+- DCS Export.lua sends telemetry packets at 10 Hz via UDP (IAS, ALT, HDG + position/attitude) — v1.0
+- Local Node.js bridge receives UDP packets and forwards to Supabase Realtime — v1.0
+- Web UI subscribes to Supabase Realtime channel and renders live telemetry — v1.0
+- Connection status indicator (Connected / Reconnecting / Offline) — v1.0
+- Telemetry cards display IAS, ALT, and HDG with live updates — v1.0
+- Debug panel shows last packet time, packets/sec, session ID, subscription status — v1.0
+- Google sign-in via NextAuth.js — v1.0
+- Session pairing: web generates code, bridge authenticates with it — v1.0
+- Bridge handles internet disconnection and auto-reconnects — v1.0
+- Bridge handles DCS exporter stopping gracefully — v1.0
+- Session scoping enforced (bridge can only publish to its paired session) — v1.0
+- No memory growth or runaway logs in a 20-minute session — v1.0
 
 ### Active
 
-- [ ] DCS Export.lua sends telemetry packets at 10 Hz via UDP (IAS, ALT, HDG + position/attitude)
-- [ ] Local Node.js bridge receives UDP packets and forwards to Supabase Realtime
-- [ ] Web UI subscribes to Supabase Realtime channel and renders live telemetry
-- [ ] Connection status indicator (Connected / Reconnecting / Offline)
-- [ ] Telemetry cards display IAS, ALT, and HDG with live updates
-- [ ] Debug panel shows last packet time, packets/sec, session ID, subscription status
-- [ ] Google sign-in via NextAuth.js
-- [ ] Session pairing: web generates code, bridge authenticates with it
-- [ ] Bridge handles internet disconnection and auto-reconnects
-- [ ] Bridge handles DCS exporter stopping gracefully
-- [ ] Session scoping enforced (bridge can only publish to its paired session)
-- [ ] No memory growth or runaway logs in a 20-minute session
+(None — next milestone requirements TBD via `/gsd:new-milestone`)
 
 ### Out of Scope
 
@@ -65,15 +73,21 @@ Live telemetry from DCS appears on a web dashboard in under 500ms — the pipeli
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Supabase Realtime for telemetry push | Vercel lacks native pub/sub; Supabase bundles Realtime + Postgres + free tier | -- Pending |
-| Supabase Postgres for storage | Same platform as Realtime; one service to manage | -- Pending |
-| NextAuth.js over Supabase Auth | More flexible, native Next.js integration, not locked to Supabase for auth | -- Pending |
-| Node.js bridge over Python | Same language ecosystem as web app; easier packaging; native async I/O | -- Pending |
-| Export.lua hook over mission scripting | Works with any mission; LoGetSelfData() is universal; no custom mission files needed | -- Pending |
-| F-16C Viper as target aircraft | Popular module with good export support; primary test platform | -- Pending |
-| Desktop only | Pilot is at a PC; HUD layout optimized for wide screens; simplifies Phase 1 | -- Pending |
-| Phase 1 scope only | Prove pipeline before adding scoring/coaching; clean separation of concerns | -- Pending |
-| Monorepo structure | Bridge + web app in single repo for easier development during prototype | -- Pending |
+| Supabase Realtime for telemetry push | Vercel lacks native pub/sub; Supabase bundles Realtime + Postgres + free tier | Good — works within free tier, <500ms latency achieved |
+| Supabase Postgres for storage | Same platform as Realtime; one service to manage | Good — simple setup, sessions table works well |
+| NextAuth.js over Supabase Auth | More flexible, native Next.js integration, not locked to Supabase for auth | Good — but requires RLS workaround (disabled for prototype) |
+| Node.js bridge over Python | Same language ecosystem as web app; easier packaging; native async I/O | Good — shared types via monorepo, tsx runtime works well |
+| Export.lua hook over mission scripting | Works with any mission; LoGetSelfData() is universal; no custom mission files needed | Good — dofile() chaining preserves TacView/SRS compatibility |
+| F-16C Viper as target aircraft | Popular module with good export support; primary test platform | Pending — not yet tested on hardware |
+| Desktop only | Pilot is at a PC; HUD layout optimized for wide screens; simplifies Phase 1 | Good — appropriate for prototype |
+| Phase 1 scope only | Prove pipeline before adding scoring/coaching; clean separation of concerns | Good — pipeline proven, clean foundation for Phase 2 |
+| Monorepo structure | Bridge + web app in single repo for easier development during prototype | Good — pnpm workspaces + shared types work smoothly |
+| Port 7779 for JARVIS UDP | Avoids DCS internal port 12800 and TacView port 7778 | Good — no conflicts observed |
+| Downsample 10 Hz to 2-5 Hz at bridge | Supabase free tier message budget constraint | Good — sufficient for dashboard updates |
+| Disable Supabase RLS for Phase 1 | NextAuth + Supabase Auth incompatibility in prototype | Revisit — re-enable when addressing auth integration |
+| AbortSignal.timeout(5000) for fetch | Prevent network hangs from blocking bridge indefinitely | Good — clean timeout behavior |
+| Edge-triggered DCS silence detection | Fire once on transition, not every heartbeat tick | Good — reduces log noise |
+| heartbeatCallback + worker: true | Prevent tab-throttle WebSocket drops | Good — maintains connection in background tabs |
 
 ---
-*Last updated: 2026-02-25 after initialization*
+*Last updated: 2026-02-25 after v1.0 milestone*

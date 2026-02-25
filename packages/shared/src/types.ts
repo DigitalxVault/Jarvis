@@ -8,6 +8,8 @@ export interface TelemetryPacket {
     lon: number
     /** Altitude MSL in metres */
     alt_m: number
+    /** Altitude AGL in metres — LoGetAltitudeAboveGroundLevel() */
+    alt_agl_m?: number
   }
   att: {
     pitch_rad: number
@@ -17,10 +19,35 @@ export interface TelemetryPacket {
   spd: {
     /** Indicated airspeed in m/s */
     ias_mps: number
+    /** True airspeed in m/s */
+    tas_mps?: number
+    /** Vertical velocity in m/s (positive = climbing) */
+    vvi_mps?: number
     mach: number
   }
   /** Magnetic heading in radians — LoGetMagneticYaw() */
   hdg_rad: number
+  /** Aerodynamic data */
+  aero?: {
+    /** Angle of attack in radians */
+    aoa_rad: number
+    /** G-loads (x=lateral, y=vertical/normal, z=longitudinal) */
+    g: { x: number; y: number; z: number }
+    /** Angular velocity in rad/s */
+    ang_vel: { x: number; y: number; z: number }
+  }
+  /** Fuel state as 0-1 fractions */
+  fuel?: {
+    internal: number
+    external: number
+  }
+  /** Engine data (primary engine) */
+  eng?: {
+    /** RPM as percentage (0-100) */
+    rpm_pct: number
+    /** Fuel consumption rate */
+    fuel_con: number
+  }
 }
 
 /** Bridge heartbeat sent at 1 Hz on the same channel */

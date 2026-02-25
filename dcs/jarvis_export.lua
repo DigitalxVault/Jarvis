@@ -57,13 +57,22 @@ function LuaExportAfterNextFrame()
     local lla = self_data.LatLongAlt
     if not lla then return nil end
 
+    -- Acceleration (G-loads) — returns {x, y, z}
+    local acc = LoGetAccelerationUnits() or {x=0, y=1, z=0}
+    -- Angular velocity — returns {x, y, z} rad/s
+    local angvel = (LoGetAngularVelocity and LoGetAngularVelocity()) or {x=0, y=0, z=0}
+    -- Engine info — returns table per engine, we take engine 1
+    local eng_raw = (LoGetEngineInfo and LoGetEngineInfo()) or {}
+    local eng1 = eng_raw.left or eng_raw[1] or {}
+
     return jarvis_JSON:encode({
       type    = "telemetry",
       t_model = t,
       pos     = {
-        lat   = lla.Lat,
-        lon   = lla.Long,
-        alt_m = lla.Alt
+        lat      = lla.Lat,
+        lon      = lla.Long,
+        alt_m    = lla.Alt,
+        alt_agl_m = (LoGetAltitudeAboveGroundLevel and LoGetAltitudeAboveGroundLevel()) or 0
       },
       att     = {
         pitch_rad = self_data.Pitch,
@@ -72,9 +81,24 @@ function LuaExportAfterNextFrame()
       },
       spd     = {
         ias_mps = LoGetIndicatedAirSpeed(),
+        tas_mps = (LoGetTrueAirSpeed and LoGetTrueAirSpeed()) or 0,
+        vvi_mps = (LoGetVerticalVelocity and LoGetVerticalVelocity()) or 0,
         mach    = (LoGetMachNumber and LoGetMachNumber()) or 0
       },
-      hdg_rad = LoGetMagneticYaw()
+      hdg_rad = LoGetMagneticYaw(),
+      aero    = {
+        aoa_rad = (LoGetAngleOfAttack and LoGetAngleOfAttack()) or 0,
+        g       = { x = acc.x, y = acc.y, z = acc.z },
+        ang_vel = { x = angvel.x, y = angvel.y, z = angvel.z }
+      },
+      fuel    = {
+        internal = (LoGetFuelData and LoGetFuelData().fuel_internal) or 0,
+        external = (LoGetFuelData and LoGetFuelData().fuel_external) or 0
+      },
+      eng     = {
+        rpm_pct  = eng1.RPM or 0,
+        fuel_con = eng1.fuel_consumption or 0
+      }
     })
   end)
 
