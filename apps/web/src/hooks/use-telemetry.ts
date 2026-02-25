@@ -33,6 +33,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
   const packetCountRef = useRef(0)
   const ppsRef = useRef(0)
   const lastPacketAtRef = useRef<number | null>(null)
+  const lastHeartbeatAtRef = useRef<number | null>(null)
   const [packetsPerSec, setPacketsPerSec] = useState(0)
   const [lastPacketAt, setLastPacketAt] = useState<number | null>(null)
 
@@ -50,10 +51,18 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
   // Staleness check
   useEffect(() => {
     const interval = setInterval(() => {
+      // Telemetry staleness: connected → dcs_offline
       if (lastPacketAtRef.current && Date.now() - lastPacketAtRef.current > STALENESS_TIMEOUT_MS) {
         setConnectionState((prev) =>
           prev === 'connected' ? 'dcs_offline' : prev
         )
+      }
+      // Heartbeat staleness: dcs_offline → connecting (bridge died)
+      if (lastHeartbeatAtRef.current && Date.now() - lastHeartbeatAtRef.current > STALENESS_TIMEOUT_MS) {
+        setConnectionState((prev) =>
+          prev === 'dcs_offline' ? 'connecting' : prev
+        )
+        setHeartbeat(null)
       }
     }, 1000)
     return () => clearInterval(interval)
@@ -88,6 +97,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
       .on('broadcast', { event: 'heartbeat' }, (msg) => {
         const hb = msg.payload as HeartbeatPacket
         if (hb?.type !== 'heartbeat') return
+        lastHeartbeatAtRef.current = Date.now()
         setHeartbeat(hb)
         if (!hb.dcsActive) {
           setConnectionState('dcs_offline')
@@ -135,6 +145,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
           .on('broadcast', { event: 'heartbeat' }, (msg) => {
             const hb = msg.payload as HeartbeatPacket
             if (hb?.type !== 'heartbeat') return
+            lastHeartbeatAtRef.current = Date.now()
             setHeartbeat(hb)
             if (!hb.dcsActive) {
               setConnectionState('dcs_offline')
