@@ -10,15 +10,26 @@ import { SessionPanel } from './session-panel'
 import { DebugPanel } from './debug-panel'
 import { RawPacketViewer } from './raw-packet-viewer'
 import { AlertOverlay } from './alert-overlay'
-import { RadarDisplay } from './radar-display'
-import { F16Silhouette } from './f16-silhouette'
+import { JarvisLogo } from './jarvis-logo'
+import { MiniTelemetryCard } from './mini-telemetry-card'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
 import { CoachingPanel } from './coaching-panel'
 import type { Session } from '@jarvis-dcs/shared'
 
+// Helper to format telemetry values
+const formatSpeed = (mps: number | null) => mps !== null ? (mps * 1.94384).toFixed(0) : '---'
+const formatAlt = (m: number | null) => m !== null ? (m * 3.28084).toFixed(0) : '---'
+const formatVVI = (mps: number | null) => mps !== null ? (mps * 196.85).toFixed(0) : '---'
+const formatMach = (mach: number | null) => mach !== null ? mach.toFixed(2) : '---'
+const formatTAS = (mps: number | null) => mps !== null ? (mps * 1.94384).toFixed(0) : '---'
+const formatG = (g: number | null) => g !== null ? g.toFixed(1) : '---'
+const formatAoA = (rad: number | null) => rad !== null ? (rad * 180 / Math.PI).toFixed(1) : '---'
+const formatHdg = (rad: number | null) => rad !== null ? ((rad * 180 / Math.PI + 360) % 360).toFixed(0) : '---'
+
 export function Dashboard() {
   const [currentSession, setCurrentSession] = useState<Session | null>(null)
   const [isCreating, setIsCreating] = useState(false)
+  const [sessionError, setSessionError] = useState<string | null>(null)
 
   const sessionId = currentSession?.id ?? null
   const {
@@ -45,14 +56,21 @@ export function Dashboard() {
 
   const handleCreateSession = useCallback(async () => {
     setIsCreating(true)
+    setSessionError(null)
     try {
       const res = await fetch('/api/sessions', { method: 'POST' })
-      if (res.ok) {
-        const session = await res.json()
-        setCurrentSession(session)
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        if (res.status === 401) {
+          throw new Error('Sign in with Google to create a session')
+        }
+        throw new Error(data.error || `Failed (${res.status})`)
       }
+      const session = await res.json()
+      setCurrentSession(session)
     } catch (err) {
       console.error('Failed to create session:', err)
+      setSessionError(err instanceof Error ? err.message : 'Unknown error')
     } finally {
       setIsCreating(false)
     }
@@ -87,6 +105,8 @@ export function Dashboard() {
             onCreateSession={handleCreateSession}
             onDevMode={handleDevMode}
             isCreating={isCreating}
+            sessionError={sessionError}
+            onClearError={() => setSessionError(null)}
           />
 
           {/* ADI */}
@@ -110,7 +130,7 @@ export function Dashboard() {
           />
         </div>
 
-        {/* Center — Radar + Alerts */}
+        {/* Center — JARVIS Logo + Mini Cards */}
         <div className="relative flex items-center justify-center p-6"
           style={{ background: 'radial-gradient(ellipse at 50% 55%, #001b3a 0%, #010a1a 65%)' }}
         >
@@ -120,12 +140,73 @@ export function Dashboard() {
           <div className="corner-bracket corner-bl" />
           <div className="corner-bracket corner-br" />
 
-          {/* Radar display */}
-          <div className="relative">
-            <RadarDisplay />
-            {/* F-16 silhouette overlay */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <F16Silhouette className="w-48 h-48 opacity-40" />
+          {/* Center layout: cards around JARVIS logo */}
+          <div className="relative w-full h-full flex items-center justify-center">
+            {/* Top row: IAS, ALT */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex gap-4">
+              <MiniTelemetryCard
+                label="IAS"
+                value={formatSpeed(telemetry?.spd?.ias_mps ?? null)}
+                unit="KTS"
+                color="accent"
+              />
+              <MiniTelemetryCard
+                label="ALT"
+                value={formatAlt(telemetry?.pos?.alt_m ?? null)}
+                unit="FT"
+                color="primary"
+              />
+            </div>
+
+            {/* Left column: G, AoA */}
+            <div className="absolute left-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
+              <MiniTelemetryCard
+                label="G"
+                value={formatG(telemetry?.aero?.g?.y ?? null)}
+                color="success"
+              />
+              <MiniTelemetryCard
+                label="AOA"
+                value={formatAoA(telemetry?.aero?.aoa_rad ?? null)}
+                unit="°"
+                color="warning"
+              />
+            </div>
+
+            {/* Right column: VVI, HDG */}
+            <div className="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
+              <MiniTelemetryCard
+                label="VVI"
+                value={formatVVI(telemetry?.spd?.vvi_mps ?? null)}
+                unit="FPM"
+                color="primary"
+              />
+              <MiniTelemetryCard
+                label="HDG"
+                value={formatHdg(telemetry?.hdg_rad ?? null)}
+                unit="°"
+                color="accent"
+              />
+            </div>
+
+            {/* Bottom row: Mach, TAS */}
+            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-4">
+              <MiniTelemetryCard
+                label="MACH"
+                value={formatMach(telemetry?.spd?.mach ?? null)}
+                color="success"
+              />
+              <MiniTelemetryCard
+                label="TAS"
+                value={formatTAS(telemetry?.spd?.tas_mps ?? null)}
+                unit="KTS"
+                color="accent"
+              />
+            </div>
+
+            {/* Center JARVIS logo */}
+            <div className="z-10">
+              <JarvisLogo />
             </div>
           </div>
 

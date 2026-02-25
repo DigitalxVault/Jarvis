@@ -9,9 +9,19 @@ interface SessionPanelProps {
   onCreateSession: () => void
   onDevMode: () => void
   isCreating: boolean
+  sessionError: string | null
+  onClearError: () => void
 }
 
-export function SessionPanel({ currentSession, connectionState, onCreateSession, onDevMode, isCreating }: SessionPanelProps) {
+export function SessionPanel({
+  currentSession,
+  connectionState,
+  onCreateSession,
+  onDevMode,
+  isCreating,
+  sessionError,
+  onClearError
+}: SessionPanelProps) {
   return (
     <div className="jarvis-panel">
       <div className="panel-title">▸ SESSION</div>
@@ -31,6 +41,25 @@ export function SessionPanel({ currentSession, connectionState, onCreateSession,
           >
             DEV MODE
           </button>
+
+          {/* Error display */}
+          {sessionError && (
+            <div className="mt-3 border border-jarvis-danger/50 rounded px-3 py-2 bg-jarvis-danger/10">
+              <div className="flex justify-between items-start gap-2">
+                <div className="flex-1">
+                  <div className="text-[10px] text-jarvis-danger tracking-wider mb-1">ERROR</div>
+                  <div className="text-[11px] text-jarvis-danger/90">{sessionError}</div>
+                  <div className="text-[9px] opacity-40 mt-1">Use Dev Mode for testing</div>
+                </div>
+                <button
+                  onClick={onClearError}
+                  className="text-jarvis-danger/50 hover:text-jarvis-danger text-[16px] leading-none cursor-pointer"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+          )}
         </>
       ) : (
         <div className="flex flex-col gap-3 mt-2">
