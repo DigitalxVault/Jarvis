@@ -80,6 +80,7 @@ export function Dashboard() {
         <div className="bg-jarvis-bar border-r border-jarvis-border p-4 flex flex-col gap-3 overflow-y-auto">
           <SessionPanel
             currentSession={currentSession}
+            connectionState={connectionState}
             onCreateSession={handleCreateSession}
             onDevMode={handleDevMode}
             isCreating={isCreating}

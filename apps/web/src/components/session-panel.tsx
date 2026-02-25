@@ -1,16 +1,17 @@
 'use client'
 
-import { useState } from 'react'
 import type { Session } from '@jarvis-dcs/shared'
+import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface SessionPanelProps {
   currentSession: Session | null
+  connectionState: ConnectionState
   onCreateSession: () => void
   onDevMode: () => void
   isCreating: boolean
 }
 
-export function SessionPanel({ currentSession, onCreateSession, onDevMode, isCreating }: SessionPanelProps) {
+export function SessionPanel({ currentSession, connectionState, onCreateSession, onDevMode, isCreating }: SessionPanelProps) {
   return (
     <div className="jarvis-panel">
       <div className="panel-title">▸ SESSION</div>
@@ -52,11 +53,32 @@ export function SessionPanel({ currentSession, onCreateSession, onDevMode, isCre
             </div>
           )}
 
-          {/* Bridge claimed */}
-          {currentSession.bridge_claimed && (
+          {/* Bridge / telemetry status */}
+          {connectionState === 'connecting' && (
+            <div className="text-center">
+              <div className="text-[12px] text-jarvis-warning opacity-70">
+                ◌ WAITING FOR BRIDGE
+              </div>
+            </div>
+          )}
+          {connectionState === 'dcs_offline' && (
+            <div className="text-center">
+              <div className="text-[12px] text-jarvis-success glow-success">
+                ● BRIDGE ONLINE
+              </div>
+            </div>
+          )}
+          {connectionState === 'connected' && (
             <div className="text-center">
               <div className="text-[12px] text-jarvis-success glow-success animate-blink">
-                ● BRIDGE CONNECTED
+                ● TELEMETRY ACTIVE
+              </div>
+            </div>
+          )}
+          {connectionState === 'reconnecting' && (
+            <div className="text-center">
+              <div className="text-[12px] text-jarvis-warning opacity-70">
+                ◌ RECONNECTING...
               </div>
             </div>
           )}
