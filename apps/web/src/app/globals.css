@@ -14,12 +14,6 @@
   --font-mono: 'Courier New', monospace;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   background: var(--color-jarvis-bg);
   color: var(--color-jarvis-primary);

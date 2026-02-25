@@ -57,7 +57,7 @@ export function Dashboard() {
   }, [])
 
   return (
-    <div className="w-screen h-screen flex flex-col">
+    <div className="w-full h-screen flex flex-col">
       {/* Top Bar */}
       <TopBar connectionState={connectionState} telemetry={telemetry} />
 
