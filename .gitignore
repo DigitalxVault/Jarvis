@@ -28,6 +28,9 @@ Thumbs.db
 # Turbo
 .turbo/
 
+# Playwright MCP
+.playwright-mcp/
+
 # Debug
 npm-debug.log*
 pnpm-debug.log*
