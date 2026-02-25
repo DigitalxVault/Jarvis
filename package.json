@@ -5,10 +5,12 @@
     "dev:bridge": "pnpm --filter @jarvis-dcs/bridge dev",
     "dev:web": "pnpm --filter @jarvis-dcs/web dev",
     "build": "pnpm -r build",
-    "typecheck": "pnpm -r typecheck"
+    "typecheck": "pnpm -r typecheck",
+    "smoke:bridge": "pnpm --filter @jarvis-dcs/bridge start -- --channel session:dev",
+    "smoke:web": "pnpm --filter @jarvis-dcs/web dev"
   },
   "engines": {
-    "node": "22.x"
+    "node": ">=22"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

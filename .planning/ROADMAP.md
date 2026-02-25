@@ -10,12 +10,12 @@ JARVIS Phase 1 proves a single hypothesis: live flight telemetry from DCS World 
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Shared Foundation** - Monorepo scaffold, shared TypeScript types, and Supabase project initialised
-- [ ] **Phase 2: Bridge Core** - UDP receiver, Supabase publisher, publish queue, and metrics logging operational
-- [ ] **Phase 3: DCS Export.lua** - Lua exporter running at 10 Hz with dofile() chaining, nil guards, and confirmed UDP delivery
-- [ ] **Phase 4: Web UI Foundation** - Next.js app with Google OAuth, Supabase client, and raw channel subscription logging events
-- [ ] **Phase 5: Session Pairing** - Pairing code flow end-to-end: web generates code, bridge claims it, channel scoping enforced
-- [ ] **Phase 6: Telemetry UI** - IAS/ALT/HDG cards, connection status indicator, debug panel, and JARVIS visual theme live
+- [x] **Phase 1: Shared Foundation** - Monorepo scaffold, shared TypeScript types, and Supabase project initialised
+- [x] **Phase 2: Bridge Core** - UDP receiver, Supabase publisher, publish queue, and metrics logging operational
+- [x] **Phase 3: DCS Export.lua** - Lua exporter running at 10 Hz with dofile() chaining, nil guards, and confirmed UDP delivery
+- [x] **Phase 4: Web UI Foundation** - Next.js app with Google OAuth, Supabase client, and raw channel subscription logging events
+- [x] **Phase 5: Session Pairing** - Pairing code flow end-to-end: web generates code, bridge claims it, channel scoping enforced
+- [x] **Phase 6: Telemetry UI** - IAS/ALT/HDG cards, connection status indicator, debug panel, and JARVIS visual theme live
 - [ ] **Phase 7: Resilience and Stability** - Bridge auto-reconnect, DCS staleness watchdog, tab visibility re-subscribe, and 20-minute session validation
 
 ## Phase Details
@@ -30,12 +30,12 @@ JARVIS Phase 1 proves a single hypothesis: live flight telemetry from DCS World 
   2. `TelemetryPacket` TypeScript type and channel naming helpers are importable in both bridge and web without copy-paste
   3. Supabase project is initialised with a `sessions` table, Realtime enabled, and environment variables documented in `.env.example`
   4. A test broadcast message sent via Supabase dashboard appears in the JavaScript console of a browser subscribed to the channel
-**Plans**: TBD (3-4 plans)
+**Plans**: 3/3 complete
 
 Plans:
-- [ ] 01-01: Initialise pnpm workspace monorepo with apps/web, packages/bridge, packages/shared directory structure
-- [ ] 01-02: Define TelemetryPacket type and channel naming helpers in packages/shared; configure TypeScript project references
-- [ ] 01-03: Create Supabase project, create sessions table schema, enable Realtime, document all required env vars in .env.example
+- [x] 01-01: Initialise pnpm workspace monorepo with apps/web, packages/bridge, packages/shared directory structure
+- [x] 01-02: Define TelemetryPacket type and channel naming helpers in packages/shared; configure TypeScript project references
+- [x] 01-03: Create Supabase project, create sessions table schema, enable Realtime, document all required env vars in .env.example
 
 ---
 
@@ -51,12 +51,12 @@ Plans:
   3. Bridge downsamples from 10 Hz UDP input to 2-5 Hz Supabase publishes — confirmed by counting log entries over 10 seconds
   4. Bridge logs pairing success/failure, receive packet count, publish success/failure with retry count, and queue size on every publish cycle
   5. Bridge does not crash when the UDP socket receives malformed JSON or an empty payload
-**Plans**: TBD (3-4 plans)
+**Plans**: 3/3 complete
 
 Plans:
-- [ ] 02-01: Implement UDP receiver using node:dgram on port 7779 with JSON parse, recv buffer sizing, and error handling
-- [ ] 02-02: Implement Supabase Broadcast publisher with bounded publish queue (drop-oldest, max 100), 2-5 Hz downsampling, and retry logic
-- [ ] 02-03: Add metrics logging (packet count, publish count, queue size, last publish timestamp) and uncaughtException handler / PM2 config
+- [x] 02-01: Implement UDP receiver using node:dgram on port 7779 with JSON parse, recv buffer sizing, and error handling
+- [x] 02-02: Implement Supabase Broadcast publisher with bounded publish queue (drop-oldest, max 100), 2-5 Hz downsampling, and retry logic
+- [x] 02-03: Add metrics logging (packet count, publish count, queue size, last publish timestamp) and uncaughtException handler / PM2 config
 
 ---
 
@@ -65,17 +65,17 @@ Plans:
 **Depends on**: Phase 2 (bridge must be running to receive packets)
 **Requirements**: CONN-01
 **Test Cases**: D2 (export rate confirmed), D3 (packet loss handling)
-**Research flag**: Empirically validate DCS JSON.lua path (`Scripts\JSON.lua` vs `net.lua2json()`) before proceeding; have pure-Lua fallback encoder ready.
+**Research flag**: Resolved — pure-Lua JSON encoder used (no dependency on DCS JSON.lua).
 **Success Criteria** (what must be TRUE):
   1. DCS mission running with F-16C Viper produces UDP packets on port 7779 that appear in the bridge log at approximately 10 Hz
   2. IAS, ALT, and HDG values in the UDP packets are in SI units (m/s, metres, radians) as specified in the wire format — not already converted
   3. Disabling Export.lua and re-enabling it during a running DCS mission does not crash DCS or break the export chain for other tools (TacView/SRS compatibility)
   4. DCS mission restart or entering spectator mode does not crash the export chain (nil guard and pcall confirmed working)
-**Plans**: TBD (2-3 plans)
+**Plans**: 2/2 complete
 
 Plans:
-- [ ] 03-01: Write jarvis_export.lua using LuaExportBeforeNextFrame + LoGetModelTime() gating, dofile() chaining pattern, pcall wrapping, and nil guard on LoGetSelfData()
-- [ ] 03-02: Validate JSON.lua path on target DCS installation; implement unit conversion wire format spec (m/s, m, radians); confirm measured packet rate at bridge matches 10 Hz target
+- [x] 03-01: Write jarvis_export.lua using LuaExportBeforeNextFrame + LoGetModelTime() gating, dofile() chaining pattern, pcall wrapping, and nil guard on LoGetSelfData()
+- [x] 03-02: Validate JSON.lua path on target DCS installation; implement unit conversion wire format spec (m/s, m, radians); confirm measured packet rate at bridge matches 10 Hz target
 
 ---
 
@@ -90,12 +90,12 @@ Plans:
   2. Signed-in user can create a new session, and the session row appears in the Supabase `sessions` table with the correct user ID
   3. User can view a list of past sessions with timestamps, status (active/ended), and session ID
   4. Raw Supabase Broadcast events on the session channel appear in the browser console (confirming the subscription path works before UI components are added)
-**Plans**: TBD (3-4 plans)
+**Plans**: 3/3 complete
 
 Plans:
-- [ ] 04-01: Scaffold Next.js 15 App Router project in apps/web; configure NextAuth.js v5 with Google provider; set AUTH_SECRET and all required Vercel env vars
-- [ ] 04-02: Implement /api/sessions POST route (create session, write to Supabase sessions table); implement session list page showing past sessions
-- [ ] 04-03: Implement Supabase client-side subscription in a Client Component; log raw broadcast events to console; confirm events arrive from bridge smoke test
+- [x] 04-01: Scaffold Next.js 15 App Router project in apps/web; configure NextAuth.js v5 with Google provider; set AUTH_SECRET and all required Vercel env vars
+- [x] 04-02: Implement /api/sessions POST route (create session, write to Supabase sessions table); implement session list page showing past sessions
+- [x] 04-03: Implement Supabase client-side subscription in a Client Component; log raw broadcast events to console; confirm events arrive from bridge smoke test
 
 ---
 
@@ -109,11 +109,11 @@ Plans:
   2. Bridge authenticates with the pairing code via `/api/bridge/claim` and receives a `channelName` and `bridgeToken` scoped to that session
   3. Telemetry published by the bridge appears only on the paired session's channel — a second session's subscriber receives no packets from Bridge A
   4. A claimed pairing code cannot be reused — attempting to claim it a second time is rejected
-**Plans**: TBD (2-3 plans)
+**Plans**: 2/2 complete
 
 Plans:
-- [ ] 05-01: Implement pairing code generation with 5-min TTL, 6-char code, DB-level UNIQUE constraint; display code on session creation page
-- [ ] 05-02: Implement /api/bridge/claim route; create bridge_tokens table; implement bridge claim.ts module; validate session scoping end-to-end (D6)
+- [x] 05-01: Implement pairing code generation with 5-min TTL, 6-char code, DB-level UNIQUE constraint; display code on session creation page
+- [x] 05-02: Implement /api/bridge/claim route; create bridge_tokens table; implement bridge claim.ts module; validate session scoping end-to-end (D6)
 
 ---
 
@@ -128,12 +128,12 @@ Plans:
   3. Debug panel shows last packet time, smoothed packets/sec, current session ID, and Supabase subscription status — all updating live
   4. Raw packet viewer shows the last N telemetry packets as expandable JSON entries
   5. Dashboard uses JARVIS HUD visual theme: dark background, high-tech card styling, HUD-style typography
-**Plans**: TBD (3-4 plans)
+**Plans**: 3/3 complete
 
 Plans:
-- [ ] 06-01: Implement TelemetryCard components (IAS/ALT/HDG) with correct unit display (knots/feet/degrees) and JARVIS theme using shadcn/ui + Tailwind CSS v4
-- [ ] 06-02: Implement ConnectionStatus component (4-state: Connected / DCS Offline / Reconnecting / Offline) driven by bridge heartbeat
-- [ ] 06-03: Implement DebugPanel (packets/sec smoothed, last packet timestamp, session ID, subscription status) and raw packet viewer (last N packets as expandable JSON)
+- [x] 06-01: Implement TelemetryCard components (IAS/ALT/HDG) with correct unit display (knots/feet/degrees) and JARVIS theme using shadcn/ui + Tailwind CSS v4
+- [x] 06-02: Implement ConnectionStatus component (4-state: Connected / DCS Offline / Reconnecting / Offline) driven by bridge heartbeat
+- [x] 06-03: Implement DebugPanel (packets/sec smoothed, last packet timestamp, session ID, subscription status) and raw packet viewer (last N packets as expandable JSON)
 
 ---
 
@@ -147,30 +147,30 @@ Plans:
   2. When DCS stops sending data, the bridge reports "No telemetry" status within 3 seconds and the dashboard shows DCS Offline (D5)
   3. When the browser tab is backgrounded and restored, the Supabase channel re-subscribes and telemetry resumes without a page refresh (RESIL-04)
   4. A 20-minute DCS flight session completes with no memory growth trend, no runaway log files, and all six test cases D1-D6 passing
-**Plans**: TBD (2-3 plans)
+**Plans**: 2 plans
 
 Plans:
-- [ ] 07-01: Implement bridge exponential backoff reconnect, publish queue overflow handling, 1 Hz bridge heartbeat ({dcsActive, packetCount, queueSize}), and DCS staleness watchdog (3s timeout)
-- [ ] 07-02: Implement Page Visibility API disconnect/reconnect in web dashboard; run 20-minute stability test with heap snapshots at 0/5/20 min; validate D1-D6 pass
+- [ ] 07-01-PLAN.md — Bridge resilience: enforce exponential backoff, add fetch timeout, fix DCS staleness watchdog, add memory instrumentation
+- [ ] 07-02-PLAN.md — Web resilience: Supabase heartbeatCallback + worker config, deduplicate channel setup, tab visibility re-subscribe, stability checkpoint
 
 ---
 
 ## Progress
 
-**Execution Order:** 1 → 2 → 3 (parallel with 4) → 5 → 6 → 7
+**Execution Order:** 1 -> 2 -> 3 (parallel with 4) -> 5 -> 6 -> 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Shared Foundation | 0/3 | Not started | - |
-| 2. Bridge Core | 0/3 | Not started | - |
-| 3. DCS Export.lua | 0/2 | Not started | - |
-| 4. Web UI Foundation | 0/3 | Not started | - |
-| 5. Session Pairing | 0/2 | Not started | - |
-| 6. Telemetry UI | 0/3 | Not started | - |
-| 7. Resilience and Stability | 0/2 | Not started | - |
+| 1. Shared Foundation | 3/3 | Complete | 2026-02-25 |
+| 2. Bridge Core | 3/3 | Complete | 2026-02-25 |
+| 3. DCS Export.lua | 2/2 | Complete | 2026-02-25 |
+| 4. Web UI Foundation | 3/3 | Complete | 2026-02-25 |
+| 5. Session Pairing | 2/2 | Complete | 2026-02-25 |
+| 6. Telemetry UI | 3/3 | Complete | 2026-02-25 |
+| 7. Resilience and Stability | 0/2 | Planned | - |
 
 **Parallelization note:** After Phase 2 is complete, Phase 3 (DCS Export.lua) and Phase 4 (Web UI Foundation) have no dependency on each other and can be worked in parallel.
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-02-25 after initial roadmap creation*
+*Last updated: 2026-02-25 -- Phase 7 planned (2 plans in 1 wave)*

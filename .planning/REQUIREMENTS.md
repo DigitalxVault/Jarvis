@@ -9,36 +9,36 @@ Requirements for Phase 1 prototype. Each maps to roadmap phases.
 
 ### Connectivity
 
-- [ ] **CONN-01**: DCS Export.lua sends JSON telemetry at 10Hz via UDP to localhost with dofile() chaining for compatibility with TacView/SRS/Helios
-- [ ] **CONN-02**: Node.js bridge receives UDP packets, downsamples to 2-5Hz, and publishes to Supabase Realtime Broadcast via REST API
-- [ ] **CONN-03**: Web UI subscribes to session-scoped Supabase Realtime channel and receives telemetry broadcasts in real-time
-- [ ] **CONN-04**: Session pairing: web generates short-lived 6-char code, bridge claims via Next.js API route, receives scoped channelName + bridgeToken
+- [x] **CONN-01**: DCS Export.lua sends JSON telemetry at 10Hz via UDP to localhost with dofile() chaining for compatibility with TacView/SRS/Helios
+- [x] **CONN-02**: Node.js bridge receives UDP packets, downsamples to 2-5Hz, and publishes to Supabase Realtime Broadcast via REST API
+- [x] **CONN-03**: Web UI subscribes to session-scoped Supabase Realtime channel and receives telemetry broadcasts in real-time
+- [x] **CONN-04**: Session pairing: web generates short-lived 6-char code, bridge claims via Next.js API route, receives scoped channelName + bridgeToken
 
 ### Telemetry Display
 
-- [ ] **TELEM-01**: IAS card displays live indicated airspeed converted to knots
-- [ ] **TELEM-02**: ALT card displays live altitude MSL converted to feet
-- [ ] **TELEM-03**: HDG card displays live heading converted to degrees
-- [ ] **TELEM-04**: Dashboard uses JARVIS HUD visual theme (dark background, high-tech card styling, HUD-style typography)
+- [x] **TELEM-01**: IAS card displays live indicated airspeed converted to knots
+- [x] **TELEM-02**: ALT card displays live altitude MSL converted to feet
+- [x] **TELEM-03**: HDG card displays live heading converted to degrees
+- [x] **TELEM-04**: Dashboard uses JARVIS HUD visual theme (dark background, high-tech card styling, HUD-style typography)
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can sign in with Google via NextAuth.js v5, session persists across browser refresh
-- [ ] **AUTH-02**: Authenticated user can create a live session and receive a 6-character pairing code displayed on screen
-- [ ] **AUTH-03**: User can view a list of past sessions with timestamps, status (active/ended), and session ID
+- [x] **AUTH-01**: User can sign in with Google via NextAuth.js v5, session persists across browser refresh
+- [x] **AUTH-02**: Authenticated user can create a live session and receive a 6-character pairing code displayed on screen
+- [x] **AUTH-03**: User can view a list of past sessions with timestamps, status (active/ended), and session ID
 
 ### Resilience
 
-- [ ] **RESIL-01**: Connection status indicator displays at least 3 states: Connected, Reconnecting, Offline
+- [x] **RESIL-01**: Connection status indicator displays at least 3 states: Connected, Reconnecting, Offline
 - [ ] **RESIL-02**: Bridge auto-reconnects to Supabase with exponential backoff after internet loss; telemetry resumes without creating duplicate sessions
 - [ ] **RESIL-03**: Bridge staleness watchdog detects DCS exporter going silent and reports "No telemetry" status within N seconds
 - [ ] **RESIL-04**: Web UI re-subscribes to Supabase Realtime channel when browser tab returns from background (Page Visibility API)
 
 ### Debug
 
-- [ ] **DEBUG-01**: Web debug panel shows last packet time, packets/sec (smoothed), session ID, and Supabase subscription status
-- [ ] **DEBUG-02**: Bridge logs pairing success/failure, receive packet count, publish success/failure + retry count, and queue size to console
-- [ ] **DEBUG-03**: Web raw packet viewer shows last N telemetry packets as expandable JSON entries
+- [x] **DEBUG-01**: Web debug panel shows last packet time, packets/sec (smoothed), session ID, and Supabase subscription status
+- [x] **DEBUG-02**: Bridge logs pairing success/failure, receive packet count, publish success/failure + retry count, and queue size to console
+- [x] **DEBUG-03**: Web raw packet viewer shows last N telemetry packets as expandable JSON entries
 
 ## v2 Requirements
 
@@ -92,30 +92,31 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONN-01 | Phase 3 - DCS Export.lua | Pending |
-| CONN-02 | Phase 2 - Bridge Core | Pending |
-| CONN-03 | Phase 4 - Web UI Foundation | Pending |
-| CONN-04 | Phase 5 - Session Pairing | Pending |
-| TELEM-01 | Phase 6 - Telemetry UI | Pending |
-| TELEM-02 | Phase 6 - Telemetry UI | Pending |
-| TELEM-03 | Phase 6 - Telemetry UI | Pending |
-| TELEM-04 | Phase 6 - Telemetry UI | Pending |
-| AUTH-01 | Phase 4 - Web UI Foundation | Pending |
-| AUTH-02 | Phase 5 - Session Pairing | Pending |
-| AUTH-03 | Phase 4 - Web UI Foundation | Pending |
-| RESIL-01 | Phase 6 - Telemetry UI | Pending |
+| CONN-01 | Phase 3 - DCS Export.lua | Complete |
+| CONN-02 | Phase 2 - Bridge Core | Complete |
+| CONN-03 | Phase 4 - Web UI Foundation | Complete |
+| CONN-04 | Phase 5 - Session Pairing | Complete |
+| TELEM-01 | Phase 6 - Telemetry UI | Complete |
+| TELEM-02 | Phase 6 - Telemetry UI | Complete |
+| TELEM-03 | Phase 6 - Telemetry UI | Complete |
+| TELEM-04 | Phase 6 - Telemetry UI | Complete |
+| AUTH-01 | Phase 4 - Web UI Foundation | Complete |
+| AUTH-02 | Phase 5 - Session Pairing | Complete |
+| AUTH-03 | Phase 4 - Web UI Foundation | Complete |
+| RESIL-01 | Phase 6 - Telemetry UI | Complete |
 | RESIL-02 | Phase 7 - Resilience and Stability | Pending |
 | RESIL-03 | Phase 7 - Resilience and Stability | Pending |
 | RESIL-04 | Phase 7 - Resilience and Stability | Pending |
-| DEBUG-01 | Phase 6 - Telemetry UI | Pending |
-| DEBUG-02 | Phase 2 - Bridge Core | Pending |
-| DEBUG-03 | Phase 6 - Telemetry UI | Pending |
+| DEBUG-01 | Phase 6 - Telemetry UI | Complete |
+| DEBUG-02 | Phase 2 - Bridge Core | Complete |
+| DEBUG-03 | Phase 6 - Telemetry UI | Complete |
 
 **Coverage:**
 - v1 requirements: 18 total
-- Mapped to phases: 18
+- Complete: 15
+- Pending: 3 (RESIL-02, RESIL-03, RESIL-04 — Phase 7)
 - Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-25*
-*Last updated: 2026-02-25 after roadmap creation — all 18 requirements mapped*
+*Last updated: 2026-02-25 — 15/18 requirements marked complete (Phases 1-6 built outside GSD)*
