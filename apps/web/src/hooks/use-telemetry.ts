@@ -68,6 +68,59 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
     return () => clearInterval(interval)
   }, [])
 
+  const handleTelemetry = useCallback((msg: { payload: unknown }) => {
+    const packet = msg.payload as TelemetryPacket
+    setTelemetry(packet)
+    packetCountRef.current++
+    const now = Date.now()
+    lastPacketAtRef.current = now
+    setLastPacketAt(now)
+    setConnectionState('connected')
+    setRawPackets((prev) => {
+      const next = [...prev, packet]
+      return next.length > MAX_RAW_PACKETS ? next.slice(-MAX_RAW_PACKETS) : next
+    })
+  }, [])
+
+  const handleHeartbeat = useCallback((msg: { payload: unknown }) => {
+    const hb = msg.payload as HeartbeatPacket
+    if (hb?.type !== 'heartbeat') return
+    lastHeartbeatAtRef.current = Date.now()
+    setHeartbeat(hb)
+    if (!hb.dcsActive) {
+      setConnectionState('dcs_offline')
+    }
+  }, [])
+
+  const handleStatus = useCallback((status: string) => {
+    setSubscriptionStatus(status)
+    if (status === 'SUBSCRIBED') {
+      setConnectionState((prev) => (prev === 'connecting' ? 'connecting' : prev))
+    }
+    if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+      setConnectionState('reconnecting')
+    }
+    if (status === 'CLOSED') {
+      setConnectionState('offline')
+    }
+  }, [])
+
+  const setupChannel = useCallback((channelName: string) => {
+    if (channelRef.current) {
+      supabase.removeChannel(channelRef.current)
+      channelRef.current = null
+    }
+
+    const channel = supabase
+      .channel(channelName)
+      .on('broadcast', { event: 'telemetry' }, handleTelemetry)
+      .on('broadcast', { event: 'heartbeat' }, handleHeartbeat)
+      .subscribe(handleStatus)
+
+    channelRef.current = channel
+    return channel
+  }, [handleTelemetry, handleHeartbeat, handleStatus])
+
   // Subscribe to channel
   useEffect(() => {
     if (!sessionId) {
@@ -79,82 +132,11 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
     setSubscriptionStatus('subscribing')
 
     const channelName = `session:${sessionId}`
-    const channel = supabase
-      .channel(channelName)
-      .on('broadcast', { event: 'telemetry' }, (msg) => {
-        const packet = msg.payload as TelemetryPacket
-        setTelemetry(packet)
-        packetCountRef.current++
-        const now = Date.now()
-        lastPacketAtRef.current = now
-        setLastPacketAt(now)
-        setConnectionState('connected')
-        setRawPackets((prev) => {
-          const next = [...prev, packet]
-          return next.length > MAX_RAW_PACKETS ? next.slice(-MAX_RAW_PACKETS) : next
-        })
-      })
-      .on('broadcast', { event: 'heartbeat' }, (msg) => {
-        const hb = msg.payload as HeartbeatPacket
-        if (hb?.type !== 'heartbeat') return
-        lastHeartbeatAtRef.current = Date.now()
-        setHeartbeat(hb)
-        if (!hb.dcsActive) {
-          setConnectionState('dcs_offline')
-        }
-      })
-      .subscribe((status) => {
-        setSubscriptionStatus(status)
-        if (status === 'SUBSCRIBED') {
-          setConnectionState((prev) => (prev === 'connecting' ? 'connecting' : prev))
-        }
-        if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-          setConnectionState('reconnecting')
-        }
-        if (status === 'CLOSED') {
-          setConnectionState('offline')
-        }
-      })
+    setupChannel(channelName)
 
-    channelRef.current = channel
-
-    // Tab visibility: unsubscribe when hidden, resubscribe when visible
     const handleVisibility = () => {
-      if (document.hidden) {
-        supabase.removeChannel(channel)
-        channelRef.current = null
-        setSubscriptionStatus('paused')
-      } else {
-        // Resubscribe by re-running this effect
-        // We use a simple approach: remove and re-add
-        const newChannel = supabase
-          .channel(channelName)
-          .on('broadcast', { event: 'telemetry' }, (msg) => {
-            const packet = msg.payload as TelemetryPacket
-            setTelemetry(packet)
-            packetCountRef.current++
-            const now = Date.now()
-            lastPacketAtRef.current = now
-            setLastPacketAt(now)
-            setConnectionState('connected')
-            setRawPackets((prev) => {
-              const next = [...prev, packet]
-              return next.length > MAX_RAW_PACKETS ? next.slice(-MAX_RAW_PACKETS) : next
-            })
-          })
-          .on('broadcast', { event: 'heartbeat' }, (msg) => {
-            const hb = msg.payload as HeartbeatPacket
-            if (hb?.type !== 'heartbeat') return
-            lastHeartbeatAtRef.current = Date.now()
-            setHeartbeat(hb)
-            if (!hb.dcsActive) {
-              setConnectionState('dcs_offline')
-            }
-          })
-          .subscribe((status) => {
-            setSubscriptionStatus(status)
-          })
-        channelRef.current = newChannel
+      if (!document.hidden) {
+        setupChannel(channelName)
       }
     }
     document.addEventListener('visibilitychange', handleVisibility)
@@ -163,10 +145,10 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
       document.removeEventListener('visibilitychange', handleVisibility)
       if (channelRef.current) {
         supabase.removeChannel(channelRef.current)
+        channelRef.current = null
       }
-      channelRef.current = null
     }
-  }, [sessionId])
+  }, [sessionId, setupChannel])
 
   return {
     telemetry,
