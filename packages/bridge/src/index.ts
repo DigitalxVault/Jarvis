@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import { parseArgs } from 'node:util'
+import { writeHeapSnapshot } from 'node:v8'
 import { getChannelName } from '@jarvis-dcs/shared'
 import { createUdpListener } from './udp.js'
 import { SupabasePublisher } from './publisher.js'
@@ -53,6 +54,16 @@ async function main() {
 
   metrics.start()
   publisher.start()
+
+  const snapshotAt = (label: string, delayMs: number) => {
+    setTimeout(() => {
+      const path = writeHeapSnapshot()
+      console.log(`[BRIDGE] Heap snapshot (${label}): ${path}`)
+    }, delayMs)
+  }
+  snapshotAt('t=0', 0)
+  snapshotAt('t=5min', 5 * 60_000)
+  snapshotAt('t=20min', 20 * 60_000)
 
   console.log('[BRIDGE] Ready. Waiting for DCS telemetry on UDP...')
 

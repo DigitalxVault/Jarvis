@@ -1,16 +1,15 @@
-import { METRICS_LOG_INTERVAL_MS, STALENESS_TIMEOUT_MS } from '@jarvis-dcs/shared'
+import { METRICS_LOG_INTERVAL_MS } from '@jarvis-dcs/shared'
 
 class Metrics {
   udpReceived = 0
   published = 0
   errors = 0
   private lastLogAt = Date.now()
-  private lastUdpAt = 0
+  private wasDcsActive = true
   private logTimer: ReturnType<typeof setInterval> | null = null
 
   recordUdpPacket(): void {
     this.udpReceived++
-    this.lastUdpAt = Date.now()
   }
 
   recordPublish(): void {
@@ -21,10 +20,11 @@ class Metrics {
     this.errors++
   }
 
-  recordDcsSilent(): void {
-    // Only log once per staleness period
-    if (Date.now() - this.lastUdpAt > STALENESS_TIMEOUT_MS * 2) return
-    console.warn('[METRICS] DCS_SILENT — no UDP packet for 3s')
+  recordDcsSilent(dcsActive: boolean): void {
+    if (!dcsActive && this.wasDcsActive) {
+      console.warn('[BRIDGE] DCS_SILENT - no UDP packet for 3s')
+    }
+    this.wasDcsActive = dcsActive
   }
 
   start(): void {
@@ -38,8 +38,10 @@ class Metrics {
   private log(): void {
     const elapsed = (Date.now() - this.lastLogAt) / 1000
     const udpRate = ((this.udpReceived) / Math.max(elapsed, 1)).toFixed(1)
+    const { heapUsed, rss } = process.memoryUsage()
+    const mb = (n: number) => (n / 1024 / 1024).toFixed(1)
     console.log(
-      `[METRICS] udp=${this.udpReceived} pub=${this.published} err=${this.errors} rate=${udpRate}/s`
+      `[METRICS] udp=${this.udpReceived} pub=${this.published} err=${this.errors} rate=${udpRate}/s heap=${mb(heapUsed)}MB rss=${mb(rss)}MB`
     )
     this.lastLogAt = Date.now()
     this.udpReceived = 0
