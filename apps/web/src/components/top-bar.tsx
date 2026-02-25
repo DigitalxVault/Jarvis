@@ -52,10 +52,10 @@ export function TopBar({ connectionState, telemetry }: TopBarProps) {
     >
       {/* Logo */}
       <div>
-        <div className="text-[13px] font-bold glow-text" style={{ letterSpacing: '5px' }}>
+        <div className="text-[16px] font-bold glow-text" style={{ letterSpacing: '5px' }}>
           J·A·R·V·I·S
         </div>
-        <div className="text-[8px] opacity-50" style={{ letterSpacing: '3px' }}>
+        <div className="text-[11px] opacity-50" style={{ letterSpacing: '3px' }}>
           DCS TELEMETRY // PHASE 1
         </div>
       </div>
@@ -64,15 +64,15 @@ export function TopBar({ connectionState, telemetry }: TopBarProps) {
       <div className="flex gap-6">
         <div className="text-center">
           <div className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">{ias}</div>
-          <div className="text-[8px] opacity-50" style={{ letterSpacing: '2px' }}>IAS (KT)</div>
+          <div className="text-[11px] opacity-50" style={{ letterSpacing: '2px' }}>IAS (KT)</div>
         </div>
         <div className="text-center">
           <div className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">{alt}</div>
-          <div className="text-[8px] opacity-50" style={{ letterSpacing: '2px' }}>ALT (FT)</div>
+          <div className="text-[11px] opacity-50" style={{ letterSpacing: '2px' }}>ALT (FT)</div>
         </div>
         <div className="text-center">
           <div className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">{hdg}°</div>
-          <div className="text-[8px] opacity-50" style={{ letterSpacing: '2px' }}>HDG</div>
+          <div className="text-[11px] opacity-50" style={{ letterSpacing: '2px' }}>HDG</div>
         </div>
       </div>
 
@@ -81,7 +81,7 @@ export function TopBar({ connectionState, telemetry }: TopBarProps) {
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
           <div className="text-xl font-bold glow-text tabular-nums">{clock}</div>
-          <div className="text-[8px] opacity-50" style={{ letterSpacing: '2px' }}>{date}</div>
+          <div className="text-[11px] opacity-50" style={{ letterSpacing: '2px' }}>{date}</div>
         </div>
       </div>
     </div>

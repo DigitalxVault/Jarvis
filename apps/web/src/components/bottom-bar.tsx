@@ -39,7 +39,7 @@ export function BottomBar({ connectionState }: BottomBarProps) {
 
   return (
     <div
-      className="bg-jarvis-bar border-t border-jarvis-border flex items-center justify-between px-5 h-[45px] text-[9px]"
+      className="bg-jarvis-bar border-t border-jarvis-border flex items-center justify-between px-5 h-[45px] text-[12px]"
       style={{ letterSpacing: '1px' }}
     >
       <div className="flex items-center gap-4">
@@ -49,7 +49,7 @@ export function BottomBar({ connectionState }: BottomBarProps) {
 
       {/* Ticker */}
       <div className="flex-1 mx-4 overflow-hidden whitespace-nowrap">
-        <div className="inline-block ticker-scroll text-jarvis-primary/25">
+        <div className="inline-block ticker-scroll text-jarvis-primary/60">
           // JARVIS DCS TELEMETRY DASHBOARD // PHASE 1 PROTOTYPE // REALTIME BROADCAST VIA SUPABASE //
           UDP → BRIDGE → CLOUD → WEB // LATENCY TARGET &lt;500MS //
         </div>

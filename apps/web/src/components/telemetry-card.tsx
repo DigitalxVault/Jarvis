@@ -23,7 +23,7 @@ export function TelemetryCard({ label, value, unit, decimals = 0, formatFn }: Te
         {displayValue}
       </div>
       <div
-        className="text-[8px] opacity-50 mt-2"
+        className="text-[11px] opacity-50 mt-2"
         style={{ letterSpacing: '2px' }}
       >
         {unit}

@@ -130,7 +130,7 @@ body::after {
 
 /* ── Panel label ── */
 .panel-title {
-  font-size: 7px;
+  font-size: 10px;
   letter-spacing: 3px;
   opacity: 0.5;
   text-transform: uppercase;

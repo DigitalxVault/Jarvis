@@ -109,7 +109,7 @@ export function Dashboard() {
           {/* Status alert */}
           {connectionState === 'connected' && (
             <div
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-jarvis-accent glow-accent animate-blink whitespace-nowrap"
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[13px] text-jarvis-accent glow-accent animate-blink whitespace-nowrap"
               style={{ letterSpacing: '3px' }}
             >
               ● SYSTEM NOMINAL // TELEMETRY ACTIVE
@@ -117,7 +117,7 @@ export function Dashboard() {
           )}
           {connectionState === 'offline' && !currentSession && (
             <div
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[10px] text-jarvis-muted whitespace-nowrap"
+              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[13px] text-jarvis-muted whitespace-nowrap"
               style={{ letterSpacing: '3px' }}
             >
               CREATE A SESSION TO BEGIN

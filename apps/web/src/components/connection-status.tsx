@@ -37,7 +37,7 @@ export function ConnectionStatus({ state }: { state: ConnectionState }) {
     <div className="flex items-center gap-2">
       <span className={`status-dot ${config.dotClass}`} />
       <span
-        className={`text-[9px] font-bold ${config.color}`}
+        className={`text-[12px] font-bold ${config.color}`}
         style={{ letterSpacing: '2px' }}
       >
         {config.label}

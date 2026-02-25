@@ -15,7 +15,7 @@ export function DebugPanel({ packetsPerSec, lastPacketAt, sessionId, subscriptio
   return (
     <div className="jarvis-panel">
       <div className="panel-title">▸ DEBUG PANEL</div>
-      <div className="flex flex-col gap-2 text-[9px]">
+      <div className="flex flex-col gap-2 text-[12px]">
         <div className="flex justify-between">
           <span className="opacity-45">PKTS/SEC</span>
           <span className="text-jarvis-accent glow-accent">{packetsPerSec.toFixed(1)}</span>
@@ -26,7 +26,7 @@ export function DebugPanel({ packetsPerSec, lastPacketAt, sessionId, subscriptio
         </div>
         <div className="flex justify-between">
           <span className="opacity-45">SESSION</span>
-          <span className="text-[8px] font-mono opacity-70">
+          <span className="text-[11px] font-mono opacity-70">
             {sessionId ? sessionId.slice(0, 8) + '...' : 'NONE'}
           </span>
         </div>
