@@ -87,6 +87,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
       })
       .on('broadcast', { event: 'heartbeat' }, (msg) => {
         const hb = msg.payload as HeartbeatPacket
+        if (hb?.type !== 'heartbeat') return
         setHeartbeat(hb)
         if (!hb.dcsActive) {
           setConnectionState('dcs_offline')
@@ -133,6 +134,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
           })
           .on('broadcast', { event: 'heartbeat' }, (msg) => {
             const hb = msg.payload as HeartbeatPacket
+            if (hb?.type !== 'heartbeat') return
             setHeartbeat(hb)
             if (!hb.dcsActive) {
               setConnectionState('dcs_offline')
