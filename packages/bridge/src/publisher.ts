@@ -19,6 +19,7 @@ export class SupabasePublisher {
   private heartbeatTimer: ReturnType<typeof setInterval> | null = null
   private lastUdpAt = 0
   private backoffMs = BASE_BACKOFF_MS
+  private backoffUntilMs = 0
   private totalPublished = 0
 
   constructor(supabaseUrl: string, apiKey: string, channelTopic: string) {
@@ -48,6 +49,7 @@ export class SupabasePublisher {
   }
 
   private async publishLatest(): Promise<void> {
+    if (Date.now() < this.backoffUntilMs) return
     // Take the latest packet from queue (skip older ones)
     let latest: TelemetryPacket | undefined
     while (this.queue.size > 0) {
@@ -60,20 +62,20 @@ export class SupabasePublisher {
       this.totalPublished++
       metrics.recordPublish()
       this.backoffMs = BASE_BACKOFF_MS // reset on success
+      this.backoffUntilMs = 0
     } catch (err) {
       metrics.recordError()
       console.error(`[PUB] Publish failed (retry in ${this.backoffMs}ms):`, (err as Error).message)
       // Re-enqueue for retry
       this.queue.push(latest)
       this.backoffMs = Math.min(this.backoffMs * 2, MAX_BACKOFF_MS)
+      this.backoffUntilMs = Date.now() + this.backoffMs
     }
   }
 
   private async sendHeartbeat(): Promise<void> {
     const dcsActive = Date.now() - this.lastUdpAt < STALENESS_TIMEOUT_MS
-    if (!dcsActive && this.lastUdpAt > 0) {
-      metrics.recordDcsSilent()
-    }
+    metrics.recordDcsSilent(dcsActive)
 
     const heartbeat: HeartbeatPacket = {
       type: 'heartbeat',
@@ -92,6 +94,7 @@ export class SupabasePublisher {
   private async broadcast(event: string, payload: unknown): Promise<void> {
     const res = await fetch(`${this.supabaseUrl}/realtime/v1/api/broadcast`, {
       method: 'POST',
+      signal: AbortSignal.timeout(5000),
       headers: {
         apikey: this.apiKey,
         'Content-Type': 'application/json',
