@@ -39,7 +39,7 @@ export function BottomBar({ connectionState }: BottomBarProps) {
 
   return (
     <div
-      className="bg-jarvis-bar border-t border-jarvis-border flex items-center justify-between px-5 h-[45px] text-[12px]"
+      className="bg-jarvis-bar border-t border-jarvis-border flex items-center justify-between px-8 h-[45px] text-[12px]"
       style={{ letterSpacing: '1px' }}
     >
       <div className="flex items-center gap-4">

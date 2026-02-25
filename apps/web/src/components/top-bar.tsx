@@ -48,7 +48,7 @@ export function TopBar({ connectionState, telemetry }: TopBarProps) {
 
   return (
     <div
-      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-5 h-[55px]"
+      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-8 h-[55px]"
     >
       {/* Logo */}
       <div>

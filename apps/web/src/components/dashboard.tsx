@@ -64,7 +64,7 @@ export function Dashboard() {
       {/* Main content */}
       <div className="flex-1 grid grid-cols-[230px_1fr_230px] min-h-0">
         {/* Left Panel — Session */}
-        <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-3 overflow-y-auto">
+        <div className="bg-jarvis-bar border-r border-jarvis-border p-4 flex flex-col gap-3 overflow-y-auto">
           <SessionPanel
             currentSession={currentSession}
             onCreateSession={handleCreateSession}
@@ -126,7 +126,7 @@ export function Dashboard() {
         </div>
 
         {/* Right Panel — Debug */}
-        <div className="bg-jarvis-bar border-l border-jarvis-border p-2 flex flex-col gap-3 overflow-y-auto">
+        <div className="bg-jarvis-bar border-l border-jarvis-border p-4 flex flex-col gap-3 overflow-y-auto">
           <DebugPanel
             packetsPerSec={packetsPerSec}
             lastPacketAt={lastPacketAt}
