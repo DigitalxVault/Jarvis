@@ -1,0 +1,19 @@
+{
+  "name": "jarvis-dcs",
+  "private": true,
+  "scripts": {
+    "dev:bridge": "pnpm --filter @jarvis-dcs/bridge dev",
+    "dev:web": "pnpm --filter @jarvis-dcs/web dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "@esbuild/*"
+    ]
+  }
+}

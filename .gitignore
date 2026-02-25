@@ -1,2 +1,33 @@
-# Intel directory is auto-generated and local-only
-.planning/intel/
+# Dependencies
+node_modules/
+
+# Build outputs
+dist/
+.next/
+out/
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Claude / Serena / Planning
+.claude/
+.serena/
+.planning/
+.docs/
+
+# Turbo
+.turbo/
+
+# Debug
+npm-debug.log*
+pnpm-debug.log*

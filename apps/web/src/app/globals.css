@@ -1,0 +1,146 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-jarvis-bg: #010a1a;
+  --color-jarvis-panel: #000d1a;
+  --color-jarvis-bar: #00050f;
+  --color-jarvis-primary: #00d4ff;
+  --color-jarvis-accent: #00ffff;
+  --color-jarvis-success: #00ff88;
+  --color-jarvis-danger: #ff4444;
+  --color-jarvis-warning: #ffaa00;
+  --color-jarvis-muted: rgba(0, 212, 255, 0.5);
+  --color-jarvis-border: rgba(0, 212, 255, 0.16);
+  --font-mono: 'Courier New', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-jarvis-bg);
+  color: var(--color-jarvis-primary);
+  font-family: var(--font-mono);
+  overflow: hidden;
+}
+
+/* ── Scanline overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0, 0, 0, 0.05) 2px,
+    rgba(0, 0, 0, 0.05) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Panel styling ── */
+.jarvis-panel {
+  border: 1px solid var(--color-jarvis-border);
+  border-radius: 3px;
+  padding: 12px;
+  background: var(--color-jarvis-panel);
+  position: relative;
+}
+
+.jarvis-panel::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 8px;
+  width: 35px;
+  height: 1px;
+  background: var(--color-jarvis-primary);
+  box-shadow: 0 0 6px var(--color-jarvis-primary);
+}
+
+/* ── Corner brackets ── */
+.corner-bracket {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-color: var(--color-jarvis-primary);
+  border-style: solid;
+  opacity: 0.6;
+}
+
+.corner-tl { top: 4px; left: 4px; border-width: 2px 0 0 2px; }
+.corner-tr { top: 4px; right: 4px; border-width: 2px 2px 0 0; }
+.corner-bl { bottom: 4px; left: 4px; border-width: 0 0 2px 2px; }
+.corner-br { bottom: 4px; right: 4px; border-width: 0 2px 2px 0; }
+
+/* ── Glow text utility ── */
+.glow-text {
+  text-shadow: 0 0 10px var(--color-jarvis-primary);
+}
+
+.glow-accent {
+  text-shadow: 0 0 14px var(--color-jarvis-accent);
+}
+
+.glow-success {
+  text-shadow: 0 0 8px var(--color-jarvis-success);
+}
+
+.glow-danger {
+  text-shadow: 0 0 8px var(--color-jarvis-danger);
+}
+
+/* ── Blink animation ── */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.animate-blink {
+  animation: blink 1.2s infinite;
+}
+
+/* ── Pulse animation ── */
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 3px rgba(0, 212, 255, 0.3); }
+  50% { box-shadow: 0 0 12px var(--color-jarvis-primary); }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
+
+/* ── Ticker ── */
+@keyframes scroll-ticker {
+  from { transform: translateX(100%); }
+  to { transform: translateX(-100%); }
+}
+
+.ticker-scroll {
+  animation: scroll-ticker 22s linear infinite;
+}
+
+/* ── Panel label ── */
+.panel-title {
+  font-size: 7px;
+  letter-spacing: 3px;
+  opacity: 0.5;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* ── Status dot ── */
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
