@@ -171,8 +171,8 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
   return (
     <canvas
       ref={canvasRef}
-      width={200}
-      height={200}
+      width={180}
+      height={180}
       className={className}
       style={{ imageRendering: 'pixelated' }}
     />

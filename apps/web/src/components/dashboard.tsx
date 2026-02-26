@@ -97,7 +97,7 @@ export function Dashboard() {
       {/* Main content */}
       <div className="flex-1 grid grid-cols-[260px_1fr_280px] min-h-0 bg-jarvis-bg">
         {/* Left Panel — Flight Instruments */}
-        <div className="bg-jarvis-bar border-r border-jarvis-border p-3 flex flex-col gap-3 overflow-y-auto">
+        <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
           {/* Session panel at top */}
           <SessionPanel
             currentSession={currentSession}
