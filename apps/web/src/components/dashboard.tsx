@@ -142,47 +142,22 @@ export function Dashboard() {
 
           {/* Center layout: cards around JARVIS logo */}
           <div className="relative w-full h-full flex items-center justify-center">
-            {/* Top row: IAS, ALT */}
+            {/* Top row: IAS, ALT, HDG */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 flex gap-4">
               <MiniTelemetryCard
-                label="IAS"
+                label="IND AIRSPEED"
                 value={formatSpeed(telemetry?.spd?.ias_mps ?? null)}
                 unit="KTS"
                 color="accent"
               />
               <MiniTelemetryCard
-                label="ALT"
+                label="ALTITUDE"
                 value={formatAlt(telemetry?.pos?.alt_m ?? null)}
                 unit="FT"
                 color="primary"
               />
-            </div>
-
-            {/* Left column: G, AoA */}
-            <div className="absolute left-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
               <MiniTelemetryCard
-                label="G"
-                value={formatG(telemetry?.aero?.g?.y ?? null)}
-                color="success"
-              />
-              <MiniTelemetryCard
-                label="AOA"
-                value={formatAoA(telemetry?.aero?.aoa_rad ?? null)}
-                unit="°"
-                color="warning"
-              />
-            </div>
-
-            {/* Right column: VVI, HDG */}
-            <div className="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col gap-4">
-              <MiniTelemetryCard
-                label="VVI"
-                value={formatVVI(telemetry?.spd?.vvi_mps ?? null)}
-                unit="FPM"
-                color="primary"
-              />
-              <MiniTelemetryCard
-                label="HDG"
+                label="HEADING"
                 value={formatHdg(telemetry?.hdg_rad ?? null)}
                 unit="°"
                 color="accent"
@@ -192,12 +167,12 @@ export function Dashboard() {
             {/* Bottom row: Mach, TAS */}
             <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-4">
               <MiniTelemetryCard
-                label="MACH"
+                label="MACH NO"
                 value={formatMach(telemetry?.spd?.mach ?? null)}
                 color="success"
               />
               <MiniTelemetryCard
-                label="TAS"
+                label="TRUE AIRSPEED"
                 value={formatTAS(telemetry?.spd?.tas_mps ?? null)}
                 unit="KTS"
                 color="accent"

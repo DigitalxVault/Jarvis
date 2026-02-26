@@ -108,20 +108,20 @@ export function EnginePanel({ rpmPct, fuelCon, className = '' }: EnginePanelProp
 
   return (
     <div className={className}>
-      <div className="jarvis-panel">
+      <div className="jarvis-panel p-2">
         <div className="panel-title">▸ ENGINE</div>
 
-        <div className="flex flex-col items-center mt-2">
+        <div className="flex flex-col items-center mt-1.5">
           {/* RPM gauge */}
           <canvas
             ref={canvasRef}
             width={120}
-            height={80}
+            height={64}
             style={{ imageRendering: 'pixelated' }}
           />
 
           {/* Fuel flow */}
-          <div className="w-full mt-2 pt-2 border-t border-jarvis-border/30">
+          <div className="w-full mt-1.5 pt-2 border-t border-jarvis-border/30">
             <div className="flex justify-between items-center">
               <span className="text-[10px] opacity-50" style={{ letterSpacing: '2px' }}>
                 FUEL FLOW

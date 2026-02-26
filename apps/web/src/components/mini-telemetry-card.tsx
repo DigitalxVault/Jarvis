@@ -32,8 +32,8 @@ export function MiniTelemetryCard({
   color = 'accent'
 }: MiniTelemetryCardProps) {
   return (
-    <div className={`border ${borderClasses[color]} rounded bg-jarvis-panel/50 px-2 py-1.5 min-w-[60px]`}>
-      <div className="text-[9px] opacity-40 tracking-wider">{label}</div>
+    <div className={`border ${borderClasses[color]} rounded bg-jarvis-panel/50 px-2 py-1 min-w-[70px]`}>
+      <div className="text-[8px] opacity-40 tracking-wider">{label}</div>
       <div className={`text-lg font-bold ${colorClasses[color]} tabular-nums`} style={{ letterSpacing: '1px' }}>
         {value}
       </div>
