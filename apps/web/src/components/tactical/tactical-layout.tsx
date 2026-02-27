@@ -11,9 +11,17 @@ const formatSpeed = (mps: number | null) => mps !== null ? (mps * 1.94384).toFix
 const formatAlt = (m: number | null) => m !== null ? (m * 3.28084).toFixed(0) : '---'
 const formatMach = (mach: number | null) => mach !== null ? mach.toFixed(2) : '---'
 const formatHdg = (rad: number | null) => rad !== null ? ((rad * 180 / Math.PI + 360) % 360).toFixed(0) : '---'
-const formatG = (g: number | null) => g !== null ? g.toFixed(1) : '---'
-const formatAoA = (rad: number | null) => rad !== null ? (rad * 180 / Math.PI).toFixed(1) : '---'
-const formatVVI = (mps: number | null) => mps !== null ? (mps * 196.85).toFixed(0) : '---'
+const formatG = (g: number | null) => g !== null ? Math.max(-4, Math.min(10, g)).toFixed(1) : '---'
+const formatAoA = (rad: number | null) => {
+  if (rad === null) return '---'
+  const deg = rad * 180 / Math.PI
+  return Math.max(-10, Math.min(40, deg)).toFixed(1)
+}
+const formatVVI = (mps: number | null) => {
+  if (mps === null) return '---'
+  const fpm = mps * 196.85
+  return Math.max(-6000, Math.min(6000, fpm)).toFixed(0)
+}
 
 export function TacticalLayout() {
   const {
@@ -27,9 +35,9 @@ export function TacticalLayout() {
       <TopBar connectionState={connectionState} />
 
       {/* TACT-02: 3-column layout */}
-      <div className="flex-1 grid grid-cols-[220px_1fr_220px] min-h-0 bg-jarvis-bg">
+      <div className="flex-1 grid grid-cols-[280px_1fr_260px] min-h-0 bg-jarvis-bg">
         {/* TACT-03: Left panel — Systems */}
-        <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
+        <div className="bg-jarvis-bar border-r border-jarvis-border p-3 flex flex-col gap-3 overflow-y-auto">
           <FuelGauge
             internal={telemetry?.fuel?.internal ?? 0}
             external={telemetry?.fuel?.external ?? 0}
@@ -41,9 +49,9 @@ export function TacticalLayout() {
           />
 
           {/* Mechanization status */}
-          <div className="jarvis-panel p-1.5">
+          <div className="jarvis-panel p-2.5">
             <div className="panel-title">▸ SYSTEMS</div>
-            <div className="flex flex-col gap-1 text-[11px] mt-1">
+            <div className="flex flex-col gap-2 text-[12px] mt-2">
               <div className="flex justify-between">
                 <span className="opacity-45">GEAR</span>
                 <span className={
@@ -109,10 +117,10 @@ export function TacticalLayout() {
         </div>
 
         {/* TACT-04: Right panel — Flight/Nav data */}
-        <div className="bg-jarvis-bar border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
-          <div className="jarvis-panel p-1.5">
+        <div className="bg-jarvis-bar border-l border-jarvis-border p-3 flex flex-col gap-3 overflow-y-auto">
+          <div className="jarvis-panel p-2.5">
             <div className="panel-title">▸ FLIGHT DATA</div>
-            <div className="flex flex-col gap-1.5 mt-1">
+            <div className="flex flex-col gap-2 mt-2">
               <FlightDataRow label="IAS" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" />
               <FlightDataRow label="MACH" value={formatMach(telemetry?.spd?.mach ?? null)} />
               <FlightDataRow label="ALT MSL" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" />
@@ -135,11 +143,11 @@ export function TacticalLayout() {
 
 function FlightDataRow({ label, value, unit }: { label: string; value: string; unit?: string }) {
   return (
-    <div className="flex justify-between items-baseline text-[11px]">
+    <div className="flex justify-between items-baseline text-[13px]">
       <span className="opacity-45" style={{ letterSpacing: '1px' }}>{label}</span>
       <span className="text-jarvis-accent tabular-nums font-bold">
         {value}
-        {unit && <span className="text-[9px] opacity-50 ml-1">{unit}</span>}
+        {unit && <span className="text-[10px] opacity-50 ml-1">{unit}</span>}
       </span>
     </div>
   )

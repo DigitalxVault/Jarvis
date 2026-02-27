@@ -29,7 +29,8 @@ export function VVITape({ vviMps, className = '' }: VVITapeProps) {
     ctx.fillStyle = '#000d1a'
     ctx.fillRect(0, 0, width, height)
 
-    const vviFpm = mpsToFpm(vviMps)
+    const rawFpm = mpsToFpm(vviMps)
+    const vviFpm = Math.max(-6000, Math.min(6000, rawFpm))
     const range = 12000 // ±6000 fpm total range
     const pixelsPerFpm = (height - 30) / range
 

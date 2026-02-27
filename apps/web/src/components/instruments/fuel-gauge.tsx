@@ -1,5 +1,9 @@
 'use client'
 
+// F-16C fuel capacities (kg)
+const INTERNAL_MAX_KG = 3200
+const EXTERNAL_MAX_KG = 1400
+
 interface FuelGaugeProps {
   internal: number  // 0-1 fraction
   external: number  // 0-1 fraction
@@ -17,21 +21,35 @@ export function FuelGauge({ internal, external, className = '' }: FuelGaugeProps
   const externalPct = Math.max(0, Math.min(100, external * 100))
   const bingoPct = 30
 
+  const internalKg = Math.round(internal * INTERNAL_MAX_KG)
+  const externalKg = Math.round(external * EXTERNAL_MAX_KG)
+  const totalKg = internalKg + externalKg
+
   return (
     <div className={className}>
-      <div className="jarvis-panel p-1.5">
+      <div className="jarvis-panel p-2.5">
         <div className="panel-title">▸ FUEL</div>
 
-        <div className="flex gap-3 mt-1.5">
+        {/* Total fuel readout */}
+        <div className="text-center mt-1 mb-2">
+          <span className={`text-xl font-bold tabular-nums ${
+            internal < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent glow-accent'
+          }`}>
+            {totalKg.toLocaleString()}
+          </span>
+          <span className="text-[10px] opacity-50 ml-1">KG</span>
+        </div>
+
+        <div className="flex gap-4 justify-center">
           {/* Internal fuel */}
-          <div className="flex-1 flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <div
-              className="text-[10px] opacity-50 mb-0.5"
+              className="text-[11px] opacity-50 mb-1"
               style={{ letterSpacing: '2px' }}
             >
               INT
             </div>
-            <div className="relative w-8 h-20 bg-jarvis-bar border border-jarvis-border rounded">
+            <div className="relative w-14 h-28 bg-jarvis-bar border border-jarvis-border rounded">
               {/* Bingo line */}
               <div
                 className="absolute left-0 right-0 border-t-2 border-dashed border-jarvis-warning z-10"
@@ -56,24 +74,25 @@ export function FuelGauge({ internal, external, className = '' }: FuelGaugeProps
               ))}
             </div>
             <div
-              className={`text-xs font-bold tabular-nums ${
+              className={`text-sm font-bold tabular-nums mt-1 ${
                 internal < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent'
               }`}
               style={{ letterSpacing: '1px' }}
             >
               {internalPct.toFixed(0)}%
             </div>
+            <div className="text-[10px] opacity-40 tabular-nums">{internalKg} kg</div>
           </div>
 
           {/* External fuel */}
-          <div className="flex-1 flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <div
-              className="text-[10px] opacity-50 mb-0.5"
+              className="text-[11px] opacity-50 mb-1"
               style={{ letterSpacing: '2px' }}
             >
               EXT
             </div>
-            <div className="relative w-8 h-20 bg-jarvis-bar border border-jarvis-border rounded">
+            <div className="relative w-14 h-28 bg-jarvis-bar border border-jarvis-border rounded">
               {/* Bingo line */}
               <div
                 className="absolute left-0 right-0 border-t-2 border-dashed border-jarvis-warning z-10"
@@ -98,18 +117,19 @@ export function FuelGauge({ internal, external, className = '' }: FuelGaugeProps
               ))}
             </div>
             <div
-              className={`text-xs font-bold tabular-nums ${
+              className={`text-sm font-bold tabular-nums mt-1 ${
                 external < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent'
               }`}
               style={{ letterSpacing: '1px' }}
             >
               {externalPct.toFixed(0)}%
             </div>
+            <div className="text-[10px] opacity-40 tabular-nums">{externalKg} kg</div>
           </div>
         </div>
 
         {/* Bingo label */}
-        <div className="mt-1 text-center">
+        <div className="mt-2 text-center">
           <span className="text-[10px] text-jarvis-warning" style={{ letterSpacing: '2px' }}>
             BINGO @ {bingoPct}%
           </span>

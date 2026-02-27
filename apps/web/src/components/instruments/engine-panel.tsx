@@ -57,7 +57,7 @@ export function EnginePanel({ rpmPct, fuelCon, className = '' }: EnginePanelProp
     // Tick marks every 10%
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.4)'
     ctx.lineWidth = 1
-    ctx.font = '8px "Courier New"'
+    ctx.font = '10px "Courier New"'
     ctx.fillStyle = '#00d4ff'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
@@ -88,15 +88,15 @@ export function EnginePanel({ rpmPct, fuelCon, className = '' }: EnginePanelProp
     }
 
     // Center RPM value
-    ctx.font = 'bold 20px "Courier New"'
+    ctx.font = 'bold 28px "Courier New"'
     ctx.fillStyle = '#00ffff'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(Math.round(rpmPct).toString(), cx, cy - 5)
 
-    ctx.font = '10px "Courier New"'
+    ctx.font = '11px "Courier New"'
     ctx.fillStyle = 'rgba(0, 212, 255, 0.6)'
-    ctx.fillText('% RPM', cx, cy + 12)
+    ctx.fillText('% RPM', cx, cy + 18)
 
     // Outer ring
     ctx.beginPath()
@@ -108,25 +108,25 @@ export function EnginePanel({ rpmPct, fuelCon, className = '' }: EnginePanelProp
 
   return (
     <div className={className}>
-      <div className="jarvis-panel p-1.5">
+      <div className="jarvis-panel p-2.5">
         <div className="panel-title">▸ ENGINE</div>
 
-        <div className="flex flex-col items-center mt-1">
+        <div className="flex flex-col items-center mt-2">
           {/* RPM gauge */}
           <canvas
             ref={canvasRef}
-            width={120}
-            height={56}
+            width={180}
+            height={120}
             style={{ imageRendering: 'pixelated' }}
           />
 
           {/* Fuel flow */}
-          <div className="w-full mt-1 pt-1.5 border-t border-jarvis-border/30">
+          <div className="w-full mt-2 pt-2 border-t border-jarvis-border/30">
             <div className="flex justify-between items-center">
-              <span className="text-[10px] opacity-50" style={{ letterSpacing: '2px' }}>
+              <span className="text-[11px] opacity-50" style={{ letterSpacing: '2px' }}>
                 FUEL FLOW
               </span>
-              <span className="text-sm font-bold text-jarvis-accent glow-accent tabular-nums">
+              <span className="text-base font-bold text-jarvis-accent glow-accent tabular-nums">
                 {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[10px] opacity-60">PPH</span>
               </span>
             </div>

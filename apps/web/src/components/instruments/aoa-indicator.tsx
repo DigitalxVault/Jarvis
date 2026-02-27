@@ -13,7 +13,9 @@ const ON_SPEED_MAX = 13
 const STALL_WARNING = 15
 
 export function AoAIndicator({ aoaRad, className = '' }: AoAIndicatorProps) {
-  const aoaDeg = Math.abs(radToDegSigned(aoaRad))
+  // Clamp to realistic AoA range (-10° to 40°) before display
+  const rawDeg = radToDegSigned(aoaRad)
+  const aoaDeg = Math.abs(Math.max(-10, Math.min(40, rawDeg)))
   const isOnSpeed = aoaDeg >= ON_SPEED_MIN && aoaDeg <= ON_SPEED_MAX
   const isSlow = aoaDeg < ON_SPEED_MIN
   const isFast = aoaDeg > ON_SPEED_MAX

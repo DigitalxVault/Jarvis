@@ -105,12 +105,13 @@ export function GMeter({ gY, className = '' }: GMeterProps) {
     ctx.fill()
     ctx.shadowBlur = 0
 
-    // Center display of current G
+    // Center display of current G (clamped to realistic range)
+    const displayG = Math.max(-4, Math.min(10, gY))
     ctx.fillStyle = barColor
     ctx.font = 'bold 24px "Courier New"'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
-    ctx.fillText(gY.toFixed(1), centerX, centerY)
+    ctx.fillText(displayG.toFixed(1), centerX, centerY)
 
     ctx.font = '10px "Courier New"'
     ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'

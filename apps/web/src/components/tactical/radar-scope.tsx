@@ -255,6 +255,10 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     })
   }
 
+  const isGated = tactical && (
+    !(tactical.permissions?.objects) || !(tactical.permissions?.sensors)
+  )
+
   return (
     <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center">
       {/* Range selector */}
@@ -276,15 +280,34 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
         <span className="text-[10px] opacity-45">NM</span>
       </div>
 
-      {/* Radar canvas */}
-      <canvas
-        ref={canvasRef}
-        width={canvasSize}
-        height={canvasSize}
-        onClick={cycleRange}
-        className="cursor-crosshair"
-        style={{ maxWidth: '100%', maxHeight: 'calc(100% - 40px)' }}
-      />
+      {/* Radar canvas with gating overlay */}
+      <div className="relative">
+        <canvas
+          ref={canvasRef}
+          width={canvasSize}
+          height={canvasSize}
+          onClick={cycleRange}
+          className="cursor-crosshair"
+          style={{ maxWidth: '100%', maxHeight: 'calc(100% - 40px)' }}
+        />
+
+        {/* Anti-cheat gating notice */}
+        {isGated && (
+          <div className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
+            <div className="text-center bg-jarvis-bar/80 px-4 py-2 border border-jarvis-warning/30 rounded">
+              <div className="text-[11px] text-jarvis-warning" style={{ letterSpacing: '1px' }}>
+                EXPORT RESTRICTED
+              </div>
+              <div className="text-[9px] text-jarvis-muted mt-1" style={{ letterSpacing: '0.5px' }}>
+                DCS server denies object/sensor export
+              </div>
+              <div className="text-[9px] text-jarvis-muted" style={{ letterSpacing: '0.5px' }}>
+                Contacts unavailable (anti-cheat)
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   )
 }
