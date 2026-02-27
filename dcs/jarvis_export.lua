@@ -20,9 +20,11 @@ local JARVIS_FUEL_INTERNAL_MAX = 3200   -- Internal tanks (kg)
 local JARVIS_FUEL_EXTERNAL_MAX = 1400   -- External tank (kg)
 local JARVIS_ENGINE_MAX_RPM = 10400     -- F110-GE-129 max RPM
 
--- Anti-cheat permission cache (checked once per mission)
+-- Anti-cheat permissions (re-checked periodically)
 local jarvis_object_export_ok = false
 local jarvis_sensor_export_ok = false
+local jarvis_perm_last_check = 0
+local jarvis_perm_interval = 10  -- re-check every 10 seconds
 
 -- ── Chain existing Export.lua functions ──
 local _prev_LuaExportStart = LuaExportStart
@@ -69,11 +71,104 @@ function LuaExportAfterNextFrame()
     pcall(jarvis_send_flight, t)
   end
 
+  -- ── Re-check anti-cheat permissions periodically ──
+  if t - jarvis_perm_last_check >= jarvis_perm_interval then
+    jarvis_perm_last_check = t
+    jarvis_object_export_ok = (LoIsObjectExportAllowed and LoIsObjectExportAllowed()) or false
+    jarvis_sensor_export_ok = (LoIsSensorExportAllowed and LoIsSensorExportAllowed()) or false
+  end
+
   -- ── Low-frequency tactical/weapons data (1 Hz) ──
   if t - jarvis_last_slow_send >= jarvis_slow_interval then
     jarvis_last_slow_send = t
     pcall(jarvis_send_tactical, t)
   end
+end
+
+-- ── Helper: safely extract a number from a DCS table field ──
+-- DCS modules return data inconsistently: sometimes {RPM=75}, sometimes {RPM={left=75}}
+local function jarvis_num(tbl, ...)
+  if not tbl then return 0 end
+  for _, key in ipairs({...}) do
+    local val = tbl[key]
+    if type(val) == "number" then return val end
+    if type(val) == "table" then
+      -- Nested: {RPM={left=75}} or {RPM={75}}
+      return val.left or val.right or val[1] or 0
+    end
+  end
+  return 0
+end
+
+-- ── Diagnostic dump (runs once per mission to help debug field names) ──
+local jarvis_diag_done = false
+local function jarvis_write_diag()
+  if jarvis_diag_done then return end
+  jarvis_diag_done = true
+
+  local path = lfs and lfs.writedir and (lfs.writedir() .. "Logs/jarvis_diag.log") or nil
+  if not path then return end
+
+  local f = io.open(path, "w")
+  if not f then return end
+
+  f:write("JARVIS Diagnostic Dump — " .. os.date() .. "\n\n")
+
+  -- Dump LoGetEngineInfo
+  local ok_eng, eng = pcall(function() return LoGetEngineInfo and LoGetEngineInfo() end)
+  if ok_eng and eng then
+    f:write("=== LoGetEngineInfo() ===\n")
+    for k, v in pairs(eng) do
+      if type(v) == "table" then
+        local parts = {}
+        for sk, sv in pairs(v) do parts[#parts+1] = sk .. "=" .. tostring(sv) end
+        f:write("  " .. k .. " = {" .. table.concat(parts, ", ") .. "}\n")
+      else
+        f:write("  " .. k .. " = " .. tostring(v) .. "\n")
+      end
+    end
+  else
+    f:write("=== LoGetEngineInfo() FAILED or nil ===\n")
+  end
+
+  -- Dump LoGetFuelData
+  local ok_fuel, fdata = pcall(function() return LoGetFuelData and LoGetFuelData() end)
+  if ok_fuel and fdata then
+    f:write("\n=== LoGetFuelData() ===\n")
+    for k, v in pairs(fdata) do
+      f:write("  " .. k .. " = " .. tostring(v) .. "\n")
+    end
+  else
+    f:write("\n=== LoGetFuelData() FAILED or nil ===\n")
+  end
+
+  -- Dump LoGetAngleOfAttack
+  local ok_aoa, aoa = pcall(function() return LoGetAngleOfAttack and LoGetAngleOfAttack() end)
+  f:write("\n=== LoGetAngleOfAttack() ===\n")
+  f:write("  value = " .. tostring(ok_aoa and aoa or "FAILED") .. "\n")
+
+  -- Dump permissions
+  f:write("\n=== Permissions ===\n")
+  f:write("  LoIsObjectExportAllowed = " .. tostring(jarvis_object_export_ok) .. "\n")
+  f:write("  LoIsSensorExportAllowed = " .. tostring(jarvis_sensor_export_ok) .. "\n")
+
+  -- Dump LoGetMechInfo
+  local ok_mech, mech = pcall(function() return LoGetMechInfo and LoGetMechInfo() end)
+  if ok_mech and mech then
+    f:write("\n=== LoGetMechInfo() ===\n")
+    for k, v in pairs(mech) do
+      if type(v) == "table" then
+        local parts = {}
+        for sk, sv in pairs(v) do parts[#parts+1] = sk .. "=" .. tostring(sv) end
+        f:write("  " .. k .. " = {" .. table.concat(parts, ", ") .. "}\n")
+      else
+        f:write("  " .. k .. " = " .. tostring(v) .. "\n")
+      end
+    end
+  end
+
+  f:write("\n=== Done ===\n")
+  f:close()
 end
 
 -- ── High-frequency flight telemetry (10 Hz) ──
@@ -84,14 +179,69 @@ function jarvis_send_flight(t)
   local lla = self_data.LatLongAlt
   if not lla then return end
 
-  -- Acceleration (G-loads) — returns {x, y, z}
+  -- Write diagnostic dump once per mission
+  jarvis_write_diag()
+
+  -- Acceleration (G-loads) — returns {x, y, z} in G units
   local acc = LoGetAccelerationUnits() or {x=0, y=1, z=0}
   -- Angular velocity — returns {x, y, z} rad/s
   local angvel = (LoGetAngularVelocity and LoGetAngularVelocity()) or {x=0, y=0, z=0}
-  -- Engine info — LoGetEngineInfo returns table per engine (EXPT-08 fix)
+
+  -- ── Engine data — handle all common DCS module formats ──
   local eng_raw = (LoGetEngineInfo and LoGetEngineInfo()) or {}
-  -- F-16 is single-engine: try .left (common convention) then [1], then raw table
-  local eng1 = eng_raw.left or eng_raw[1] or eng_raw
+  -- RPM: try {RPM={left=pct}}, {RPM=pct}, {rpm=pct}, eng.left.RPM, etc.
+  local rpm_val = jarvis_num(eng_raw, "RPM", "rpm")
+  -- If RPM is 0-1 fraction, convert to percentage
+  local rpm_pct = 0
+  if rpm_val > 0 and rpm_val <= 1 then
+    rpm_pct = rpm_val * 100       -- fraction → percentage
+  elseif rpm_val > 1 and rpm_val <= 110 then
+    rpm_pct = rpm_val             -- already percentage
+  elseif rpm_val > 110 then
+    rpm_pct = (rpm_val / JARVIS_ENGINE_MAX_RPM) * 100  -- raw RPM → percentage
+  end
+
+  -- Fuel consumption: try {FuelConsumption={left=val}}, flat, etc.
+  local fuelcon = jarvis_num(eng_raw, "FuelConsumption", "fuel_consumption", "fuelConsumption")
+
+  -- ── Fuel data — try multiple sources ──
+  local fuel_int = 0
+  local fuel_ext = 0
+
+  -- Source 1: LoGetFuelData() (community API, may not exist on all modules)
+  if LoGetFuelData then
+    local ok_fd, fdata = pcall(LoGetFuelData)
+    if ok_fd and fdata then
+      fuel_int = fdata.fuel_internal or fdata.FuelInternal or fdata.fuel0 or 0
+      fuel_ext = fdata.fuel_external or fdata.FuelExternal or fdata.fuel1 or 0
+    end
+  end
+
+  -- Source 2: LoGetEngineInfo() often has fuel_internal/fuel_external as top-level fields
+  if fuel_int == 0 then
+    fuel_int = eng_raw.fuel_internal or eng_raw.FuelInternal or 0
+  end
+  if fuel_ext == 0 then
+    fuel_ext = eng_raw.fuel_external or eng_raw.FuelExternal or 0
+  end
+
+  -- Normalize fuel to 0-1 fraction
+  local fuel_int_frac = (fuel_int > 1) and math.min(1, fuel_int / JARVIS_FUEL_INTERNAL_MAX) or fuel_int
+  local fuel_ext_frac = (fuel_ext > 1) and math.min(1, fuel_ext / JARVIS_FUEL_EXTERNAL_MAX) or fuel_ext
+
+  -- ── AoA — validate and clamp to sane range ──
+  local raw_aoa = (LoGetAngleOfAttack and LoGetAngleOfAttack()) or 0
+  -- Sanity check: valid AoA should be within ±1.0 radians (±57°)
+  -- If value is outside this, it's likely degrees or garbage — clamp to 0
+  local aoa_val = raw_aoa
+  if math.abs(raw_aoa) > 1.0 then
+    -- Might be degrees instead of radians, or garbage
+    if math.abs(raw_aoa) <= 60 then
+      aoa_val = raw_aoa * math.pi / 180  -- treat as degrees → convert to radians
+    else
+      aoa_val = 0  -- garbage value, discard
+    end
+  end
 
   local encoded = jarvis_JSON:encode({
     type    = "telemetry",
@@ -115,17 +265,17 @@ function jarvis_send_flight(t)
     },
     hdg_rad = LoGetMagneticYaw(),
     aero    = {
-      aoa_rad = (LoGetAngleOfAttack and LoGetAngleOfAttack()) or 0,
+      aoa_rad = aoa_val,
       g       = { x = acc.x, y = acc.y, z = acc.z },
       ang_vel = { x = angvel.x, y = angvel.y, z = angvel.z }
     },
     fuel    = {
-      internal = math.min(1, ((LoGetFuelData and LoGetFuelData().fuel_internal) or 0) / JARVIS_FUEL_INTERNAL_MAX),
-      external = math.min(1, ((LoGetFuelData and LoGetFuelData().fuel_external) or 0) / JARVIS_FUEL_EXTERNAL_MAX)
+      internal = fuel_int_frac,
+      external = fuel_ext_frac
     },
     eng     = {
-      rpm_pct  = math.min(100, ((eng1.RPM or eng1.rpm or 0) / JARVIS_ENGINE_MAX_RPM) * 100),
-      fuel_con = eng1.fuel_consumption or eng1.FuelConsumption or 0
+      rpm_pct  = math.min(100, math.max(0, rpm_pct)),
+      fuel_con = fuelcon
     }
   })
 
