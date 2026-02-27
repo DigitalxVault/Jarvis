@@ -40,6 +40,16 @@ export function latToDMS(lat: number): string {
   return `${d}°${m.toString().padStart(2, '0')}'${s.toString().padStart(2, '0')}"${lat >= 0 ? 'N' : 'S'}`
 }
 
+/** metres → nautical miles */
+export function metresToNM(m: number): number {
+  return m / 1852
+}
+
+/** nautical miles → metres */
+export function nmToMetres(nm: number): number {
+  return nm * 1852
+}
+
 /** Format decimal degrees to DMS (e.g., 044°18'30"E) */
 export function lonToDMS(lon: number): string {
   const abs = Math.abs(lon)

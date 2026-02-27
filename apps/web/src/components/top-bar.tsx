@@ -1,19 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import { ConnectionStatus } from './connection-status'
 import type { ConnectionState } from '@/hooks/use-telemetry'
-import type { TelemetryPacket } from '@jarvis-dcs/shared'
-import { mpsToKnots, metresToFeet, formatHeading, radToDegSigned } from '@/lib/conversions'
 
 interface TopBarProps {
   connectionState: ConnectionState
-  telemetry: TelemetryPacket | null
 }
 
-export function TopBar({ connectionState, telemetry }: TopBarProps) {
+export function TopBar({ connectionState }: TopBarProps) {
   const [clock, setClock] = useState('--:--:--')
   const [date, setDate] = useState('')
+  const pathname = usePathname()
 
   useEffect(() => {
     const tick = () => {
@@ -26,27 +26,12 @@ export function TopBar({ connectionState, telemetry }: TopBarProps) {
     return () => clearInterval(interval)
   }, [])
 
-  const ias = telemetry ? Math.round(mpsToKnots(telemetry.spd.ias_mps)) : '---'
-  const alt = telemetry ? Math.round(metresToFeet(telemetry.pos.alt_m)).toLocaleString() : '---'
-  const hdg = telemetry ? formatHeading(radToDegSigned(telemetry.hdg_rad)) : '---'
-  const mach = telemetry?.spd.mach ? telemetry.spd.mach.toFixed(2) : '---'
-  const aoa = telemetry?.aero?.aoa_rad ? Math.round(radToDegSigned(telemetry.aero.aoa_rad)) : '---'
-  const gLoad = telemetry?.aero?.g?.y ? telemetry.aero.g.y.toFixed(1) : '---'
-
-  // G-load color
-  const gColor = telemetry && telemetry.aero?.g?.y
-    ? telemetry.aero.g.y > 7
-      ? 'text-jarvis-danger'
-      : telemetry.aero.g.y > 5
-        ? 'text-jarvis-warning'
-        : telemetry.aero.g.y < -1
-          ? 'text-jarvis-danger'
-          : 'text-jarvis-accent'
-    : 'text-jarvis-accent'
+  const isMainDash = pathname === '/'
+  const isTactical = pathname === '/tactical'
 
   return (
     <div
-      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-6 h-[60px]"
+      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-6 h-[52px]"
     >
       {/* Logo */}
       <div>
@@ -54,40 +39,34 @@ export function TopBar({ connectionState, telemetry }: TopBarProps) {
           J·A·R·V·I·S
         </div>
         <div className="text-[10px] opacity-50" style={{ letterSpacing: '2px' }}>
-          TACTICAL HUD v1.1
+          TACTICAL HUD v2.0
         </div>
       </div>
 
-      {/* Quick stats - primary */}
-      <div className="flex gap-4">
-        <div className="text-center">
-          <div className="text-lg font-bold text-jarvis-accent glow-accent tabular-nums">{ias}</div>
-          <div className="text-[10px] opacity-50" style={{ letterSpacing: '1px' }}>IAS</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-jarvis-accent glow-accent tabular-nums">{alt}</div>
-          <div className="text-[10px] opacity-50" style={{ letterSpacing: '1px' }}>ALT</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-jarvis-accent glow-accent tabular-nums">{hdg}°</div>
-          <div className="text-[10px] opacity-50" style={{ letterSpacing: '1px' }}>HDG</div>
-        </div>
-      </div>
-
-      {/* Quick stats - secondary */}
-      <div className="flex gap-4">
-        <div className="text-center">
-          <div className="text-sm font-bold text-jarvis-primary tabular-nums">{mach}</div>
-          <div className="text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>MACH</div>
-        </div>
-        <div className="text-center">
-          <div className="text-sm font-bold text-jarvis-primary tabular-nums">{aoa}°</div>
-          <div className="text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>AOA</div>
-        </div>
-        <div className="text-center">
-          <div className={`text-sm font-bold tabular-nums ${gColor}`}>{gLoad}</div>
-          <div className="text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>G</div>
-        </div>
+      {/* Navigation */}
+      <div className="flex gap-2">
+        <Link
+          href="/"
+          className={`px-4 py-1.5 text-[11px] font-bold border transition-all ${
+            isMainDash
+              ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
+              : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
+          }`}
+          style={{ letterSpacing: '2px' }}
+        >
+          DASHBOARD
+        </Link>
+        <Link
+          href="/tactical"
+          className={`px-4 py-1.5 text-[11px] font-bold border transition-all ${
+            isTactical
+              ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
+              : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
+          }`}
+          style={{ letterSpacing: '2px' }}
+        >
+          TACTICAL
+        </Link>
       </div>
 
       {/* Status + Clock */}

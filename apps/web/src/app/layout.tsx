@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { TelemetryProvider } from '@/providers/telemetry-provider'
 
 export const metadata: Metadata = {
   title: 'J·A·R·V·I·S // DCS Telemetry',
@@ -13,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <TelemetryProvider>
+          {children}
+        </TelemetryProvider>
+      </body>
     </html>
   )
 }

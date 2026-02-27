@@ -6,7 +6,7 @@ import type { RealtimeChannel } from '@supabase/supabase-js'
 import type {
   TelemetryPacket,
   HeartbeatPacket,
-  BroadcastPayload,
+  TacticalPacket,
 } from '@jarvis-dcs/shared'
 import { MAX_RAW_PACKETS, STALENESS_TIMEOUT_MS } from '@jarvis-dcs/shared'
 
@@ -15,6 +15,7 @@ export type ConnectionState = 'connecting' | 'connected' | 'dcs_offline' | 'reco
 interface TelemetryState {
   telemetry: TelemetryPacket | null
   heartbeat: HeartbeatPacket | null
+  tactical: TacticalPacket | null
   connectionState: ConnectionState
   packetsPerSec: number
   lastPacketAt: number | null
@@ -25,6 +26,7 @@ interface TelemetryState {
 export function useTelemetry(sessionId: string | null): TelemetryState {
   const [telemetry, setTelemetry] = useState<TelemetryPacket | null>(null)
   const [heartbeat, setHeartbeat] = useState<HeartbeatPacket | null>(null)
+  const [tactical, setTactical] = useState<TacticalPacket | null>(null)
   const [connectionState, setConnectionState] = useState<ConnectionState>('offline')
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>('idle')
   const [rawPackets, setRawPackets] = useState<TelemetryPacket[]>([])
@@ -92,6 +94,12 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
     }
   }, [])
 
+  const handleTactical = useCallback((msg: { payload: unknown }) => {
+    const packet = msg.payload as TacticalPacket
+    if (packet?.type !== 'tactical') return
+    setTactical(packet)
+  }, [])
+
   const handleStatus = useCallback((status: string) => {
     setSubscriptionStatus(status)
     if (status === 'SUBSCRIBED') {
@@ -115,11 +123,12 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
       .channel(channelName)
       .on('broadcast', { event: 'telemetry' }, handleTelemetry)
       .on('broadcast', { event: 'heartbeat' }, handleHeartbeat)
+      .on('broadcast', { event: 'tactical' }, handleTactical)
       .subscribe(handleStatus)
 
     channelRef.current = channel
     return channel
-  }, [handleTelemetry, handleHeartbeat, handleStatus])
+  }, [handleTelemetry, handleHeartbeat, handleTactical, handleStatus])
 
   // Subscribe to channel
   useEffect(() => {
@@ -153,6 +162,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
   return {
     telemetry,
     heartbeat,
+    tactical,
     connectionState,
     packetsPerSec,
     lastPacketAt,

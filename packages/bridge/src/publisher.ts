@@ -1,4 +1,4 @@
-import type { TelemetryPacket, HeartbeatPacket } from '@jarvis-dcs/shared'
+import type { TelemetryPacket, TacticalPacket, HeartbeatPacket } from '@jarvis-dcs/shared'
 import {
   PUBLISH_INTERVAL_MS,
   STALENESS_TIMEOUT_MS,
@@ -22,6 +22,11 @@ export class SupabasePublisher {
   private backoffUntilMs = 0
   private totalPublished = 0
 
+  // Tactical packet (latest only, overwritten on each receive)
+  private latestTactical: TacticalPacket | null = null
+  private tacticalDirty = false
+  private tacticalTimer: ReturnType<typeof setInterval> | null = null
+
   constructor(supabaseUrl: string, apiKey: string, channelTopic: string) {
     this.supabaseUrl = supabaseUrl
     this.apiKey = apiKey
@@ -33,6 +38,12 @@ export class SupabasePublisher {
     this.lastUdpAt = Date.now()
   }
 
+  enqueueTactical(packet: TacticalPacket): void {
+    this.latestTactical = packet
+    this.tacticalDirty = true
+    this.lastUdpAt = Date.now()
+  }
+
   start(): void {
     console.log(`[PUB] Publishing to channel: ${this.channelTopic}`)
 
@@ -41,11 +52,15 @@ export class SupabasePublisher {
 
     // Heartbeat loop — 1 Hz
     this.heartbeatTimer = setInterval(() => this.sendHeartbeat(), HEARTBEAT_INTERVAL_MS)
+
+    // Tactical publish loop — 1 Hz (matches DCS send rate)
+    this.tacticalTimer = setInterval(() => this.publishTactical(), 1000)
   }
 
   stop(): void {
     if (this.publishTimer) clearInterval(this.publishTimer)
     if (this.heartbeatTimer) clearInterval(this.heartbeatTimer)
+    if (this.tacticalTimer) clearInterval(this.tacticalTimer)
   }
 
   private async publishLatest(): Promise<void> {
@@ -70,6 +85,19 @@ export class SupabasePublisher {
       this.queue.push(latest)
       this.backoffMs = Math.min(this.backoffMs * 2, MAX_BACKOFF_MS)
       this.backoffUntilMs = Date.now() + this.backoffMs
+    }
+  }
+
+  private async publishTactical(): Promise<void> {
+    if (!this.tacticalDirty || !this.latestTactical) return
+    if (Date.now() < this.backoffUntilMs) return
+
+    this.tacticalDirty = false
+    try {
+      await this.broadcast('tactical', this.latestTactical)
+    } catch {
+      // Tactical publish failure is non-critical — next cycle will retry
+      this.tacticalDirty = true
     }
   }
 

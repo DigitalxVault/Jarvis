@@ -32,7 +32,9 @@ export function RawPacketViewer({ packets }: RawPacketViewerProps) {
                 className="w-full text-left opacity-60 hover:opacity-100 cursor-pointer py-0.5"
               >
                 <span className="text-jarvis-accent">t={pkt.t_model.toFixed(1)}</span>
-                {' '}ias={pkt.spd.ias_mps.toFixed(0)} alt={pkt.pos.alt_m.toFixed(0)}
+                {' '}ias={pkt.spd.ias_mps.toFixed(0)}
+                {' '}alt_msl={<span className="text-jarvis-primary">{pkt.pos.alt_m.toFixed(0)}m</span>}
+                {' '}alt_agl={<span className="text-jarvis-warning">{(pkt.pos.alt_agl_m ?? 0).toFixed(0)}m</span>}
               </button>
               {expandedIdx === i && (
                 <pre className="text-[10px] opacity-40 pl-2 whitespace-pre-wrap break-all">

@@ -1,17 +1,24 @@
 import dgram from 'node:dgram'
-import type { TelemetryPacket } from '@jarvis-dcs/shared'
+import type { TelemetryPacket, TacticalPacket } from '@jarvis-dcs/shared'
 import { UDP_PORT } from '@jarvis-dcs/shared'
 
 export type UdpCallback = (packet: TelemetryPacket) => void
+export type TacticalCallback = (packet: TacticalPacket) => void
 
-export function createUdpListener(onPacket: UdpCallback): dgram.Socket {
+export function createUdpListener(
+  onPacket: UdpCallback,
+  onTactical?: TacticalCallback,
+): dgram.Socket {
   const server = dgram.createSocket('udp4')
 
   server.on('message', (buf: Buffer) => {
     try {
       const raw = JSON.parse(buf.toString('utf8'))
-      if (raw?.type !== 'telemetry') return
-      onPacket(raw as TelemetryPacket)
+      if (raw?.type === 'telemetry') {
+        onPacket(raw as TelemetryPacket)
+      } else if (raw?.type === 'tactical' && onTactical) {
+        onTactical(raw as TacticalPacket)
+      }
     } catch {
       // Malformed packet — silently drop
     }

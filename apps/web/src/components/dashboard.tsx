@@ -1,9 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
-import { useTelemetry } from '@/hooks/use-telemetry'
-import { useAlerts } from '@/hooks/use-alerts'
-import { useCoaching } from '@/hooks/use-coaching'
+import { useTelemetryContext } from '@/providers/telemetry-provider'
 import { TopBar } from './top-bar'
 import { BottomBar } from './bottom-bar'
 import { SessionPanel } from './session-panel'
@@ -14,91 +11,44 @@ import { JarvisLogo } from './jarvis-logo'
 import { MiniTelemetryCard } from './mini-telemetry-card'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
 import { CoachingPanel } from './coaching-panel'
-import type { Session } from '@jarvis-dcs/shared'
 
-// Helper to format telemetry values
 const formatSpeed = (mps: number | null) => mps !== null ? (mps * 1.94384).toFixed(0) : '---'
 const formatAlt = (m: number | null) => m !== null ? (m * 3.28084).toFixed(0) : '---'
-const formatVVI = (mps: number | null) => mps !== null ? (mps * 196.85).toFixed(0) : '---'
 const formatMach = (mach: number | null) => mach !== null ? mach.toFixed(2) : '---'
 const formatTAS = (mps: number | null) => mps !== null ? (mps * 1.94384).toFixed(0) : '---'
-const formatG = (g: number | null) => g !== null ? g.toFixed(1) : '---'
-const formatAoA = (rad: number | null) => rad !== null ? (rad * 180 / Math.PI).toFixed(1) : '---'
 const formatHdg = (rad: number | null) => rad !== null ? ((rad * 180 / Math.PI + 360) % 360).toFixed(0) : '---'
 
 export function Dashboard() {
-  const [currentSession, setCurrentSession] = useState<Session | null>(null)
-  const [isCreating, setIsCreating] = useState(false)
-  const [sessionError, setSessionError] = useState<string | null>(null)
-
-  const sessionId = currentSession?.id ?? null
   const {
+    currentSession,
+    isCreating,
+    sessionError,
+    handleCreateSession,
+    handleDevMode,
+    clearSessionError,
     telemetry,
     connectionState,
     packetsPerSec,
     lastPacketAt,
     rawPackets,
     subscriptionStatus,
-  } = useTelemetry(sessionId)
+    alerts,
+    hasCritical,
+    hasWarning,
+    coaching,
+  } = useTelemetryContext()
 
-  // Safety alerts
-  const { alerts, hasCritical, hasWarning } = useAlerts(telemetry)
-
-  // Flight coaching
-  const coaching = useCoaching(telemetry, {
-    targetSpeedKnots: 350,
-    speedTolerance: 50,
-    targetAltFt: 25000,
-    altTolerance: 200,
-    targetHeadingDeg: 270,
-    headingTolerance: 10,
-  })
-
-  const handleCreateSession = useCallback(async () => {
-    setIsCreating(true)
-    setSessionError(null)
-    try {
-      const res = await fetch('/api/sessions', { method: 'POST' })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        if (res.status === 401) {
-          throw new Error('Sign in with Google to create a session')
-        }
-        throw new Error(data.error || `Failed (${res.status})`)
-      }
-      const session = await res.json()
-      setCurrentSession(session)
-    } catch (err) {
-      console.error('Failed to create session:', err)
-      setSessionError(err instanceof Error ? err.message : 'Unknown error')
-    } finally {
-      setIsCreating(false)
-    }
-  }, [])
-
-  const handleDevMode = useCallback(() => {
-    setCurrentSession({
-      id: 'dev',
-      user_id: 'dev',
-      status: 'active',
-      pairing_code: null,
-      pairing_expires_at: null,
-      bridge_claimed: true,
-      created_at: new Date().toISOString(),
-      ended_at: null,
-    })
-  }, [])
+  const sessionId = currentSession?.id ?? null
 
   return (
     <div className="w-full h-screen flex flex-col">
-      {/* Top Bar */}
-      <TopBar connectionState={connectionState} telemetry={telemetry} />
+      {/* Top Bar — DASH-01: logo, nav, connection, clock only */}
+      <TopBar connectionState={connectionState} />
 
-      {/* Main content */}
-      <div className="flex-1 grid grid-cols-[260px_1fr_280px] min-h-0 bg-jarvis-bg">
-        {/* Left Panel — Flight Instruments */}
+      {/* Main content — DASH-02/03: 2-column, everything visible without scrolling */}
+      <div className="flex-1 grid grid-cols-[260px_1fr] min-h-0 bg-jarvis-bg">
+        {/* Left Panel — DASH-04: Session, ADI, Fuel, Engine */}
         <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
-          {/* Session panel at top */}
           <SessionPanel
             currentSession={currentSession}
             connectionState={connectionState}
@@ -106,10 +56,9 @@ export function Dashboard() {
             onDevMode={handleDevMode}
             isCreating={isCreating}
             sessionError={sessionError}
-            onClearError={() => setSessionError(null)}
+            onClearError={clearSessionError}
           />
 
-          {/* ADI */}
           <div className="flex justify-center">
             <ADI
               pitchRad={telemetry?.att.pitch_rad ?? 0}
@@ -117,21 +66,19 @@ export function Dashboard() {
             />
           </div>
 
-          {/* Fuel Gauge */}
           <FuelGauge
             internal={telemetry?.fuel?.internal ?? 0}
             external={telemetry?.fuel?.external ?? 0}
           />
 
-          {/* Engine Panel */}
           <EnginePanel
             rpmPct={telemetry?.eng?.rpm_pct ?? 0}
             fuelCon={telemetry?.eng?.fuel_con ?? 0}
           />
         </div>
 
-        {/* Center — JARVIS Logo + Mini Cards */}
-        <div className="relative flex items-center justify-center p-6"
+        {/* Center Panel — DASH-02/03: Flight data + instruments + debug */}
+        <div className="relative flex flex-col min-h-0 overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 55%, #001b3a 0%, #010a1a 65%)' }}
         >
           {/* Corner brackets */}
@@ -140,60 +87,43 @@ export function Dashboard() {
           <div className="corner-bracket corner-bl" />
           <div className="corner-bracket corner-br" />
 
-          {/* Center layout: cards around JARVIS logo */}
-          <div className="relative w-full h-full flex items-center justify-center">
-            {/* Top row: IAS, ALT, HDG */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 flex gap-4">
-              <MiniTelemetryCard
-                label="IND AIRSPEED"
-                value={formatSpeed(telemetry?.spd?.ias_mps ?? null)}
-                unit="KTS"
-                color="accent"
-              />
-              <MiniTelemetryCard
-                label="ALTITUDE"
-                value={formatAlt(telemetry?.pos?.alt_m ?? null)}
-                unit="FT"
-                color="primary"
-              />
-              <MiniTelemetryCard
-                label="HEADING"
-                value={formatHdg(telemetry?.hdg_rad ?? null)}
-                unit="°"
-                color="accent"
-              />
+          {/* Top: Mini telemetry cards */}
+          <div className="flex justify-center gap-4 pt-3 px-4">
+            <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
+            <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
+            <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
+            <MiniTelemetryCard label="MACH NO" value={formatMach(telemetry?.spd?.mach ?? null)} color="success" />
+            <MiniTelemetryCard label="TRUE AIRSPEED" value={formatTAS(telemetry?.spd?.tas_mps ?? null)} unit="KTS" color="accent" />
+          </div>
+
+          {/* Middle: Instruments row + JARVIS logo */}
+          <div className="flex-1 flex items-center justify-center gap-6 px-4 min-h-0">
+            <div className="flex-shrink-0">
+              <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
             </div>
 
-            {/* Bottom row: Mach, TAS */}
-            <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-4">
-              <MiniTelemetryCard
-                label="MACH NO"
-                value={formatMach(telemetry?.spd?.mach ?? null)}
-                color="success"
-              />
-              <MiniTelemetryCard
-                label="TRUE AIRSPEED"
-                value={formatTAS(telemetry?.spd?.tas_mps ?? null)}
-                unit="KTS"
-                color="accent"
-              />
-            </div>
-
-            {/* Center JARVIS logo */}
             <div className="z-10">
               <JarvisLogo />
             </div>
+
+            <div className="flex-shrink-0">
+              <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
+            </div>
+
+            <div className="flex-shrink-0">
+              <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
+            </div>
           </div>
 
-          {/* Alert overlay at bottom of center */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-lg">
+          {/* Alert overlay */}
+          <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-full max-w-lg z-20">
             <AlertOverlay alerts={alerts} />
           </div>
 
-          {/* Connection status indicator */}
+          {/* Connection status */}
           {connectionState === 'connected' && !hasCritical && !hasWarning && (
             <div
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[12px] text-jarvis-accent glow-accent animate-blink whitespace-nowrap"
+              className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[12px] text-jarvis-accent glow-accent animate-blink whitespace-nowrap z-10"
               style={{ letterSpacing: '2px' }}
             >
               ● SYSTEM NOMINAL
@@ -201,43 +131,35 @@ export function Dashboard() {
           )}
           {connectionState === 'offline' && !currentSession && (
             <div
-              className="absolute bottom-8 left-1/2 -translate-x-1/2 text-[12px] text-jarvis-muted whitespace-nowrap"
+              className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[12px] text-jarvis-muted whitespace-nowrap z-10"
               style={{ letterSpacing: '2px' }}
             >
               CREATE A SESSION TO BEGIN
             </div>
           )}
-        </div>
 
-        {/* Right Panel — Tactical Instruments */}
-        <div className="bg-jarvis-bar border-l border-jarvis-border p-3 flex flex-col gap-3 overflow-y-auto">
-          {/* G-Meter */}
-          <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
-
-          {/* AoA Indicator */}
-          <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
-
-          {/* VVI Tape */}
-          <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
-
-          {/* Flight Coaching */}
-          <CoachingPanel
-            speedBand={coaching.speedBand}
-            altBand={coaching.altBand}
-            headingTrack={coaching.headingTrack}
-            smoothness={coaching.smoothness}
-          />
-
-          {/* Debug Panel */}
-          <DebugPanel
-            packetsPerSec={packetsPerSec}
-            lastPacketAt={lastPacketAt}
-            sessionId={sessionId}
-            subscriptionStatus={subscriptionStatus}
-          />
-
-          {/* Raw Packet Viewer */}
-          <RawPacketViewer packets={rawPackets} />
+          {/* Bottom: Coaching + Debug row */}
+          <div className="flex gap-2 px-4 pb-2 overflow-x-auto">
+            <div className="flex-1 min-w-[200px]">
+              <CoachingPanel
+                speedBand={coaching.speedBand}
+                altBand={coaching.altBand}
+                headingTrack={coaching.headingTrack}
+                smoothness={coaching.smoothness}
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <DebugPanel
+                packetsPerSec={packetsPerSec}
+                lastPacketAt={lastPacketAt}
+                sessionId={sessionId}
+                subscriptionStatus={subscriptionStatus}
+              />
+            </div>
+            <div className="flex-1 min-w-[200px]">
+              <RawPacketViewer packets={rawPackets} />
+            </div>
+          </div>
         </div>
       </div>
 

@@ -47,10 +47,15 @@ async function main() {
 
   const publisher = new SupabasePublisher(supabaseUrl!, supabaseKey!, channelTopic)
 
-  const udpSocket = createUdpListener((packet) => {
-    metrics.recordUdpPacket()
-    publisher.enqueue(packet)
-  })
+  const udpSocket = createUdpListener(
+    (packet) => {
+      metrics.recordUdpPacket()
+      publisher.enqueue(packet)
+    },
+    (tactical) => {
+      publisher.enqueueTactical(tactical)
+    },
+  )
 
   metrics.start()
   publisher.start()
