@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useTelemetryContext } from '@/providers/telemetry-provider'
 import { TopBar } from './top-bar'
 import { BottomBar } from './bottom-bar'
@@ -10,7 +11,7 @@ import { AlertOverlay } from './alert-overlay'
 import { JarvisLogo } from './jarvis-logo'
 import { MiniTelemetryCard } from './mini-telemetry-card'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
-import { CoachingPanel } from './coaching-panel'
+import type { CoachingBand, SmoothnessScore } from '@/hooks/use-coaching'
 
 const formatSpeed = (mps: number | null) => mps !== null ? (mps * 1.94384).toFixed(0) : '---'
 const formatAlt = (m: number | null) => m !== null ? (m * 3.28084).toFixed(0) : '---'
@@ -42,12 +43,11 @@ export function Dashboard() {
 
   return (
     <div className="w-full h-screen flex flex-col">
-      {/* Top Bar — DASH-01: logo, nav, connection, clock only */}
       <TopBar connectionState={connectionState} />
 
-      {/* Main content — DASH-02/03: 2-column, everything visible without scrolling */}
-      <div className="flex-1 grid grid-cols-[260px_1fr] min-h-0 bg-jarvis-bg">
-        {/* Left Panel — DASH-04: Session, ADI, Fuel, Engine */}
+      {/* Main content — 3-column: left instruments | center HUD | right instruments */}
+      <div className="flex-1 grid grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg">
+        {/* Left Panel — Session, ADI, Fuel, Engine */}
         <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
           <SessionPanel
             currentSession={currentSession}
@@ -77,9 +77,9 @@ export function Dashboard() {
           />
         </div>
 
-        {/* Center Panel — DASH-02/03: Flight data + instruments + debug */}
+        {/* Center Panel — HUD display */}
         <div className="relative flex flex-col min-h-0 overflow-hidden"
-          style={{ background: 'radial-gradient(ellipse at 50% 55%, #001b3a 0%, #010a1a 65%)' }}
+          style={{ background: 'radial-gradient(ellipse at 50% 45%, #001b3a 0%, #010a1a 65%)' }}
         >
           {/* Corner brackets */}
           <div className="corner-bracket corner-tl" />
@@ -88,7 +88,7 @@ export function Dashboard() {
           <div className="corner-bracket corner-br" />
 
           {/* Top: Mini telemetry cards */}
-          <div className="flex justify-center gap-4 pt-3 px-4">
+          <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
             <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
             <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
             <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
@@ -96,75 +96,138 @@ export function Dashboard() {
             <MiniTelemetryCard label="TRUE AIRSPEED" value={formatTAS(telemetry?.spd?.tas_mps ?? null)} unit="KTS" color="accent" />
           </div>
 
-          {/* Middle: Instruments row + JARVIS logo */}
-          <div className="flex-1 flex items-center justify-center gap-6 px-4 min-h-0">
-            <div className="flex-shrink-0">
-              <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
-            </div>
-
-            <div className="z-10">
-              <JarvisLogo />
-            </div>
-
-            <div className="flex-shrink-0">
-              <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
-            </div>
-
-            <div className="flex-shrink-0">
-              <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
-            </div>
+          {/* Center: JARVIS logo */}
+          <div className="flex-1 flex items-center justify-center min-h-0">
+            <JarvisLogo />
           </div>
 
           {/* Alert overlay */}
-          <div className="absolute bottom-28 left-1/2 -translate-x-1/2 w-full max-w-lg z-20">
+          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-lg z-20">
             <AlertOverlay alerts={alerts} />
           </div>
 
-          {/* Connection status */}
+          {/* Status text — positioned above the coaching/debug bars */}
           {connectionState === 'connected' && !hasCritical && !hasWarning && (
-            <div
-              className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[12px] text-jarvis-accent glow-accent animate-blink whitespace-nowrap z-10"
-              style={{ letterSpacing: '2px' }}
-            >
+            <div className="flex-shrink-0 text-center text-[12px] text-jarvis-accent glow-accent animate-blink whitespace-nowrap pb-1"
+              style={{ letterSpacing: '2px' }}>
               ● SYSTEM NOMINAL
             </div>
           )}
           {connectionState === 'offline' && !currentSession && (
-            <div
-              className="absolute bottom-24 left-1/2 -translate-x-1/2 text-[12px] text-jarvis-muted whitespace-nowrap z-10"
-              style={{ letterSpacing: '2px' }}
-            >
+            <div className="flex-shrink-0 text-center text-[12px] text-jarvis-muted whitespace-nowrap pb-1"
+              style={{ letterSpacing: '2px' }}>
               CREATE A SESSION TO BEGIN
             </div>
           )}
 
-          {/* Bottom: Coaching + Debug row */}
-          <div className="flex gap-2 px-4 pb-2 overflow-x-auto">
-            <div className="flex-1 min-w-[200px]">
-              <CoachingPanel
-                speedBand={coaching.speedBand}
-                altBand={coaching.altBand}
-                headingTrack={coaching.headingTrack}
-                smoothness={coaching.smoothness}
-              />
-            </div>
-            <div className="flex-1 min-w-[200px]">
-              <DebugPanel
-                packetsPerSec={packetsPerSec}
-                lastPacketAt={lastPacketAt}
-                sessionId={sessionId}
-                subscriptionStatus={subscriptionStatus}
-              />
-            </div>
-            <div className="flex-1 min-w-[200px]">
-              <RawPacketViewer packets={rawPackets} />
-            </div>
+          {/* Bottom: Coaching compact bar + Debug compact bar */}
+          <div className="flex-shrink-0 px-3 pb-2 flex flex-col gap-1">
+            <CompactCoaching
+              speedBand={coaching.speedBand}
+              altBand={coaching.altBand}
+              headingTrack={coaching.headingTrack}
+              smoothness={coaching.smoothness}
+            />
+            <CompactDebug
+              packetsPerSec={packetsPerSec}
+              lastPacketAt={lastPacketAt}
+              sessionId={sessionId}
+              subscriptionStatus={subscriptionStatus}
+              rawPackets={rawPackets}
+            />
           </div>
+        </div>
+
+        {/* Right Panel — G-Meter, AoA, VVI (compact, stacked) */}
+        <div className="bg-jarvis-bar border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
+          <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
+          <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
+          <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
         </div>
       </div>
 
-      {/* Bottom Bar */}
       <BottomBar connectionState={connectionState} telemetry={telemetry} />
+    </div>
+  )
+}
+
+/** Compact single-row coaching summary */
+function CompactCoaching({
+  speedBand, altBand, headingTrack, smoothness,
+}: {
+  speedBand: CoachingBand
+  altBand: CoachingBand
+  headingTrack: CoachingBand
+  smoothness: SmoothnessScore
+}) {
+  return (
+    <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 flex items-center gap-4 text-[10px]">
+      <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>COACHING</span>
+      <BandChip label="SPD" band={speedBand} unit="KT" />
+      <BandChip label="ALT" band={altBand} unit="FT" />
+      <BandChip label="HDG" band={headingTrack} unit="°" />
+      <div className="flex items-center gap-1 ml-auto">
+        <span className="opacity-40">SM</span>
+        <span className={`font-bold tabular-nums ${
+          smoothness.score >= 80 ? 'text-jarvis-success' : smoothness.score >= 50 ? 'text-jarvis-warning' : 'text-jarvis-danger'
+        }`}>
+          {smoothness.score}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+function BandChip({ label, band, unit }: { label: string; band: CoachingBand; unit: string }) {
+  const statusColor = band.status === 'in-band' ? 'text-jarvis-success'
+    : band.status === 'no-data' ? 'text-jarvis-muted' : 'text-jarvis-warning'
+
+  return (
+    <div className="flex items-center gap-1">
+      <span className="opacity-40">{label}</span>
+      <span className={`font-bold tabular-nums ${statusColor}`}>
+        {band.current !== null ? band.current.toFixed(0) : '---'}
+      </span>
+      <span className="opacity-30">/{band.target.toFixed(0)}{unit}</span>
+    </div>
+  )
+}
+
+/** Compact single-row debug info */
+function CompactDebug({
+  packetsPerSec, lastPacketAt, sessionId, subscriptionStatus, rawPackets,
+}: {
+  packetsPerSec: number
+  lastPacketAt: number | null
+  sessionId: string | null
+  subscriptionStatus: string
+  rawPackets: unknown[]
+}) {
+  const [showRaw, setShowRaw] = useState(false)
+
+  return (
+    <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 text-[10px]">
+      <div className="flex items-center gap-4">
+        <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>DEBUG</span>
+        <span className="opacity-40">PPS</span>
+        <span className="text-jarvis-accent tabular-nums font-bold">{packetsPerSec.toFixed(1)}</span>
+        <span className="opacity-40">SES</span>
+        <span className="text-jarvis-accent tabular-nums">{sessionId ? sessionId.slice(0, 8) : 'NONE'}</span>
+        <span className="opacity-40">SUB</span>
+        <span className="text-jarvis-accent tabular-nums">{subscriptionStatus}</span>
+        <button
+          onClick={() => setShowRaw(!showRaw)}
+          className="ml-auto opacity-40 hover:opacity-100 cursor-pointer font-bold"
+          style={{ letterSpacing: '1px' }}
+        >
+          RAW ({rawPackets.length}) {showRaw ? '▾' : '▸'}
+        </button>
+      </div>
+      {showRaw && rawPackets.length > 0 && (
+        <pre className="mt-1 text-[9px] opacity-30 max-h-24 overflow-y-auto whitespace-pre-wrap break-all">
+          {JSON.stringify(rawPackets[rawPackets.length - 1], null, 2)}
+        </pre>
+      )}
     </div>
   )
 }

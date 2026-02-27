@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback } from 'react'
+import { createContext, useContext, useState, useCallback, useMemo } from 'react'
 import { useTelemetry, type ConnectionState } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
 import { useCoaching } from '@/hooks/use-coaching'
@@ -58,14 +58,16 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
 
   const { alerts, hasCritical, hasWarning } = useAlerts(telemetry)
 
-  const coaching = useCoaching(telemetry, {
+  const coachingOpts = useMemo(() => ({
     targetSpeedKnots: 350,
     speedTolerance: 50,
     targetAltFt: 25000,
     altTolerance: 200,
     targetHeadingDeg: 270,
     headingTolerance: 10,
-  })
+  }), [])
+
+  const coaching = useCoaching(telemetry, coachingOpts)
 
   const handleCreateSession = useCallback(async () => {
     setIsCreating(true)
@@ -89,6 +91,8 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
+  const clearSessionError = useCallback(() => setSessionError(null), [])
+
   const handleDevMode = useCallback(() => {
     setCurrentSession({
       id: 'dev',
@@ -109,7 +113,7 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
       sessionError,
       handleCreateSession,
       handleDevMode,
-      clearSessionError: () => setSessionError(null),
+      clearSessionError,
       telemetry,
       tactical,
       heartbeat,

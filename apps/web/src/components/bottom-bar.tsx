@@ -71,7 +71,8 @@ export function BottomBar({ connectionState, telemetry }: BottomBarProps) {
       {/* Ticker */}
       <div className="flex-1 mx-6 overflow-hidden whitespace-nowrap">
         <div className="inline-block ticker-scroll text-jarvis-primary/60">
-          // JARVIS DCS TACTICAL HUD v1.1 // EXPANDED TELEMETRY ACTIVE // SAFETY ALERTS ARMED // FLIGHT COACHING ENABLED //
+          {/* eslint-disable-next-line react/jsx-no-comment-textnodes */}
+          // JARVIS DCS TACTICAL HUD v2.0 // EXPANDED TELEMETRY ACTIVE // SAFETY ALERTS ARMED // FLIGHT COACHING ENABLED //
         </div>
       </div>
 

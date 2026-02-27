@@ -178,7 +178,7 @@ export function useCoaching(
         averageAngVel: avgAngVel,
       })
     }
-  }, [telemetry, opts])
+  }, [telemetry, opts.targetSpeedKnots, opts.speedTolerance, opts.targetAltFt, opts.altTolerance, opts.targetHeadingDeg, opts.headingTolerance])
 
   return { speedBand, altBand, headingTrack, smoothness }
 }

@@ -31,7 +31,7 @@ export function TopBar({ connectionState }: TopBarProps) {
 
   return (
     <div
-      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-6 h-[52px]"
+      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-6 h-[52px] relative z-50"
     >
       {/* Logo */}
       <div>
