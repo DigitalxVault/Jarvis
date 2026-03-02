@@ -29,6 +29,9 @@ local jarvis_perm_interval = 10  -- re-check every 10 seconds
 -- Tactical error tracking (write error to log once, not every frame)
 local jarvis_tac_err_logged = false
 
+-- One-time tactical send diagnostic (same pattern as jarvis_diag_done)
+local jarvis_tac_send_logged = false
+
 -- ── Chain existing Export.lua functions ──
 local _prev_LuaExportStart = LuaExportStart
 local _prev_LuaExportAfterNextFrame = LuaExportAfterNextFrame
@@ -308,7 +311,8 @@ function jarvis_send_tactical(t)
   }
 
   -- ── World Objects (EXPT-01) — anti-cheat gated ──
-  if jarvis_object_export_ok and LoGetWorldObjects then
+  pcall(function()
+    if not (jarvis_object_export_ok and LoGetWorldObjects) then return end
     local raw_objects = LoGetWorldObjects("units") or {}
     local objects = {}
     local player_id = (LoGetPlayerPlaneId and LoGetPlayerPlaneId()) or -1
@@ -334,10 +338,11 @@ function jarvis_send_tactical(t)
       end
     end
     packet.objects = objects
-  end
+  end)
 
   -- ── Radar Targets (EXPT-02) — anti-cheat gated ──
-  if jarvis_sensor_export_ok then
+  pcall(function()
+    if not jarvis_sensor_export_ok then return end
     -- All tracked targets
     if LoGetTargetInformation then
       local raw_targets = LoGetTargetInformation() or {}
@@ -360,33 +365,36 @@ function jarvis_send_tactical(t)
       end
       packet.targets = targets
     end
+  end)
 
-    -- Locked targets only (EXPT-02)
-    if LoGetLockedTargetInformation then
-      local raw_locked = LoGetLockedTargetInformation() or {}
-      local locked = {}
-      for _, tgt in pairs(raw_locked) do
-        local pos_p = (tgt.position and tgt.position.p) or {x=0, y=0, z=0}
-        local vel = tgt.velocity or {x=0, y=0, z=0}
-        locked[#locked + 1] = {
-          id       = tgt.ID or 0,
-          dist     = tgt.distance or 0,
-          course   = tgt.course or 0,
-          mach     = tgt.mach or 0,
-          flags    = tgt.flags or 0,
-          fim      = tgt.fim or 0,
-          fin      = tgt.fin or 0,
-          vel      = { x = vel.x, y = vel.y, z = vel.z },
-          pos      = { x = pos_p.x, y = pos_p.y, z = pos_p.z },
-          jamming  = tgt.isjamming or false,
-        }
-      end
-      packet.locked = locked
+  -- ── Locked Targets (EXPT-02) — anti-cheat gated ──
+  pcall(function()
+    if not jarvis_sensor_export_ok then return end
+    if not LoGetLockedTargetInformation then return end
+    local raw_locked = LoGetLockedTargetInformation() or {}
+    local locked = {}
+    for _, tgt in pairs(raw_locked) do
+      local pos_p = (tgt.position and tgt.position.p) or {x=0, y=0, z=0}
+      local vel = tgt.velocity or {x=0, y=0, z=0}
+      locked[#locked + 1] = {
+        id       = tgt.ID or 0,
+        dist     = tgt.distance or 0,
+        course   = tgt.course or 0,
+        mach     = tgt.mach or 0,
+        flags    = tgt.flags or 0,
+        fim      = tgt.fim or 0,
+        fin      = tgt.fin or 0,
+        vel      = { x = vel.x, y = vel.y, z = vel.z },
+        pos      = { x = pos_p.x, y = pos_p.y, z = pos_p.z },
+        jamming  = tgt.isjamming or false,
+      }
     end
-  end
+    packet.locked = locked
+  end)
 
   -- ── Payload / Weapons (EXPT-03) — NOT anti-cheat gated ──
-  if LoGetPayloadInfo then
+  pcall(function()
+    if not LoGetPayloadInfo then return end
     local payload = LoGetPayloadInfo() or {}
     local stations = {}
     if payload.Stations then
@@ -413,19 +421,21 @@ function jarvis_send_tactical(t)
       stations = stations,
       gun_rounds = (payload.Cannon and payload.Cannon.shells) or 0,
     }
-  end
+  end)
 
   -- ── Countermeasures (EXPT-03) ──
-  if LoGetSnares then
+  pcall(function()
+    if not LoGetSnares then return end
     local cm = LoGetSnares() or {}
     packet.countermeasures = {
       chaff = cm.chaff or 0,
       flare = cm.flare or 0,
     }
-  end
+  end)
 
   -- ── Navigation Info (EXPT-04) ──
-  if LoGetNavigationInfo then
+  pcall(function()
+    if not LoGetNavigationInfo then return end
     local nav = LoGetNavigationInfo() or {}
     local sys_mode = nav.SystemMode or {}
     local acs = nav.ACS or {}
@@ -436,31 +446,35 @@ function jarvis_send_tactical(t)
       autothrust  = (acs.autothrust or 0) > 0,
       current_wp  = nav.CurrentWaypoint or 0,
     }
-  end
+  end)
 
   -- ── Route / Waypoints (EXPT-04b) — NOT anti-cheat gated ──
-  if LoGetRoute then
+  pcall(function()
+    if not LoGetRoute then return end
     local ok_route, raw_route = pcall(LoGetRoute)
-    if ok_route and raw_route then
-      local waypoints = {}
-      for i, wp in ipairs(raw_route) do
-        local geo = LoLoCoordinatesToGeoCoordinates(wp.x or 0, wp.y or 0)
-        waypoints[#waypoints + 1] = {
-          idx  = i,
-          lat  = geo.latitude or 0,
-          lon  = geo.longitude or 0,
-          alt  = wp.alt or 0,
-          name = wp.name or ("WP" .. i),
-        }
-      end
-      if #waypoints > 0 then
-        packet.route = waypoints
-      end
+    if not ok_route or not raw_route then return end
+    local waypoints = {}
+    local geo_fn = LoCoordinatesToGeoCoordinates or LoLoCoordinatesToGeoCoordinates
+    for i, wp in ipairs(raw_route) do
+      if not geo_fn then break end
+      local geo_ok, geo = pcall(geo_fn, wp.x or 0, wp.z or 0)
+      if not geo_ok or not geo then break end
+      waypoints[#waypoints + 1] = {
+        idx  = i,
+        lat  = geo.latitude or 0,
+        lon  = geo.longitude or 0,
+        alt  = wp.alt or 0,
+        name = wp.name or ("WP" .. i),
+      }
     end
-  end
+    if #waypoints > 0 then
+      packet.route = waypoints
+    end
+  end)
 
   -- ── MCP State / Warnings (EXPT-05) ──
-  if LoGetMCPState then
+  pcall(function()
+    if not LoGetMCPState then return end
     local mcp = LoGetMCPState() or {}
     -- Only send active warnings to minimize packet size
     local warnings = {}
@@ -470,10 +484,11 @@ function jarvis_send_tactical(t)
       end
     end
     packet.mcp_warnings = warnings
-  end
+  end)
 
   -- ── Mechanization Info (EXPT-06) ──
-  if LoGetMechInfo then
+  pcall(function()
+    if not LoGetMechInfo then return end
     local mech = LoGetMechInfo() or {}
     local gear = mech.gear or {}
     local flaps = mech.flaps or {}
@@ -483,7 +498,7 @@ function jarvis_send_tactical(t)
       flaps_value = flaps.value or 0,       -- 0.0-1.0
       speedbrakes = spbrk.value or 0,       -- 0.0-1.0
     }
-  end
+  end)
 
   -- ── Anti-cheat flags for client awareness (EXPT-07) ──
   packet.permissions = {
@@ -491,14 +506,80 @@ function jarvis_send_tactical(t)
     sensors = jarvis_sensor_export_ok,
   }
 
+  -- ── Encode + Send with one-time diagnostic log ──
   local ok, encoded = pcall(function()
     return jarvis_JSON:encode(packet)
   end)
 
+  local send_ok, send_err = false, "skipped (encode failed)"
   if ok and encoded then
-    pcall(function()
+    send_ok, send_err = pcall(function()
       jarvis_udp:sendto(encoded, jarvis_host, jarvis_port)
     end)
+  end
+
+  -- One-time diagnostic: write to Logs/jarvis_tactical_send.log on first call
+  if not jarvis_tac_send_logged then
+    jarvis_tac_send_logged = true
+    local path = lfs and lfs.writedir and (lfs.writedir() .. "Logs/jarvis_tactical_send.log") or nil
+    if path then
+      local f = io.open(path, "w")
+      if f then
+        f:write("JARVIS Tactical Send Diagnostic — " .. os.date() .. "\n\n")
+
+        -- Report which packet sections populated
+        f:write("=== Packet Sections ===\n")
+        f:write("  objects:         " .. tostring(packet.objects ~= nil) .. (packet.objects and (" (" .. #packet.objects .. " items)") or "") .. "\n")
+        f:write("  targets:         " .. tostring(packet.targets ~= nil) .. (packet.targets and (" (" .. #packet.targets .. " items)") or "") .. "\n")
+        f:write("  locked:          " .. tostring(packet.locked ~= nil) .. (packet.locked and (" (" .. #packet.locked .. " items)") or "") .. "\n")
+        f:write("  weapons:         " .. tostring(packet.weapons ~= nil) .. "\n")
+        f:write("  countermeasures: " .. tostring(packet.countermeasures ~= nil) .. "\n")
+        f:write("  nav:             " .. tostring(packet.nav ~= nil) .. "\n")
+        f:write("  route:           " .. tostring(packet.route ~= nil) .. (packet.route and (" (" .. #packet.route .. " waypoints)") or "") .. "\n")
+        f:write("  mcp_warnings:    " .. tostring(packet.mcp_warnings ~= nil) .. "\n")
+        f:write("  mech:            " .. tostring(packet.mech ~= nil) .. "\n")
+        f:write("  permissions:     " .. tostring(packet.permissions ~= nil) .. "\n")
+
+        -- Report JSON encode result
+        f:write("\n=== JSON Encode ===\n")
+        f:write("  ok:   " .. tostring(ok) .. "\n")
+        if ok and encoded then
+          f:write("  size: " .. tostring(#encoded) .. " bytes\n")
+        else
+          f:write("  error: " .. tostring(encoded) .. "\n")
+        end
+
+        -- Report UDP send result
+        f:write("\n=== UDP Send ===\n")
+        f:write("  ok:    " .. tostring(send_ok) .. "\n")
+        if not send_ok then
+          f:write("  error: " .. tostring(send_err) .. "\n")
+        end
+        f:write("  host:  " .. jarvis_host .. ":" .. tostring(jarvis_port) .. "\n")
+
+        -- Report API availability (settles which coordinate function exists)
+        f:write("\n=== API Availability ===\n")
+        f:write("  LoCoordinatesToGeoCoordinates:   " .. tostring(LoCoordinatesToGeoCoordinates ~= nil) .. "\n")
+        f:write("  LoLoCoordinatesToGeoCoordinates: " .. tostring(LoLoCoordinatesToGeoCoordinates ~= nil) .. "\n")
+        f:write("  LoGetWorldObjects:               " .. tostring(LoGetWorldObjects ~= nil) .. "\n")
+        f:write("  LoGetTargetInformation:          " .. tostring(LoGetTargetInformation ~= nil) .. "\n")
+        f:write("  LoGetLockedTargetInformation:    " .. tostring(LoGetLockedTargetInformation ~= nil) .. "\n")
+        f:write("  LoGetPayloadInfo:                " .. tostring(LoGetPayloadInfo ~= nil) .. "\n")
+        f:write("  LoGetSnares:                     " .. tostring(LoGetSnares ~= nil) .. "\n")
+        f:write("  LoGetNavigationInfo:             " .. tostring(LoGetNavigationInfo ~= nil) .. "\n")
+        f:write("  LoGetRoute:                      " .. tostring(LoGetRoute ~= nil) .. "\n")
+        f:write("  LoGetMCPState:                   " .. tostring(LoGetMCPState ~= nil) .. "\n")
+        f:write("  LoGetMechInfo:                   " .. tostring(LoGetMechInfo ~= nil) .. "\n")
+
+        -- Anti-cheat permission state
+        f:write("\n=== Permissions ===\n")
+        f:write("  object_export_ok: " .. tostring(jarvis_object_export_ok) .. "\n")
+        f:write("  sensor_export_ok: " .. tostring(jarvis_sensor_export_ok) .. "\n")
+
+        f:write("\n=== Done ===\n")
+        f:close()
+      end
+    end
   end
 end
 
