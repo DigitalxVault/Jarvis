@@ -26,6 +26,9 @@ local jarvis_sensor_export_ok = false
 local jarvis_perm_last_check = 0
 local jarvis_perm_interval = 10  -- re-check every 10 seconds
 
+-- Tactical error tracking (write error to log once, not every frame)
+local jarvis_tac_err_logged = false
+
 -- ── Chain existing Export.lua functions ──
 local _prev_LuaExportStart = LuaExportStart
 local _prev_LuaExportAfterNextFrame = LuaExportAfterNextFrame
@@ -81,7 +84,15 @@ function LuaExportAfterNextFrame()
   -- ── Low-frequency tactical/weapons data (1 Hz) ──
   if t - jarvis_last_slow_send >= jarvis_slow_interval then
     jarvis_last_slow_send = t
-    pcall(jarvis_send_tactical, t)
+    local tac_ok, tac_err = pcall(jarvis_send_tactical, t)
+    if not tac_ok and not jarvis_tac_err_logged then
+      jarvis_tac_err_logged = true
+      local path = lfs and lfs.writedir and (lfs.writedir() .. "Logs/jarvis_tactical_err.log") or nil
+      if path then
+        local f = io.open(path, "w")
+        if f then f:write("Tactical error at t=" .. tostring(t) .. ": " .. tostring(tac_err) .. "\n"); f:close() end
+      end
+    end
   end
 end
 

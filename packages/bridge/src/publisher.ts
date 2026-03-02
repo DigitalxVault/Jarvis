@@ -94,9 +94,12 @@ export class SupabasePublisher {
 
     this.tacticalDirty = false
     try {
+      const tac = this.latestTactical
+      console.log(`[PUB] Publishing tactical (obj=${tac.objects?.length ?? 0} tgt=${tac.targets?.length ?? 0} nav=${tac.nav?.master_mode ?? '?'} route=${tac.route?.length ?? 0})`)
       await this.broadcast('tactical', this.latestTactical)
-    } catch {
-      // Tactical publish failure is non-critical — next cycle will retry
+      metrics.recordTacticalPublish()
+    } catch (err) {
+      console.error(`[PUB] Tactical publish failed:`, (err as Error).message)
       this.tacticalDirty = true
     }
   }

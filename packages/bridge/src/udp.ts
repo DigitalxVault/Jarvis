@@ -1,6 +1,7 @@
 import dgram from 'node:dgram'
 import type { TelemetryPacket, TacticalPacket } from '@jarvis-dcs/shared'
 import { UDP_PORT } from '@jarvis-dcs/shared'
+import { metrics } from './metrics.js'
 
 export type UdpCallback = (packet: TelemetryPacket) => void
 export type TacticalCallback = (packet: TacticalPacket) => void
@@ -17,6 +18,8 @@ export function createUdpListener(
       if (raw?.type === 'telemetry') {
         onPacket(raw as TelemetryPacket)
       } else if (raw?.type === 'tactical' && onTactical) {
+        console.log(`[UDP] Tactical packet received (t=${raw.t_model}, objects=${raw.objects?.length ?? 0}, targets=${raw.targets?.length ?? 0})`)
+        metrics.recordTacticalReceive()
         onTactical(raw as TacticalPacket)
       }
     } catch {

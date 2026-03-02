@@ -4,6 +4,8 @@ class Metrics {
   udpReceived = 0
   published = 0
   errors = 0
+  tacticalReceived = 0
+  tacticalPublished = 0
   private lastLogAt = Date.now()
   private wasDcsActive = true
   private logTimer: ReturnType<typeof setInterval> | null = null
@@ -18,6 +20,14 @@ class Metrics {
 
   recordError(): void {
     this.errors++
+  }
+
+  recordTacticalReceive(): void {
+    this.tacticalReceived++
+  }
+
+  recordTacticalPublish(): void {
+    this.tacticalPublished++
   }
 
   recordDcsSilent(dcsActive: boolean): void {
@@ -41,12 +51,14 @@ class Metrics {
     const { heapUsed, rss } = process.memoryUsage()
     const mb = (n: number) => (n / 1024 / 1024).toFixed(1)
     console.log(
-      `[METRICS] udp=${this.udpReceived} pub=${this.published} err=${this.errors} rate=${udpRate}/s heap=${mb(heapUsed)}MB rss=${mb(rss)}MB`
+      `[METRICS] udp=${this.udpReceived} pub=${this.published} err=${this.errors} tac_rx=${this.tacticalReceived} tac_pub=${this.tacticalPublished} rate=${udpRate}/s heap=${mb(heapUsed)}MB rss=${mb(rss)}MB`
     )
     this.lastLogAt = Date.now()
     this.udpReceived = 0
     this.published = 0
     this.errors = 0
+    this.tacticalReceived = 0
+    this.tacticalPublished = 0
   }
 }
 
