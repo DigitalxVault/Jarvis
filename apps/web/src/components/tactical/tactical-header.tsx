@@ -15,8 +15,8 @@ export function TacticalHeader({ tactical, connectionState }: TacticalHeaderProp
   const lockedCount = (tactical?.locked?.length ?? 0)
   const objectCount = (tactical?.objects?.length ?? 0)
 
-  const hasPermObjects = tactical?.permissions?.objects ?? false
-  const hasPermSensors = tactical?.permissions?.sensors ?? false
+  const hasPermObjects = tactical ? (tactical.permissions?.objects ?? true) : true
+  const hasPermSensors = tactical ? (tactical.permissions?.sensors ?? true) : true
 
   const modeColor = masterMode === 'OFF' ? 'text-jarvis-muted'
     : masterMode === 'NAV' ? 'text-jarvis-success'

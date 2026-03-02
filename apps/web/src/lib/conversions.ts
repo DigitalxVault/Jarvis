@@ -50,6 +50,31 @@ export function nmToMetres(nm: number): number {
   return nm * 1852
 }
 
+/** Calculate bearing in degrees from point 1 to point 2 (all inputs in degrees) */
+export function bearingDeg(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = Math.PI / 180
+  const dLon = (lon2 - lon1) * toRad
+  const lat1R = lat1 * toRad
+  const lat2R = lat2 * toRad
+  const y = Math.sin(dLon) * Math.cos(lat2R)
+  const x = Math.cos(lat1R) * Math.sin(lat2R) - Math.sin(lat1R) * Math.cos(lat2R) * Math.cos(dLon)
+  let brg = Math.atan2(y, x) * (180 / Math.PI)
+  if (brg < 0) brg += 360
+  return brg
+}
+
+/** Calculate great-circle distance in NM between two lat/lon points (degrees) */
+export function distanceNM(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const toRad = Math.PI / 180
+  const dLat = (lat2 - lat1) * toRad
+  const dLon = (lon2 - lon1) * toRad
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos(lat1 * toRad) * Math.cos(lat2 * toRad) * Math.sin(dLon / 2) ** 2
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+  return c * 3440.065 // Earth radius in NM
+}
+
 /** Format decimal degrees to DMS (e.g., 044°18'30"E) */
 export function lonToDMS(lon: number): string {
   const abs = Math.abs(lon)

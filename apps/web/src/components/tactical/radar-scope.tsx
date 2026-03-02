@@ -1,9 +1,9 @@
 'use client'
 
 import { useRef, useEffect, useState, useCallback } from 'react'
-import type { TelemetryPacket, TacticalPacket, RadarContact, RadarTarget } from '@jarvis-dcs/shared'
+import type { TelemetryPacket, TacticalPacket, RadarContact, RadarTarget, Waypoint } from '@jarvis-dcs/shared'
 import { hasTargetFlag, TargetFlags } from '@jarvis-dcs/shared'
-import { metresToNM, metresToFeet, mpsToKnots } from '@/lib/conversions'
+import { metresToNM, metresToFeet, mpsToKnots, bearingDeg, distanceNM, formatHeading } from '@/lib/conversions'
 
 interface RadarScopeProps {
   telemetry: TelemetryPacket | null
@@ -29,6 +29,12 @@ const COLOR = {
   unknown: 'rgba(0, 212, 255, 0.5)',
   label: 'rgba(0, 212, 255, 0.7)',
   scanline: 'rgba(0, 255, 255, 0.03)',
+  waypoint: '#00ff88',
+  waypointActive: '#00ffff',
+  waypointRoute: 'rgba(0, 255, 136, 0.25)',
+  bearingLine: 'rgba(0, 255, 255, 0.3)',
+  statusText: 'rgba(0, 212, 255, 0.5)',
+  diagText: 'rgba(0, 212, 255, 0.35)',
 }
 
 export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
@@ -41,9 +47,13 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
   const telemetryRef = useRef(telemetry)
   const tacticalRef = useRef(tactical)
   const rangeRef = useRef(rangeNM)
+  const lastTacticalAtRef = useRef(0)
 
   useEffect(() => { telemetryRef.current = telemetry }, [telemetry])
-  useEffect(() => { tacticalRef.current = tactical }, [tactical])
+  useEffect(() => {
+    tacticalRef.current = tactical
+    if (tactical) lastTacticalAtRef.current = Date.now()
+  }, [tactical])
   useEffect(() => { rangeRef.current = rangeNM }, [rangeNM])
 
   // Resize observer for responsive canvas
@@ -175,8 +185,14 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     const ownLon = tel?.pos?.lon ?? 0
     const rangeMetres = range * 1852 // NM to metres
 
+    // Staleness: dim contacts if tactical data is >5s old
+    const tacticalAge = Date.now() - lastTacticalAtRef.current
+    const isStale = lastTacticalAtRef.current > 0 && tacticalAge > 5000
+    const contactAlpha = isStale ? 0.5 : 1.0
+
     // Render world objects as contacts
     if (tac?.objects) {
+      ctx.globalAlpha = contactAlpha
       const lockedIds = new Set((tac.locked ?? []).map((l) => l.id))
       const trackedIds = new Set((tac.targets ?? []).map((t) => t.id))
 
@@ -197,10 +213,12 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
         // Contact marker
         drawContact(ctx, px, py, obj, isLocked, isTracked)
       }
+      ctx.globalAlpha = 1.0
     }
 
     // Render radar targets that might not be in objects (sensor-only tracks)
     if (tac?.targets) {
+      ctx.globalAlpha = contactAlpha
       for (const tgt of tac.targets) {
         // Use fim/fin (body-axis angles) for relative position
         const distNM = metresToNM(tgt.dist)
@@ -216,6 +234,100 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
 
         // Draw radar target blip
         drawRadarBlip(ctx, px, py, tgt, isLocked)
+      }
+      ctx.globalAlpha = 1.0
+    }
+
+    // ── Waypoint rendering ──
+    const route = tac?.route
+    const currentWp = tac?.nav?.current_wp ?? 0
+    if (route && route.length > 0 && ownLat !== 0) {
+      // Route line (dashed green connecting waypoints in order)
+      ctx.save()
+      ctx.setLineDash([4, 6])
+      ctx.strokeStyle = COLOR.waypointRoute
+      ctx.lineWidth = 1
+      ctx.beginPath()
+      let firstInScope = true
+      for (const wp of route) {
+        const { dx, dy } = latLonToRelative(ownLat, ownLon, wp.lat, wp.lon, hdg)
+        const px = cx + (dx / rangeMetres) * radius
+        const py = cy - (dy / rangeMetres) * radius
+        if (firstInScope) { ctx.moveTo(px, py); firstInScope = false }
+        else ctx.lineTo(px, py)
+      }
+      ctx.stroke()
+      ctx.setLineDash([])
+      ctx.restore()
+
+      // Bearing line from ownship to active waypoint
+      const activeWp = route.find((w) => w.idx === currentWp)
+      if (activeWp) {
+        const { dx: awDx, dy: awDy } = latLonToRelative(ownLat, ownLon, activeWp.lat, activeWp.lon, hdg)
+        const awPx = cx + (awDx / rangeMetres) * radius
+        const awPy = cy - (awDy / rangeMetres) * radius
+
+        ctx.save()
+        ctx.setLineDash([6, 4])
+        ctx.strokeStyle = COLOR.bearingLine
+        ctx.lineWidth = 1
+        ctx.beginPath()
+        ctx.moveTo(cx, cy)
+        ctx.lineTo(awPx, awPy)
+        ctx.stroke()
+        ctx.setLineDash([])
+        ctx.restore()
+
+        // Bearing/distance readout at top of scope
+        const brg = bearingDeg(ownLat, ownLon, activeWp.lat, activeWp.lon)
+        const dist = distanceNM(ownLat, ownLon, activeWp.lat, activeWp.lon)
+        ctx.font = 'bold 10px "Courier New"'
+        ctx.fillStyle = COLOR.waypointActive
+        ctx.textAlign = 'center'
+        ctx.fillText(
+          `STPT ${currentWp} → ${formatHeading(brg)}° / ${dist.toFixed(1)} NM`,
+          cx, cy - radius + 24,
+        )
+      }
+
+      // Individual waypoint markers
+      for (const wp of route) {
+        const { dx, dy } = latLonToRelative(ownLat, ownLon, wp.lat, wp.lon, hdg)
+        const px = cx + (dx / rangeMetres) * radius
+        const py = cy - (dy / rangeMetres) * radius
+
+        // Skip if far outside scope (allow some bleed)
+        const screenDist = Math.sqrt((px - cx) ** 2 + (py - cy) ** 2)
+        if (screenDist > radius * 1.3) continue
+
+        const isActive = wp.idx === currentWp
+        const color = isActive ? COLOR.waypointActive : COLOR.waypoint
+
+        ctx.save()
+        ctx.translate(px, py)
+
+        // Square marker
+        const sz = isActive ? 5 : 4
+        ctx.strokeStyle = color
+        ctx.lineWidth = isActive ? 2 : 1
+        ctx.strokeRect(-sz, -sz, sz * 2, sz * 2)
+
+        // Active highlight ring
+        if (isActive) {
+          ctx.beginPath()
+          ctx.arc(0, 0, 10, 0, Math.PI * 2)
+          ctx.strokeStyle = COLOR.waypointActive
+          ctx.lineWidth = 1.5
+          ctx.stroke()
+        }
+
+        // Index label
+        ctx.font = `${isActive ? 'bold ' : ''}9px "Courier New"`
+        ctx.fillStyle = color
+        ctx.textAlign = 'left'
+        ctx.fillText(`${wp.idx}`, sz + 4, 3)
+
+        ctx.restore()
       }
     }
 
@@ -233,6 +345,46 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     ctx.fillStyle = sweepGrad
     ctx.fill()
     ctx.restore()
+
+    // ── Status feedback overlay ──
+    if (!tac) {
+      // No tactical data at all
+      ctx.font = '12px "Courier New"'
+      ctx.fillStyle = COLOR.statusText
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('AWAITING TACTICAL', cx, cy + radius * 0.35)
+    } else {
+      const objCount = tac.objects?.length ?? 0
+      const tgtCount = tac.targets?.length ?? 0
+      if (objCount === 0 && tgtCount === 0 && (!route || route.length === 0)) {
+        ctx.font = '11px "Courier New"'
+        ctx.fillStyle = COLOR.statusText
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText('NO CONTACTS', cx, cy + radius * 0.35)
+      }
+    }
+
+    // ── Diagnostic readout at bottom of scope ──
+    if (tac) {
+      const objCount = tac.objects?.length ?? 0
+      const tgtCount = tac.targets?.length ?? 0
+      const lckCount = tac.locked?.length ?? 0
+      const permObj = tac.permissions?.objects !== false
+      const permSns = tac.permissions?.sensors !== false
+
+      ctx.font = '8px "Courier New"'
+      ctx.fillStyle = COLOR.diagText
+      ctx.textAlign = 'center'
+      const diagY = cy + radius + 12
+
+      const staleTag = isStale ? ' STALE' : ''
+      ctx.fillText(
+        `OBJ:${objCount} TGT:${tgtCount} LCK:${lckCount}  PERM: OBJ${permObj ? '✓' : '✗'} SNS${permSns ? '✓' : '✗'}${staleTag}`,
+        cx, diagY,
+      )
+    }
   }, [])
 
   // Animation loop

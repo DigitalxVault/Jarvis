@@ -66,6 +66,8 @@ export interface TacticalPacket {
   countermeasures?: CountermeasuresState
   /** Navigation/mode info */
   nav?: NavigationState
+  /** Flight plan waypoints from LoGetRoute() */
+  route?: Waypoint[]
   /** Active MCP warnings */
   mcp_warnings?: string[]
   /** Mechanization state */
@@ -153,6 +155,20 @@ export interface NavigationState {
   sub_mode: string
   acs_mode: string
   autothrust: boolean
+  /** Active steerpoint/waypoint index from LoGetNavigationInfo().CurrentWaypoint */
+  current_wp?: number
+}
+
+/** Flight plan waypoint from LoGetRoute() — NOT anti-cheat gated */
+export interface Waypoint {
+  idx: number
+  /** Latitude in degrees */
+  lat: number
+  /** Longitude in degrees */
+  lon: number
+  /** Altitude MSL in metres */
+  alt: number
+  name: string
 }
 
 /** Mechanization state from LoGetMechInfo */

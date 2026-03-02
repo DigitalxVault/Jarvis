@@ -423,7 +423,29 @@ function jarvis_send_tactical(t)
       sub_mode    = sys_mode.submode or "OFF",
       acs_mode    = acs.mode or "OFF",
       autothrust  = (acs.autothrust or 0) > 0,
+      current_wp  = nav.CurrentWaypoint or 0,
     }
+  end
+
+  -- ── Route / Waypoints (EXPT-04b) — NOT anti-cheat gated ──
+  if LoGetRoute then
+    local ok_route, raw_route = pcall(LoGetRoute)
+    if ok_route and raw_route then
+      local waypoints = {}
+      for i, wp in ipairs(raw_route) do
+        local geo = LoLoCoordinatesToGeoCoordinates(wp.x or 0, wp.y or 0)
+        waypoints[#waypoints + 1] = {
+          idx  = i,
+          lat  = geo.latitude or 0,
+          lon  = geo.longitude or 0,
+          alt  = wp.alt or 0,
+          name = wp.name or ("WP" .. i),
+        }
+      end
+      if #waypoints > 0 then
+        packet.route = waypoints
+      end
+    end
   end
 
   -- ── MCP State / Warnings (EXPT-05) ──
