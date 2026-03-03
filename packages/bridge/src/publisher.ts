@@ -21,6 +21,7 @@ export class SupabasePublisher {
   private backoffMs = BASE_BACKOFF_MS
   private backoffUntilMs = 0
   private totalPublished = 0
+  private fetchErrorLogged = false // Log full error details only once to avoid spam
 
   // Tactical packet (latest only, overwritten on each receive)
   private latestTactical: TacticalPacket | null = null
@@ -78,9 +79,15 @@ export class SupabasePublisher {
       metrics.recordPublish()
       this.backoffMs = BASE_BACKOFF_MS // reset on success
       this.backoffUntilMs = 0
+      this.fetchErrorLogged = false
     } catch (err) {
       metrics.recordError()
       console.error(`[PUB] Publish failed (retry in ${this.backoffMs}ms):`, (err as Error).message)
+      if (!this.fetchErrorLogged) {
+        const cause = (err as any)?.cause
+        if (cause) console.error('[PUB]   cause:', cause)
+        this.fetchErrorLogged = true
+      }
       // Re-enqueue for retry
       this.queue.push(latest)
       this.backoffMs = Math.min(this.backoffMs * 2, MAX_BACKOFF_MS)
@@ -100,6 +107,11 @@ export class SupabasePublisher {
       metrics.recordTacticalPublish()
     } catch (err) {
       console.error(`[PUB] Tactical publish failed:`, (err as Error).message)
+      if (!this.fetchErrorLogged) {
+        const cause = (err as any)?.cause
+        if (cause) console.error('[PUB]   cause:', cause)
+        this.fetchErrorLogged = true
+      }
       this.tacticalDirty = true
     }
   }
