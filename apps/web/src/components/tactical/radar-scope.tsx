@@ -10,6 +10,15 @@ interface RadarScopeProps {
   tactical: TacticalPacket | null
 }
 
+interface DestroyedContact {
+  id: number
+  lat: number
+  lon: number
+  alt: number
+  destroyedAt: number
+}
+
+const KILL_FADE_MS = 5000
 const RANGE_OPTIONS = [10, 20, 40, 80] as const
 type RangeNM = typeof RANGE_OPTIONS[number]
 
@@ -48,6 +57,8 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
   const tacticalRef = useRef(tactical)
   const rangeRef = useRef(rangeNM)
   const lastTacticalAtRef = useRef(0)
+  const prevEnemyMapRef = useRef<Map<number, RadarContact>>(new Map())
+  const destroyedRef = useRef<DestroyedContact[]>([])
 
   useEffect(() => { telemetryRef.current = telemetry }, [telemetry])
   useEffect(() => {
@@ -55,6 +66,63 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     if (tactical) lastTacticalAtRef.current = Date.now()
   }, [tactical])
   useEffect(() => { rangeRef.current = rangeNM }, [rangeNM])
+
+  // Destroyed enemy detection
+  useEffect(() => {
+    if (!tactical) return
+
+    const now = Date.now()
+    const tacticalAge = now - lastTacticalAtRef.current
+
+    // Staleness guard: if tactical data had a >5s gap, clear prev map to avoid false kills
+    if (tacticalAge > 5000 && lastTacticalAtRef.current > 0) {
+      prevEnemyMapRef.current = new Map()
+    }
+
+    // Build current enemy map
+    const currentEnemies = new Map<number, RadarContact>()
+    if (tactical.objects) {
+      for (const obj of tactical.objects) {
+        if (obj.coal === 'Enemies') {
+          currentEnemies.set(obj.id, obj)
+        }
+      }
+    }
+
+    const prevMap = prevEnemyMapRef.current
+
+    // Only check for kills if we had a previous frame
+    if (prevMap.size > 0) {
+      const missingIds: number[] = []
+      for (const [id] of prevMap) {
+        if (!currentEnemies.has(id)) {
+          missingIds.push(id)
+        }
+      }
+
+      // Mission reset guard: if >50% vanish simultaneously, treat as reset
+      if (missingIds.length > 0 && missingIds.length <= prevMap.size * 0.5) {
+        for (const id of missingIds) {
+          const prev = prevMap.get(id)!
+          destroyedRef.current.push({
+            id,
+            lat: prev.lat,
+            lon: prev.lon,
+            alt: prev.alt,
+            destroyedAt: now,
+          })
+        }
+      }
+    }
+
+    // Clean up expired entries
+    destroyedRef.current = destroyedRef.current.filter(
+      (d) => now - d.destroyedAt < KILL_FADE_MS,
+    )
+
+    // Store current frame for next comparison
+    prevEnemyMapRef.current = currentEnemies
+  }, [tactical])
 
   // Resize observer for responsive canvas
   useEffect(() => {
@@ -190,6 +258,23 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     const isStale = lastTacticalAtRef.current > 0 && tacticalAge > 5000
     const contactAlpha = isStale ? 0.5 : 1.0
 
+    // Render destroyed markers (red X at last known position)
+    const now = Date.now()
+    for (const d of destroyedRef.current) {
+      const elapsed = now - d.destroyedAt
+      if (elapsed > KILL_FADE_MS) continue
+
+      const { dx, dy } = latLonToRelative(ownLat, ownLon, d.lat, d.lon, hdg)
+      const distMetres = Math.sqrt(dx * dx + dy * dy)
+      if (distMetres > rangeMetres * 1.1) continue
+
+      const px = cx + (dx / rangeMetres) * radius
+      const py = cy - (dy / rangeMetres) * radius
+      const fadeAlpha = 1.0 - elapsed / KILL_FADE_MS
+
+      drawDestroyedMarker(ctx, px, py, fadeAlpha)
+    }
+
     // Render world objects as contacts
     if (tac?.objects) {
       ctx.globalAlpha = contactAlpha
@@ -211,7 +296,7 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
         const isTracked = trackedIds.has(obj.id)
 
         // Contact marker
-        drawContact(ctx, px, py, obj, isLocked, isTracked)
+        drawContact(ctx, px, py, obj, isLocked, isTracked, hdg)
       }
       ctx.globalAlpha = 1.0
     }
@@ -379,9 +464,10 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
       ctx.textAlign = 'center'
       const diagY = cy + radius + 12
 
+      const kiaCount = destroyedRef.current.length
       const staleTag = isStale ? ' STALE' : ''
       ctx.fillText(
-        `OBJ:${objCount} TGT:${tgtCount} LCK:${lckCount}  PERM: OBJ${permObj ? '✓' : '✗'} SNS${permSns ? '✓' : '✗'}${staleTag}`,
+        `OBJ:${objCount} TGT:${tgtCount} LCK:${lckCount} KIA:${kiaCount}  PERM: OBJ${permObj ? '✓' : '✗'} SNS${permSns ? '✓' : '✗'}${staleTag}`,
         cx, diagY,
       )
     }
@@ -488,61 +574,71 @@ function latLonToRelative(
   return { dx, dy }
 }
 
-/** Draw a world object contact marker */
+/** Draw a world object contact marker (filled triangle, rotated to heading) */
 function drawContact(
   ctx: CanvasRenderingContext2D,
   x: number, y: number,
   obj: RadarContact,
   isLocked: boolean,
   isTracked: boolean,
+  ownHdg: number,
 ) {
+  // Coalition-based color
   const color = isLocked ? COLOR.locked
     : isTracked ? COLOR.tracked
     : obj.coal === 'Enemies' ? COLOR.hostile
     : obj.coal === 'Allies' ? COLOR.friendly
     : COLOR.unknown
 
-  // Contact diamond
+  // Coalition-based triangle sizing
+  let triH: number, triW: number
+  if (obj.coal === 'Enemies') {
+    triH = 9; triW = 8  // 18px tall, 16px wide
+  } else if (obj.coal === 'Allies') {
+    triH = 7; triW = 6  // 14px tall, 12px wide
+  } else {
+    triH = 6; triW = 5  // 12px tall, 10px wide
+  }
+
   ctx.save()
   ctx.translate(x, y)
 
+  // Rotate triangle to point in direction of travel (heading-up corrected)
+  if (obj.hdg != null) {
+    ctx.rotate(obj.hdg - ownHdg)
+  }
+
+  // Filled triangle (pointing up = forward)
   ctx.beginPath()
-  ctx.moveTo(0, -5)
-  ctx.lineTo(4, 0)
-  ctx.lineTo(0, 5)
-  ctx.lineTo(-4, 0)
+  ctx.moveTo(0, -triH)
+  ctx.lineTo(-triW, triH)
+  ctx.lineTo(triW, triH)
   ctx.closePath()
   ctx.fillStyle = color
   ctx.fill()
+  ctx.strokeStyle = color
+  ctx.lineWidth = 1.5
+  ctx.stroke()
+
+  // Reset rotation for lock ring and labels
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  ctx.translate(x, y)
 
   // Lock ring
   if (isLocked) {
     ctx.beginPath()
-    ctx.arc(0, 0, 8, 0, Math.PI * 2)
+    ctx.arc(0, 0, triH + 5, 0, Math.PI * 2)
     ctx.strokeStyle = COLOR.locked
     ctx.lineWidth = 2
     ctx.stroke()
   }
 
-  // Velocity vector arrow
-  if (obj.hdg) {
-    const vLen = 12
-    const vx = Math.sin(obj.hdg) * vLen
-    const vy = -Math.cos(obj.hdg) * vLen
-    ctx.beginPath()
-    ctx.moveTo(0, 0)
-    ctx.lineTo(vx, vy)
-    ctx.strokeStyle = color
-    ctx.lineWidth = 1
-    ctx.stroke()
-  }
-
-  // Labels
+  // Altitude label
   ctx.font = '8px "Courier New"'
   ctx.fillStyle = COLOR.label
   ctx.textAlign = 'left'
   const altFt = Math.round(metresToFeet(obj.alt) / 100) // FL
-  ctx.fillText(`${altFt}`, 8, -2)
+  ctx.fillText(`${altFt}`, triW + 4, -2)
 
   ctx.restore()
 }
@@ -579,6 +675,42 @@ function drawRadarBlip(
   ctx.fillStyle = COLOR.label
   ctx.textAlign = 'left'
   ctx.fillText(`${spdKts}`, 6, 3)
+
+  ctx.restore()
+}
+
+/** Draw a destroyed contact marker (red X with fade) */
+function drawDestroyedMarker(
+  ctx: CanvasRenderingContext2D,
+  x: number, y: number,
+  alpha: number,
+) {
+  const arm = 8
+
+  ctx.save()
+  ctx.translate(x, y)
+  ctx.globalAlpha = alpha
+
+  // Red X
+  ctx.strokeStyle = COLOR.hostile
+  ctx.lineWidth = 2.5
+  ctx.lineCap = 'round'
+
+  ctx.beginPath()
+  ctx.moveTo(-arm, -arm)
+  ctx.lineTo(arm, arm)
+  ctx.stroke()
+
+  ctx.beginPath()
+  ctx.moveTo(arm, -arm)
+  ctx.lineTo(-arm, arm)
+  ctx.stroke()
+
+  // Center dot
+  ctx.beginPath()
+  ctx.arc(0, 0, 2, 0, Math.PI * 2)
+  ctx.fillStyle = COLOR.hostile
+  ctx.fill()
 
   ctx.restore()
 }
