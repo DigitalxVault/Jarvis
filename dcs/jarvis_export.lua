@@ -323,7 +323,17 @@ function jarvis_send_tactical(t)
         objects[#objects + 1] = {
           id    = id,
           name  = obj.Name or "",
-          type  = obj.Type or {},
+          -- obj.Type may carry metatables; extract only primitive numbers
+          type  = (function()
+            local ot = obj.Type
+            if not ot then return {} end
+            return {
+              level1 = ot.level1 or 0,
+              level2 = ot.level2 or 0,
+              level3 = ot.level3 or 0,
+              level4 = ot.level4 or 0,
+            }
+          end)(),
           coal  = obj.Coalition or "",
           lat   = obj.LatLongAlt.Lat,
           lon   = obj.LatLongAlt.Long,
@@ -411,7 +421,13 @@ function jarvis_send_tactical(t)
         stations[#stations + 1] = {
           idx   = i,
           name  = wep_name,
-          type  = wep_type,
+          -- wep_type may carry metatables; extract only primitive numbers
+          type  = {
+            level1 = wep_type.level1 or 0,
+            level2 = wep_type.level2 or 0,
+            level3 = wep_type.level3 or 0,
+            level4 = wep_type.level4 or 0,
+          },
           count = stn.count or 0,
         }
       end
@@ -454,7 +470,7 @@ function jarvis_send_tactical(t)
     local ok_route, raw_route = pcall(LoGetRoute)
     if not ok_route or not raw_route then return end
     local waypoints = {}
-    local geo_fn = LoCoordinatesToGeoCoordinates or LoLoCoordinatesToGeoCoordinates
+    local geo_fn = LoLoCoordinatesToGeoCoordinates or LoCoordinatesToGeoCoordinates
     for i, wp in ipairs(raw_route) do
       if not geo_fn then break end
       local geo_ok, geo = pcall(geo_fn, wp.x or 0, wp.z or 0)

@@ -12,12 +12,21 @@ export function createUdpListener(
 ): dgram.Socket {
   const server = dgram.createSocket('udp4')
 
-  // One-time diagnostic: log first non-telemetry packet for debugging
-  let tacticalDiagDone = false
+  // One-time diagnostic: dump first non-telemetry packet raw BEFORE parsing
+  let rawDumpDone = false
 
   server.on('message', (buf: Buffer) => {
+    const str = buf.toString('utf8')
+
+    // One-time: dump first non-telemetry packet raw (before JSON.parse)
+    if (!rawDumpDone && !str.startsWith('{"type":"telemetry"')) {
+      rawDumpDone = true
+      console.log(`[UDP] *** RAW NON-TELEMETRY (${buf.length} bytes) ***`)
+      console.log(`[UDP] ${str.slice(0, 500)}`)
+    }
+
     try {
-      const raw = JSON.parse(buf.toString('utf8'))
+      const raw = JSON.parse(str)
       if (raw?.type === 'telemetry') {
         onPacket(raw as TelemetryPacket)
       } else if (raw?.type === 'tactical' && onTactical) {
@@ -25,20 +34,11 @@ export function createUdpListener(
         metrics.recordTacticalReceive()
         onTactical(raw as TacticalPacket)
       } else {
-        // Unknown type — log once
-        if (!tacticalDiagDone) {
-          tacticalDiagDone = true
-          console.warn(`[UDP] Unknown packet type="${raw?.type}" keys=[${Object.keys(raw ?? {}).join(',')}] size=${buf.length}`)
-        }
+        console.warn(`[UDP] Unknown packet type="${raw?.type}" keys=[${Object.keys(raw ?? {}).join(',')}] size=${buf.length}`)
       }
     } catch (err) {
-      // Log parse failures once
-      if (!tacticalDiagDone) {
-        tacticalDiagDone = true
-        const preview = buf.toString('utf8', 0, Math.min(200, buf.length))
-        console.error(`[UDP] JSON parse failed (size=${buf.length}): ${(err as Error).message}`)
-        console.error(`[UDP] Raw preview: ${preview}`)
-      }
+      console.error(`[UDP] Parse FAILED: ${(err as Error).message}`)
+      console.error(`[UDP] Raw: ${str.slice(0, 300)}`)
     }
   })
 
