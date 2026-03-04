@@ -312,10 +312,14 @@ function jarvis_run_tac_phase(t, phase)
       local raw_objects = LoGetWorldObjects("units") or {}
       local objects = {}
       local player_id = (LoGetPlayerPlaneId and LoGetPlayerPlaneId()) or -1
+      local self_coal = self_data.Coalition or ""
+      local sample_coal = nil  -- for diagnostic logging
 
       for id, obj in pairs(raw_objects) do
         if id ~= player_id and obj.LatLongAlt then
           local ot = obj.Type
+          local obj_coal = obj.Coalition or ""
+          if not sample_coal then sample_coal = obj_coal end
           objects[#objects + 1] = {
             id    = id,
             name  = obj.Name or "",
@@ -325,7 +329,7 @@ function jarvis_run_tac_phase(t, phase)
               level3 = ot.level3 or 0,
               level4 = ot.level4 or 0,
             } or {},
-            coal  = obj.Coalition or "",
+            coal  = (obj_coal ~= "" and obj_coal ~= self_coal) and "Enemies" or "Allies",
             lat   = obj.LatLongAlt.Lat,
             lon   = obj.LatLongAlt.Long,
             alt   = obj.LatLongAlt.Alt,
@@ -339,6 +343,8 @@ function jarvis_run_tac_phase(t, phase)
         end
       end
       jarvis_tac_acc.objects = objects
+      jarvis_tac_acc.self_coal_raw = self_coal
+      jarvis_tac_acc.sample_obj_coal_raw = sample_coal
     end
 
     -- ── Radar Targets (EXPT-02) — anti-cheat gated ──
@@ -523,6 +529,12 @@ function jarvis_run_tac_phase(t, phase)
     -- ── Encode + Send ──
     -- Tactical still uses JSON.lua (complex nested structure, not fixed schema)
     if jarvis_JSON then
+      -- Strip diagnostic fields before encoding (only used in log below)
+      local self_coal_raw = jarvis_tac_acc.self_coal_raw
+      local sample_obj_coal_raw = jarvis_tac_acc.sample_obj_coal_raw
+      jarvis_tac_acc.self_coal_raw = nil
+      jarvis_tac_acc.sample_obj_coal_raw = nil
+
       local ok, encoded = pcall(function()
         return jarvis_JSON:encode(jarvis_tac_acc)
       end)
@@ -545,6 +557,8 @@ function jarvis_run_tac_phase(t, phase)
             f:write("=== Packet Sections ===\n")
             local packet = jarvis_tac_acc
             f:write("  objects:         " .. tostring(packet.objects ~= nil) .. (packet.objects and (" (" .. #packet.objects .. " items)") or "") .. "\n")
+            f:write("  self_coalition:       " .. tostring(self_coal_raw or "N/A") .. "\n")
+            f:write("  sample_obj_coalition: " .. tostring(sample_obj_coal_raw or "N/A") .. "\n")
             f:write("  targets:         " .. tostring(packet.targets ~= nil) .. (packet.targets and (" (" .. #packet.targets .. " items)") or "") .. "\n")
             f:write("  locked:          " .. tostring(packet.locked ~= nil) .. (packet.locked and (" (" .. #packet.locked .. " items)") or "") .. "\n")
             f:write("  weapons:         " .. tostring(packet.weapons ~= nil) .. "\n")
