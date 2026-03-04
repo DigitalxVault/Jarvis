@@ -3,6 +3,7 @@ import './globals.css'
 import { TelemetryProvider } from '@/providers/telemetry-provider'
 import { SwRegister } from '@/components/pwa/sw-register'
 import { UpdateBanner } from '@/components/pwa/update-banner'
+import { InstallPrompt } from '@/components/pwa/install-prompt'
 
 export const metadata: Metadata = {
   title: 'J·A·R·V·I·S // DCS Telemetry',
@@ -37,6 +38,7 @@ export default function RootLayout({
         </TelemetryProvider>
         <SwRegister />
         <UpdateBanner />
+        <InstallPrompt />
       </body>
     </html>
   )
