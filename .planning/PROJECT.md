@@ -16,6 +16,22 @@ Pipeline proven: DCS (10 Hz UDP) → bridge (2-5 Hz downsample) → Supabase Rea
 Google OAuth placeholders configured but not yet tested with real credentials.
 Supabase RLS disabled for prototype — re-enable when addressing auth integration.
 
+## Current Milestone: v2.0 — PWA + Responsive Layout
+
+**Goal:** Make the JARVIS DCS dashboard installable as a PWA on desktop and mobile, with an offline app shell, service worker caching, and a responsive layout that works on phones and tablets alongside the PC.
+
+**Scope:**
+- Full PWA: installable on desktop (taskbar app) and mobile (home screen)
+- Service worker with offline app shell caching
+- Responsive layout for phones and tablets
+- Web app manifest with JARVIS branding
+
+**Explicitly out of scope for v2.0:**
+- Training events / scoring / event feed
+- Coaching engine / rule-based prompts
+- DCS injection (outText, sounds, flags)
+- Audio / JARVIS voice cues
+
 ## Requirements
 
 ### Validated
@@ -35,19 +51,21 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 
 ### Active
 
-(None — next milestone requirements TBD via `/gsd:new-milestone`)
+- PWA manifest with JARVIS branding, icons, theme colors — v2.0
+- Service worker with offline app shell caching — v2.0
+- Install prompt for desktop and mobile — v2.0
+- Responsive layout for phones and tablets — v2.0
 
 ### Out of Scope
 
-- Training events / scoring / event feed — Phase 2
-- Coaching engine / rule-based prompts — Phase 2
-- DCS injection (outText, sounds, flags) — Phase 3
-- Audio / JARVIS voice cues — Phase 3
-- Instructor view / multi-session — Phase 4
-- Multiplayer support — Phase 4
-- Mobile / tablet responsive layout — future
+- Training events / scoring / event feed — future milestone
+- Coaching engine / rule-based prompts — future milestone
+- DCS injection (outText, sounds, flags) — future milestone
+- Audio / JARVIS voice cues — future milestone
+- Instructor view / multi-session — future milestone
+- Multiplayer support — future milestone
 - Standalone .exe packaging for bridge — future
-- Mission scripting (gates, triggers) — Phase 2
+- Mission scripting (gates, triggers) — future milestone
 
 ## Context
 
@@ -62,7 +80,7 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 ## Constraints
 
 - **Tech stack**: Next.js (App Router) on Vercel, Supabase (Realtime + Postgres), NextAuth.js, Node.js bridge
-- **Target platform**: DCS runs on Windows 10/11; bridge runs on same PC; web UI is desktop Chrome/Edge
+- **Target platform**: DCS runs on Windows 10/11; bridge runs on same PC; web UI is desktop + mobile (PWA)
 - **Latency**: End-to-end < 500ms typical on local internet
 - **Export rate**: 10 Hz from DCS (bridge may downsample for cloud publishing)
 - **Free tiers**: Prototype must work within Supabase free tier and Vercel Hobby plan limits
@@ -79,7 +97,7 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 | Node.js bridge over Python | Same language ecosystem as web app; easier packaging; native async I/O | Good — shared types via monorepo, tsx runtime works well |
 | Export.lua hook over mission scripting | Works with any mission; LoGetSelfData() is universal; no custom mission files needed | Good — dofile() chaining preserves TacView/SRS compatibility |
 | F-16C Viper as target aircraft | Popular module with good export support; primary test platform | Pending — not yet tested on hardware |
-| Desktop only | Pilot is at a PC; HUD layout optimized for wide screens; simplifies Phase 1 | Good — appropriate for prototype |
+| Desktop only (v1.0) | Pilot is at a PC; HUD layout optimized for wide screens; simplifies Phase 1 | Evolving — v2.0 adds responsive + PWA |
 | Phase 1 scope only | Prove pipeline before adding scoring/coaching; clean separation of concerns | Good — pipeline proven, clean foundation for Phase 2 |
 | Monorepo structure | Bridge + web app in single repo for easier development during prototype | Good — pnpm workspaces + shared types work smoothly |
 | Port 7779 for JARVIS UDP | Avoids DCS internal port 12800 and TacView port 7778 | Good — no conflicts observed |
@@ -90,4 +108,4 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 | heartbeatCallback + worker: true | Prevent tab-throttle WebSocket drops | Good — maintains connection in background tabs |
 
 ---
-*Last updated: 2026-02-25 after v1.0 milestone*
+*Last updated: 2026-03-04 — v2.0 milestone started (PWA + Responsive)*

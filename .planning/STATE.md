@@ -2,19 +2,20 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-02-25)
+See: .planning/PROJECT.md (updated 2026-03-04)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms — the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** Planning next milestone
+**Current focus:** v2.0 — PWA + Responsive Layout
 
 ## Current Position
 
-Phase: v1.0 complete. Next milestone not yet started.
+Phase: v2.0 milestone started. Research phase.
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-02-25 — v1.0 MVP milestone complete and archived
+Status: Initializing milestone
+Last activity: 2026-03-04 — v2.0 milestone initialized
 
 Progress: v1.0 [██████████] 100% SHIPPED
+Progress: v2.0 [░░░░░░░░░░] 0% INITIALIZING
 
 ## Performance Metrics
 
@@ -42,20 +43,24 @@ Progress: v1.0 [██████████] 100% SHIPPED
 ### Decisions
 
 All v1.0 decisions logged in PROJECT.md Key Decisions table with outcomes.
-No pending decisions — next milestone decisions TBD.
+v2.0 decisions TBD during research and planning.
 
 ### Pending Todos
 
-None.
+- Complete PWA research (stack, features, architecture, pitfalls)
+- Define v2.0 requirements with REQ-IDs
+- Create v2.0 roadmap (phases 8+)
 
 ### Blockers/Concerns
 
 - NextAuth v5 session JWT structure may change between betas — verify before next milestone
 - Supabase free tier pauses projects after 1 week of inactivity; unpause manually or add keepalive
 - Supabase RLS disabled — must re-enable when addressing auth integration in future milestone
+- iOS PWA limitations (no push notifications, limited background execution) — research needed
+- Service worker + Supabase WebSocket interaction — research needed
 
 ## Session Continuity
 
-Last session: 2026-02-25
-Stopped at: v1.0 MVP milestone completed and archived. All 7 phases, 18 plans, 18 requirements shipped.
-Resume file: N/A — start next milestone with /gsd:new-milestone
+Last session: 2026-03-04
+Stopped at: v2.0 milestone initialized. Research phase next.
+Resume file: N/A — continue with research agents
