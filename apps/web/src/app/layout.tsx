@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { TelemetryProvider } from '@/providers/telemetry-provider'
 import { SwRegister } from '@/components/pwa/sw-register'
+import { UpdateBanner } from '@/components/pwa/update-banner'
 
 export const metadata: Metadata = {
   title: 'J·A·R·V·I·S // DCS Telemetry',
@@ -35,6 +36,7 @@ export default function RootLayout({
           {children}
         </TelemetryProvider>
         <SwRegister />
+        <UpdateBanner />
       </body>
     </html>
   )
