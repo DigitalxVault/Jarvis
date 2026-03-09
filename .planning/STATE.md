@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-03-04)
 
 ## Current Position
 
-Phase: 8 -- PWA Foundation
-Plan: 2 of N (08-02 complete)
-Status: In progress
-Last activity: 2026-03-04 -- Completed 08-02-PLAN.md (Service Worker, SW Registration)
+Phase: 8 -- PWA Foundation (COMPLETE)
+Plan: 4 of 4 (08-04 complete)
+Status: Phase 8 complete, ready for Phase 9
+Last activity: 2026-03-04 -- Completed 08-04-PLAN.md (Install Prompt)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [##........] 20% IN PROGRESS
+Progress: v2.0 [####......] 40% IN PROGRESS
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 20 (18 v1.0 MVP + 2 v2.0)
-- Average duration: ~3 min (08-01), ~3 min (08-02)
+- Total plans completed: 22 (18 v1.0 MVP + 4 v2.0)
+- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04)
 - Total execution time: 1 day (2026-02-25) + ongoing
 
 **By Phase:**
@@ -35,7 +35,7 @@ Progress: v2.0 [##........] 20% IN PROGRESS
 | 5. Session Pairing | v1.0 | 2 |
 | 6. Telemetry UI | v1.0 | 3 |
 | 7. Resilience and Stability | v1.0 | 2 |
-| 8. PWA Foundation | v2.0 | 2 complete |
+| 8. PWA Foundation | v2.0 | 4 complete (DONE) |
 | 9. Responsive Layout | v2.0 | -- |
 | 10. Offline Shell & Polish | v2.0 | -- |
 
@@ -64,6 +64,17 @@ v2.0 research completed:
 - D-823: RSC excluded via _rsc param AND RSC/Next-Router-Prefetch headers -- two detection paths
 - D-824: sw.js served no-cache via next.config.ts headers() -- browsers always revalidate
 
+08-03 decisions:
+- D-831: No controllerchange listener -- fires on first install, would cause unwanted reload
+- D-832: Offline page is standalone HTML/CSS -- no external deps (user is offline when it loads)
+- D-833: UpdateBanner z-10000 (above scanline z-9999) -- must be visible and interactive
+
+08-04 decisions:
+- D-841: dismiss sets state to 'dismissed' (session-scoped, no localStorage) -- reappears on reload
+- D-842: appinstalled listener cleanup in useEffect return -- prevents stale closures
+- D-843: iOS detection uses Mac+ontouchend heuristic -- iPadOS 13+ reports as Mac UA
+- D-844: Install prompt fixed at bottom, update banner at top -- no visual overlap
+
 | ID | Decision | Outcome |
 |----|----------|---------|
 | D-801 | Separate maskable icon entry | 3 icon entries: 192/any, 512/any, 512/maskable |
@@ -73,24 +84,31 @@ v2.0 research completed:
 | D-822 | NavigationPreload in activate | Lower latency on navigate requests |
 | D-823 | RSC: two-path detection | Prevents hydration errors |
 | D-824 | sw.js no-cache headers | Browsers always fetch latest SW |
+| D-831 | No controllerchange in UpdateBanner | Prevents reload on first SW install |
+| D-832 | Offline page: zero external deps | Loads correctly when user is offline |
+| D-833 | UpdateBanner z-10000 | Visible above scanline overlay |
+| D-841 | Session-scoped dismiss (no localStorage) | Prompt reappears on reload; no persistence needed |
+| D-842 | appinstalled cleanup in useEffect return | Prevents stale closures on unmount |
+| D-843 | Mac+ontouchend iOS heuristic | Catches iPadOS 13+ which reports as Mac UA |
+| D-844 | Install prompt at bottom, update banner at top | No visual overlap between banners |
 
 ### Pending Todos
 
-- Plan remaining Phase 8 plans (install prompt, update notification)
 - Plan Phase 9: Responsive Layout
+- Plan Phase 10: Offline Shell and Polish
 
 ### Blockers/Concerns
 
 - NextAuth v5 session JWT structure may change between betas -- verify before next milestone
 - Supabase free tier pauses projects after 1 week of inactivity; unpause manually or add keepalive
 - Supabase RLS disabled -- must re-enable when addressing auth integration in future milestone
-- iOS PWA limitations: no beforeinstallprompt, 7-day storage eviction, limited background execution
+- iOS PWA limitations: no beforeinstallprompt (HANDLED via guidance UI in 08-04), 7-day storage eviction, limited background execution
 - RSC payloads excluded from SW caching (RESOLVED in 08-02 via two-path detection)
 - iOS WebSocket dies on background -- existing visibilitychange reconnection mitigates
 - pnpm sharp resolution: script uses fallback path to virtual store (not symlinked at top-level)
 
 ## Session Continuity
 
-Last session: 2026-03-04T09:42:05Z
-Stopped at: Completed 08-02-PLAN.md
-Resume file: None -- continue with next Phase 8 plan
+Last session: 2026-03-04T10:01:15Z
+Stopped at: Completed 08-04-PLAN.md (Phase 8 complete)
+Resume file: None -- begin Phase 9 planning

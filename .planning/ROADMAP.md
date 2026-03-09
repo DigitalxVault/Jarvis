@@ -33,10 +33,10 @@
 **Plans:** 4 plans
 
 Plans:
-- [ ] 08-01-PLAN.md -- Manifest, icons, and layout PWA metadata
-- [ ] 08-02-PLAN.md -- Service worker with cache routing and registration
-- [ ] 08-03-PLAN.md -- Offline fallback page and SW update banner
-- [ ] 08-04-PLAN.md -- Install prompt (Chromium + iOS)
+- [x] 08-01-PLAN.md -- Manifest, icons, and layout PWA metadata
+- [x] 08-02-PLAN.md -- Service worker with cache routing and registration
+- [x] 08-03-PLAN.md -- Offline fallback page and SW update banner
+- [x] 08-04-PLAN.md -- Install prompt (Chromium + iOS)
 
 **Requirements:**
 - REQ-200 -- Web app manifest with JARVIS branding
@@ -69,6 +69,14 @@ Plans:
 **Goal:** Dashboard renders correctly on phones, tablets, and desktops -- pilots can glance at key instruments on a phone mounted in their cockpit or use the full dashboard on a monitor.
 
 **Dependencies:** Phase 8 (PWA foundation must be in place so responsive layout is tested in standalone mode)
+
+**Plans:** 4 plans
+
+Plans:
+- [ ] 09-01-PLAN.md -- Viewport, breakpoints, and safe area foundation
+- [ ] 09-02-PLAN.md -- Responsive dashboard grid
+- [ ] 09-03-PLAN.md -- Responsive canvas instruments
+- [ ] 09-04-PLAN.md -- Touch UX and polish
 
 **Requirements:**
 - REQ-218 -- Breakpoint system: mobile (<640px), tablet (640-1024px), desktop (>1024px)
@@ -122,10 +130,10 @@ Plans:
 | 5. Session Pairing | v1.0 | 2/2 | Complete | 2026-02-25 |
 | 6. Telemetry UI | v1.0 | 3/3 | Complete | 2026-02-25 |
 | 7. Resilience and Stability | v1.0 | 2/2 | Complete | 2026-02-25 |
-| 8. PWA Foundation | v2.0 | 0/4 | Planned | -- |
-| 9. Responsive Layout | v2.0 | 0/? | Not Started | -- |
+| 8. PWA Foundation | v2.0 | 4/4 | Complete | 2026-03-04 |
+| 9. Responsive Layout | v2.0 | 0/4 | Planned | -- |
 | 10. Offline Shell & Polish | v2.0 | 0/? | Not Started | -- |
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-04 -- Phase 8 planned (4 plans, 2 waves)*
+*Last updated: 2026-03-04 -- Phase 9 planned (4 plans in 2 waves)*

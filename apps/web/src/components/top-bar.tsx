@@ -28,6 +28,7 @@ export function TopBar({ connectionState }: TopBarProps) {
 
   const isMainDash = pathname === '/'
   const isTactical = pathname === '/tactical'
+  const isDocumentation = pathname === '/documentation'
 
   return (
     <div
@@ -66,6 +67,17 @@ export function TopBar({ connectionState }: TopBarProps) {
           style={{ letterSpacing: '2px' }}
         >
           TACTICAL
+        </Link>
+        <Link
+          href="/documentation"
+          className={`px-4 py-1.5 text-[11px] font-bold border transition-all ${
+            isDocumentation
+              ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
+              : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
+          }`}
+          style={{ letterSpacing: '2px' }}
+        >
+          DOCUMENTATION
         </Link>
       </div>
 
