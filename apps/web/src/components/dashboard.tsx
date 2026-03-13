@@ -161,7 +161,7 @@ function CompactCoaching({
   smoothness: SmoothnessScore
 }) {
   return (
-    <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 flex items-center gap-4 text-[10px]">
+    <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 flex items-center gap-4 text-[12px]">
       <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>COACHING</span>
       <BandChip label="SPD" band={speedBand} unit="KT" />
       <BandChip label="ALT" band={altBand} unit="FT" />
@@ -206,7 +206,7 @@ function CompactDebug({
   const [showRaw, setShowRaw] = useState(false)
 
   return (
-    <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 text-[10px]">
+    <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 text-[12px]">
       <div className="flex items-center gap-4">
         <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>DEBUG</span>
         <span className="opacity-40">PPS</span>
@@ -224,7 +224,7 @@ function CompactDebug({
         </button>
       </div>
       {showRaw && rawPackets.length > 0 && (
-        <pre className="mt-1 text-[9px] opacity-30 max-h-24 overflow-y-auto whitespace-pre-wrap break-all">
+        <pre className="mt-1 text-[12px] opacity-30 max-h-24 overflow-y-auto whitespace-pre-wrap break-all">
           {JSON.stringify(rawPackets[rawPackets.length - 1], null, 2)}
         </pre>
       )}

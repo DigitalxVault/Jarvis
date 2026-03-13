@@ -37,7 +37,7 @@ export function SessionPanel({
           </button>
           <button
             onClick={onDevMode}
-            className="w-full mt-1.5 border border-jarvis-accent/40 rounded px-3 py-1 text-[10px] font-bold tracking-[3px] text-jarvis-accent hover:bg-jarvis-accent/10 transition-colors cursor-pointer"
+            className="w-full mt-1.5 border border-jarvis-accent/40 rounded px-3 py-1 text-[12px] font-bold tracking-[3px] text-jarvis-accent hover:bg-jarvis-accent/10 transition-colors cursor-pointer"
           >
             DEV MODE
           </button>
@@ -47,9 +47,9 @@ export function SessionPanel({
             <div className="mt-3 border border-jarvis-danger/50 rounded px-3 py-2 bg-jarvis-danger/10">
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-1">
-                  <div className="text-[10px] text-jarvis-danger tracking-wider mb-1">ERROR</div>
-                  <div className="text-[11px] text-jarvis-danger/90">{sessionError}</div>
-                  <div className="text-[9px] opacity-40 mt-1">Use Dev Mode for testing</div>
+                  <div className="text-[12px] text-jarvis-danger tracking-wider mb-1">ERROR</div>
+                  <div className="text-[13px] text-jarvis-danger/90">{sessionError}</div>
+                  <div className="text-[12px] opacity-40 mt-1">Use Dev Mode for testing</div>
                 </div>
                 <button
                   onClick={onClearError}
@@ -66,7 +66,7 @@ export function SessionPanel({
           {/* Pairing Code */}
           {currentSession.pairing_code && !currentSession.bridge_claimed && (
             <div className="text-center">
-              <div className="text-[11px] opacity-45 mb-1" style={{ letterSpacing: '2px' }}>
+              <div className="text-[13px] opacity-45 mb-1" style={{ letterSpacing: '2px' }}>
                 PAIRING CODE
               </div>
               <div
@@ -76,7 +76,7 @@ export function SessionPanel({
               >
                 {currentSession.pairing_code}
               </div>
-              <div className="text-[10px] opacity-30 mt-1">
+              <div className="text-[12px] opacity-30 mt-1">
                 EXPIRES IN 5 MIN // CLICK TO COPY
               </div>
             </div>
@@ -113,7 +113,7 @@ export function SessionPanel({
           )}
 
           {/* Session info */}
-          <div className="flex flex-col gap-1 text-[11px]">
+          <div className="flex flex-col gap-1 text-[13px]">
             <div className="flex justify-between">
               <span className="opacity-45">ID</span>
               <span className="opacity-60">{currentSession.id.slice(0, 8)}...</span>

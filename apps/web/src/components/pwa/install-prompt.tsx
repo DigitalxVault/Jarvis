@@ -28,14 +28,14 @@ export function InstallPrompt() {
           >
             INSTALL JARVIS
           </span>
-          <span className="text-jarvis-muted text-[10px]" style={{ letterSpacing: '0.5px' }}>
+          <span className="text-jarvis-muted text-[12px]" style={{ letterSpacing: '0.5px' }}>
             Add to your home screen for quick access
           </span>
         </div>
         <div className="flex items-center gap-2 ml-3">
           <button
             onClick={dismiss}
-            className="text-jarvis-muted hover:text-jarvis-primary text-[10px] transition-colors"
+            className="text-jarvis-muted hover:text-jarvis-primary text-[12px] transition-colors"
             style={{ letterSpacing: '1px' }}
           >
             SKIP
@@ -73,7 +73,7 @@ export function InstallPrompt() {
               INSTALL JARVIS
             </span>
             <span
-              className="text-jarvis-primary text-[10px] leading-relaxed"
+              className="text-jarvis-primary text-[12px] leading-relaxed"
               style={{ letterSpacing: '0.5px' }}
             >
               Tap{' '}
@@ -85,7 +85,7 @@ export function InstallPrompt() {
           </div>
           <button
             onClick={dismiss}
-            className="text-jarvis-muted hover:text-jarvis-primary text-[10px] ml-3 transition-colors"
+            className="text-jarvis-muted hover:text-jarvis-primary text-[12px] ml-3 transition-colors"
             style={{ letterSpacing: '1px' }}
             aria-label="Dismiss install instructions"
           >

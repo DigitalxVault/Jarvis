@@ -39,7 +39,7 @@ export function TopBar({ connectionState }: TopBarProps) {
         <div className="text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
           J·A·R·V·I·S
         </div>
-        <div className="text-[10px] opacity-50" style={{ letterSpacing: '2px' }}>
+        <div className="text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
           TACTICAL HUD v2.0
         </div>
       </div>
@@ -48,7 +48,7 @@ export function TopBar({ connectionState }: TopBarProps) {
       <div className="flex gap-2">
         <Link
           href="/"
-          className={`px-4 py-1.5 text-[11px] font-bold border transition-all ${
+          className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
             isMainDash
               ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
               : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
@@ -59,7 +59,7 @@ export function TopBar({ connectionState }: TopBarProps) {
         </Link>
         <Link
           href="/tactical"
-          className={`px-4 py-1.5 text-[11px] font-bold border transition-all ${
+          className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
             isTactical
               ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
               : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
@@ -70,7 +70,7 @@ export function TopBar({ connectionState }: TopBarProps) {
         </Link>
         <Link
           href="/documentation"
-          className={`px-4 py-1.5 text-[11px] font-bold border transition-all ${
+          className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
             isDocumentation
               ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
               : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
@@ -86,7 +86,7 @@ export function TopBar({ connectionState }: TopBarProps) {
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
           <div className="text-lg font-bold glow-text tabular-nums">{clock}</div>
-          <div className="text-[10px] opacity-50" style={{ letterSpacing: '1px' }}>{date}</div>
+          <div className="text-[12px] opacity-50" style={{ letterSpacing: '1px' }}>{date}</div>
         </div>
       </div>
     </div>

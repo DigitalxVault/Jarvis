@@ -35,7 +35,7 @@ export function AlertOverlay({ alerts, className = '' }: AlertOverlayProps) {
 
         {/* Secondary alerts as smaller text below */}
         {sortedAlerts.length > 1 && (
-          <div className="mt-1 text-[10px] opacity-70">
+          <div className="mt-1 text-[12px] opacity-70">
             {sortedAlerts.slice(1).map((a) => a.message).join(' • ')}
           </div>
         )}

@@ -139,7 +139,7 @@ export function JarvisLogo({ className = '' }: JarvisLogoProps) {
 
       // Small tech text below
       ctx.fillStyle = 'rgba(0, 212, 255, 0.4)'
-      ctx.font = '8px "Courier New"'
+      ctx.font = '12px "Courier New"'
       ctx.letterSpacing = '2px'
       ctx.fillText('TACTICAL INTERFACE', cx, cy + baseRadius * 0.7)
 

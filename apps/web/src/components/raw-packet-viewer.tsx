@@ -21,7 +21,7 @@ export function RawPacketViewer({ packets }: RawPacketViewerProps) {
       </button>
 
       {expanded && (
-        <div className="mt-2 max-h-[200px] overflow-y-auto text-[11px] flex flex-col gap-1">
+        <div className="mt-2 max-h-[200px] overflow-y-auto text-[13px] flex flex-col gap-1">
           {packets.length === 0 && (
             <div className="opacity-30">No packets received yet...</div>
           )}
@@ -37,7 +37,7 @@ export function RawPacketViewer({ packets }: RawPacketViewerProps) {
                 {' '}alt_agl={<span className="text-jarvis-warning">{(pkt.pos.alt_agl_m ?? 0).toFixed(0)}m</span>}
               </button>
               {expandedIdx === i && (
-                <pre className="text-[10px] opacity-40 pl-2 whitespace-pre-wrap break-all">
+                <pre className="text-[12px] opacity-40 pl-2 whitespace-pre-wrap break-all">
                   {JSON.stringify(pkt, null, 2)}
                 </pre>
               )}

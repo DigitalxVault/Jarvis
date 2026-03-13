@@ -195,12 +195,12 @@ function DataTable({ title, rows }: { title: string; rows: DataRow[] }) {
   return (
     <div className="jarvis-panel">
       <div
-        className="text-[10px] text-jarvis-accent font-bold mb-2 pb-1 border-b border-jarvis-border"
+        className="text-[12px] text-jarvis-accent font-bold mb-2 pb-1 border-b border-jarvis-border"
         style={{ letterSpacing: '3px' }}
       >
         {title}
       </div>
-      <table className="w-full text-[11px]">
+      <table className="w-full text-[13px]">
         <tbody>
           {rows.map((row, i) => (
             <tr
@@ -237,7 +237,7 @@ export function DocumentationLayout() {
       <div className="flex-1 overflow-y-auto bg-jarvis-bg p-4">
           <div className="max-w-3xl mx-auto flex flex-col gap-3">
             <div
-              className="text-[10px] text-jarvis-muted text-center mb-1"
+              className="text-[12px] text-jarvis-muted text-center mb-1"
               style={{ letterSpacing: '2px' }}
             >
               LIVE DCS DATA REFERENCE
