@@ -36,16 +36,16 @@ function BandIndicator({ band, label, unit, decimals = 0 }: BandIndicatorProps) 
       <div className="flex items-center justify-between mt-1">
         {/* Current value */}
         <div>
-          <span className={`text-lg font-bold tabular-nums ${statusColor}`}>
+          <span className={`text-2xl font-bold tabular-nums ${statusColor}`}>
             {band.current !== null ? band.current.toFixed(decimals) : '---'}
           </span>
-          <span className={`text-[10px] ml-1 opacity-50`}>{unit}</span>
+          <span className={`text-[13px] ml-1 opacity-50`}>{unit}</span>
         </div>
 
         {/* Target indicator */}
         <div className="text-right">
-          <div className="text-[10px] opacity-40">TARGET</div>
-          <div className="text-sm font-bold text-jarvis-accent">
+          <div className="text-[12px] opacity-40">TARGET</div>
+          <div className="text-base font-bold text-jarvis-accent">
             {band.target.toFixed(decimals)}
           </div>
         </div>
@@ -73,7 +73,7 @@ function BandIndicator({ band, label, unit, decimals = 0 }: BandIndicatorProps) 
 
       {/* Deviation text */}
       {band.deviation !== null && (
-        <div className={`text-[10px] mt-1 text-right ${deviationColor}`}>
+        <div className={`text-[12px] mt-1 text-right ${deviationColor}`}>
           {band.deviation > 0 ? '+' : ''}{band.deviation.toFixed(decimals)}
         </div>
       )}
@@ -106,13 +106,13 @@ function SmoothnessGauge({ score, current }: SmoothnessGaugeProps) {
           `}
           style={{ background: 'rgba(0, 13, 26, 0.8)' }}
         >
-          <span className={`text-2xl font-bold tabular-nums ${color}`}>
+          <span className={`text-3xl font-bold tabular-nums ${color}`}>
             {score}
           </span>
         </div>
 
         {/* Current angular velocity */}
-        <div className="mt-2 text-[10px] opacity-50" style={{ letterSpacing: '1px' }}>
+        <div className="mt-2 text-[13px] opacity-50" style={{ letterSpacing: '1px' }}>
           ANG VEL: <span className="text-jarvis-accent">{(current * 57.3).toFixed(2)}°/s</span>
         </div>
       </div>

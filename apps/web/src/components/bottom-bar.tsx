@@ -49,7 +49,7 @@ export function BottomBar({ connectionState, telemetry }: BottomBarProps) {
 
   return (
     <div
-      className="bg-jarvis-bar border-t border-jarvis-border flex items-center justify-between px-4 h-[50px] text-[11px]"
+      className="bg-jarvis-bar border-t border-jarvis-border flex items-center justify-between px-4 h-[50px] text-[13px]"
       style={{ letterSpacing: '0.5px' }}
     >
       {/* Position data */}
@@ -80,7 +80,7 @@ export function BottomBar({ connectionState, telemetry }: BottomBarProps) {
       <div className="flex items-center gap-4">
         <span className="opacity-45">UPTIME</span>
         <span className="text-jarvis-accent glow-accent tabular-nums">{uptime}</span>
-        <span className={`${statusColor} animate-blink font-bold text-[10px]`}>
+        <span className={`${statusColor} animate-blink font-bold text-[12px]`}>
           {statusLabel}
         </span>
       </div>
