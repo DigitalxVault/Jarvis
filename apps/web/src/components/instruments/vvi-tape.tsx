@@ -44,7 +44,7 @@ export function VVITape({ vviMps, className = '' }: VVITapeProps) {
     // Draw tick marks
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.3)'
     ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-    ctx.font = '9px "Courier New"'
+    ctx.font = '12px "Courier New"'
     ctx.textAlign = 'left'
     ctx.textBaseline = 'middle'
     ctx.lineWidth = 1
@@ -66,7 +66,7 @@ export function VVITape({ vviMps, className = '' }: VVITapeProps) {
       // Labels on major marks
       if (isMajor) {
         const label = fpm >= 0 ? `+${fpm / 1000}` : `${fpm / 1000}`
-        ctx.fillText(label, cx + 36, y)
+        ctx.fillText(label, cx + 40, y)
       }
     }
 
@@ -117,17 +117,17 @@ export function VVITape({ vviMps, className = '' }: VVITapeProps) {
 
     // Center value display
     ctx.fillStyle = indicatorColor
-    ctx.font = 'bold 16px "Courier New"'
+    ctx.font = 'bold 48px "Courier New"'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
 
     const sign = vviFpm >= 0 ? '+' : ''
     const displayValue = `${sign}${Math.round(vviFpm)}`
-    ctx.fillText(displayValue, cx, cy + 20)
+    ctx.fillText(displayValue, cx, cy + 30)
 
-    ctx.font = '9px "Courier New"'
+    ctx.font = '14px "Courier New"'
     ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-    ctx.fillText('FPM', cx, cy + 34)
+    ctx.fillText('FPM', cx, cy + 52)
 
     // Border
     ctx.strokeStyle = '#00d4ff'
@@ -142,8 +142,8 @@ export function VVITape({ vviMps, className = '' }: VVITapeProps) {
         <div className="flex justify-center mt-2">
           <canvas
             ref={canvasRef}
-            width={90}
-            height={150}
+            width={120}
+            height={200}
             style={{ imageRendering: 'pixelated' }}
           />
         </div>

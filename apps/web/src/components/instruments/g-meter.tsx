@@ -52,7 +52,7 @@ export function GMeter({ gY, className = '' }: GMeterProps) {
     // G scale markings
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.3)'
     ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-    ctx.font = '10px "Courier New"'
+    ctx.font = '12px "Courier New"'
     ctx.textAlign = 'right'
     ctx.textBaseline = 'middle'
     ctx.lineWidth = 1
@@ -71,7 +71,7 @@ export function GMeter({ gY, className = '' }: GMeterProps) {
         ctx.stroke()
 
         // Label
-        ctx.fillText(`${g}G`, centerX - 20, y)
+        ctx.fillText(`${g}G`, centerX - 28, y)
       } else if (isHalfInteger) {
         // Minor tick
         ctx.beginPath()
@@ -108,14 +108,14 @@ export function GMeter({ gY, className = '' }: GMeterProps) {
     // Center display of current G (clamped to realistic range)
     const displayG = Math.max(-4, Math.min(10, gY))
     ctx.fillStyle = barColor
-    ctx.font = 'bold 24px "Courier New"'
+    ctx.font = 'bold 56px "Courier New"'
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
     ctx.fillText(displayG.toFixed(1), centerX, centerY)
 
-    ctx.font = '10px "Courier New"'
+    ctx.font = '14px "Courier New"'
     ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-    ctx.fillText('G-LOAD', centerX, centerY + 18)
+    ctx.fillText('G-LOAD', centerX, centerY + 38)
 
     // Border
     ctx.strokeStyle = '#00d4ff'
@@ -130,8 +130,8 @@ export function GMeter({ gY, className = '' }: GMeterProps) {
         <div className="flex justify-center mt-2">
           <canvas
             ref={canvasRef}
-            width={80}
-            height={180}
+            width={120}
+            height={220}
             style={{ imageRendering: 'pixelated' }}
           />
         </div>
