@@ -21,7 +21,7 @@ export function WeaponsPanel({ tactical }: WeaponsPanelProps) {
       <div className="flex items-center gap-4">
         {/* Gun */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>GUN</span>
+          <span className="text-[12px] opacity-40" style={{ letterSpacing: '1px' }}>GUN</span>
           <span className={`text-[13px] font-bold tabular-nums ${
             gunRounds > 0 ? 'text-jarvis-accent' : 'text-jarvis-muted'
           }`}>
@@ -45,7 +45,7 @@ export function WeaponsPanel({ tactical }: WeaponsPanelProps) {
               />
             ))
           ) : (
-            <span className="text-[10px] opacity-30" style={{ letterSpacing: '1px' }}>
+            <span className="text-[12px] opacity-30" style={{ letterSpacing: '1px' }}>
               NO STORES DATA
             </span>
           )}
@@ -57,7 +57,7 @@ export function WeaponsPanel({ tactical }: WeaponsPanelProps) {
         {/* Countermeasures */}
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1">
-            <span className="text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>CH</span>
+            <span className="text-[12px] opacity-40" style={{ letterSpacing: '1px' }}>CH</span>
             <span className={`text-[12px] font-bold tabular-nums ${
               chaff > 10 ? 'text-jarvis-accent' : chaff > 0 ? 'text-jarvis-warning' : 'text-jarvis-danger'
             }`}>
@@ -65,7 +65,7 @@ export function WeaponsPanel({ tactical }: WeaponsPanelProps) {
             </span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>FL</span>
+            <span className="text-[12px] opacity-40" style={{ letterSpacing: '1px' }}>FL</span>
             <span className={`text-[12px] font-bold tabular-nums ${
               flare > 10 ? 'text-jarvis-accent' : flare > 0 ? 'text-jarvis-warning' : 'text-jarvis-danger'
             }`}>
@@ -94,7 +94,7 @@ function StationBadge({
 
   return (
     <div
-      className={`flex items-center gap-1 px-1.5 py-0.5 border text-[10px] ${
+      className={`flex items-center gap-1 px-1.5 py-0.5 border text-[12px] ${
         isSelected
           ? 'border-jarvis-accent text-jarvis-accent bg-jarvis-accent/10'
           : count > 0

@@ -189,10 +189,10 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
 
       // Range label
       const ringNM = Math.round((range / ringSteps) * i)
-      ctx.font = '9px "Courier New"'
+      ctx.font = '12px "Courier New"'
       ctx.fillStyle = COLOR.ringLabel
       ctx.textAlign = 'center'
-      ctx.fillText(`${ringNM}`, cx, cy - r + 10)
+      ctx.fillText(`${ringNM}`, cx, cy - r + 12)
     }
 
     // Heading-up: cross lines (rotated by heading)
@@ -217,7 +217,7 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     const northAngle = -hdg
     const northX = Math.sin(northAngle) * (radius + 12)
     const northY = -Math.cos(northAngle) * (radius + 12)
-    ctx.font = 'bold 11px "Courier New"'
+    ctx.font = 'bold 14px "Courier New"'
     ctx.fillStyle = COLOR.north
     ctx.textAlign = 'center'
     ctx.textBaseline = 'middle'
@@ -366,12 +366,12 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
         // Bearing/distance readout at top of scope
         const brg = bearingDeg(ownLat, ownLon, activeWp.lat, activeWp.lon)
         const dist = distanceNM(ownLat, ownLon, activeWp.lat, activeWp.lon)
-        ctx.font = 'bold 10px "Courier New"'
+        ctx.font = 'bold 12px "Courier New"'
         ctx.fillStyle = COLOR.waypointActive
         ctx.textAlign = 'center'
         ctx.fillText(
           `STPT ${currentWp} → ${formatHeading(brg)}° / ${dist.toFixed(1)} NM`,
-          cx, cy - radius + 24,
+          cx, cy - radius + 26,
         )
       }
 
@@ -407,7 +407,7 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
         }
 
         // Index label
-        ctx.font = `${isActive ? 'bold ' : ''}9px "Courier New"`
+        ctx.font = `${isActive ? 'bold ' : ''}12px "Courier New"`
         ctx.fillStyle = color
         ctx.textAlign = 'left'
         ctx.fillText(`${wp.idx}`, sz + 4, 3)
@@ -443,7 +443,7 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
       const objCount = tac.objects?.length ?? 0
       const tgtCount = tac.targets?.length ?? 0
       if (objCount === 0 && tgtCount === 0 && (!route || route.length === 0)) {
-        ctx.font = '11px "Courier New"'
+        ctx.font = '12px "Courier New"'
         ctx.fillStyle = COLOR.statusText
         ctx.textAlign = 'center'
         ctx.textBaseline = 'middle'
@@ -459,10 +459,10 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
       const permObj = tac.permissions?.objects !== false
       const permSns = tac.permissions?.sensors !== false
 
-      ctx.font = '8px "Courier New"'
+      ctx.font = '12px "Courier New"'
       ctx.fillStyle = COLOR.diagText
       ctx.textAlign = 'center'
-      const diagY = cy + radius + 12
+      const diagY = cy + radius + 14
 
       const kiaCount = destroyedRef.current.length
       const staleTag = isStale ? ' STALE' : ''
@@ -501,12 +501,12 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
     <div ref={containerRef} className="w-full h-full flex flex-col items-center justify-center">
       {/* Range selector */}
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-[10px] opacity-45" style={{ letterSpacing: '1px' }}>RANGE</span>
+        <span className="text-[12px] opacity-45" style={{ letterSpacing: '1px' }}>RANGE</span>
         {RANGE_OPTIONS.map((r) => (
           <button
             key={r}
             onClick={() => setRangeNM(r)}
-            className={`px-2 py-0.5 text-[11px] font-bold border cursor-pointer transition-all ${
+            className={`px-2 py-0.5 text-[13px] font-bold border cursor-pointer transition-all ${
               r === rangeNM
                 ? 'border-jarvis-accent text-jarvis-accent bg-jarvis-accent/10'
                 : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary'
@@ -515,7 +515,7 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
             {r}
           </button>
         ))}
-        <span className="text-[10px] opacity-45">NM</span>
+        <span className="text-[12px] opacity-45">NM</span>
       </div>
 
       {/* Radar canvas with gating overlay */}
@@ -533,13 +533,13 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
         {isGated && (
           <div className="absolute inset-0 flex items-end justify-center pb-16 pointer-events-none">
             <div className="text-center bg-jarvis-bar/80 px-4 py-2 border border-jarvis-warning/30 rounded">
-              <div className="text-[11px] text-jarvis-warning" style={{ letterSpacing: '1px' }}>
+              <div className="text-[13px] text-jarvis-warning" style={{ letterSpacing: '1px' }}>
                 EXPORT RESTRICTED
               </div>
-              <div className="text-[9px] text-jarvis-muted mt-1" style={{ letterSpacing: '0.5px' }}>
+              <div className="text-[12px] text-jarvis-muted mt-1" style={{ letterSpacing: '0.5px' }}>
                 DCS server denies object/sensor export
               </div>
-              <div className="text-[9px] text-jarvis-muted" style={{ letterSpacing: '0.5px' }}>
+              <div className="text-[12px] text-jarvis-muted" style={{ letterSpacing: '0.5px' }}>
                 Contacts unavailable (anti-cheat)
               </div>
             </div>
@@ -634,7 +634,7 @@ function drawContact(
   }
 
   // Altitude label
-  ctx.font = '8px "Courier New"'
+  ctx.font = '12px "Courier New"'
   ctx.fillStyle = COLOR.label
   ctx.textAlign = 'left'
   const altFt = Math.round(metresToFeet(obj.alt) / 100) // FL
@@ -671,10 +671,10 @@ function drawRadarBlip(
 
   // Speed label
   const spdKts = Math.round(mpsToKnots(tgt.mach * 340))
-  ctx.font = '8px "Courier New"'
+  ctx.font = '12px "Courier New"'
   ctx.fillStyle = COLOR.label
   ctx.textAlign = 'left'
-  ctx.fillText(`${spdKts}`, 6, 3)
+  ctx.fillText(`${spdKts}`, 8, 4)
 
   ctx.restore()
 }

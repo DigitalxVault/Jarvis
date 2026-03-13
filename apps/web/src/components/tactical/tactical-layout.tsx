@@ -85,7 +85,7 @@ export function TacticalLayout() {
               <div className="panel-title text-jarvis-danger">▸ WARNINGS</div>
               <div className="flex flex-col gap-0.5 mt-1">
                 {tactical.mcp_warnings.slice(0, 6).map((w) => (
-                  <div key={w} className="text-[10px] text-jarvis-danger animate-blink" style={{ letterSpacing: '1px' }}>
+                  <div key={w} className="text-[12px] text-jarvis-danger animate-blink" style={{ letterSpacing: '1px' }}>
                     ● {w.replace(/([A-Z])/g, ' $1').trim().toUpperCase()}
                   </div>
                 ))}
@@ -147,7 +147,7 @@ function FlightDataRow({ label, value, unit }: { label: string; value: string; u
       <span className="opacity-45" style={{ letterSpacing: '1px' }}>{label}</span>
       <span className="text-jarvis-accent tabular-nums font-bold">
         {value}
-        {unit && <span className="text-[10px] opacity-50 ml-1">{unit}</span>}
+        {unit && <span className="text-[12px] opacity-50 ml-1">{unit}</span>}
       </span>
     </div>
   )

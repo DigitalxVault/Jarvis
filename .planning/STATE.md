@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 ## Current Position
 
 Phase: 9 -- Font Size Overhaul (IN PROGRESS)
-Plan: 01 of 3 complete
+Plan: 02 of 3 complete
 Status: In progress
-Last activity: 2026-03-13 -- Completed 09-01-PLAN.md (DOM font size overhaul)
+Last activity: 2026-03-13 -- Completed 09-02-PLAN.md (canvas instrument font size overhaul)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [###.......] 23% IN PROGRESS (Phase 8 complete, Phase 9 in progress)
+Progress: v2.0 [####......] 26% IN PROGRESS (Phase 8 complete, Phase 9 in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 22 (18 v1.0 MVP + 4 v2.0)
-- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04)
+- Total plans completed: 24 (18 v1.0 MVP + 6 v2.0)
+- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02)
 - Total execution time: 1 day (2026-02-25) + ongoing
 
 **By Phase:**
@@ -36,7 +36,7 @@ Progress: v2.0 [###.......] 23% IN PROGRESS (Phase 8 complete, Phase 9 in progre
 | 6. Telemetry UI | v1.0 | 3 |
 | 7. Resilience and Stability | v1.0 | 2 |
 | 8. PWA Foundation | v2.0 | 4 complete (DONE) |
-| 9. Font Size Overhaul | v2.0 | -- |
+| 9. Font Size Overhaul | v2.0 | 2 of 3 complete |
 | 10. Smart Connection Status | v2.0 | -- |
 | 11. Collapsible Widgets | v2.0 | -- |
 | 12. Draggable Layout | v2.0 | -- |
@@ -105,10 +105,11 @@ Amendment decisions (2026-03-13):
 | D-902 | Smart connection status panel | Amendment 3 + 4a + 4c — Phase 10 |
 | D-903 | Collapsible widget panels | Amendment 4d — Phase 11 |
 | D-904 | react-grid-layout draggable layout | Amendment 1 — Phase 12 |
+| D-921 | Y-offsets scaled to font metrics, not just size delta | Correct vertical spacing; no text overlap on canvas instruments |
 
 ### Pending Todos
 
-- Complete Phase 9 plans 02 and 03: Font Size Overhaul (canvas instruments + remaining)
+- Complete Phase 9 plan 03: Font Size Overhaul (remaining items if any)
 - Plan Phase 10: Smart Connection Status
 - Plan Phase 11: Collapsible Widgets
 - Plan Phase 12: Draggable Layout
@@ -128,6 +129,6 @@ Amendment decisions (2026-03-13):
 
 ## Session Continuity
 
-Last session: 2026-03-13T09:22:43Z
-Stopped at: Completed 09-01-PLAN.md -- DOM font sizes increased for in-flight readability
-Resume file: None -- continue with 09-02 and 09-03 plans
+Last session: 2026-03-13T09:23:38Z
+Stopped at: Completed 09-02-PLAN.md -- canvas instrument font sizes increased (G-meter 56px, VVI 48px, RPM 42px, ADI 12-14px)
+Resume file: None -- continue with 09-03 plan
