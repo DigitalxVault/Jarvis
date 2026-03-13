@@ -32,19 +32,19 @@ export function FuelGauge({ internal, external, className = '' }: FuelGaugeProps
 
         {/* Total fuel readout */}
         <div className="text-center mt-1 mb-2">
-          <span className={`text-xl font-bold tabular-nums ${
+          <span className={`text-4xl font-bold tabular-nums ${
             internal < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent glow-accent'
           }`}>
             {totalKg.toLocaleString()}
           </span>
-          <span className="text-[10px] opacity-50 ml-1">KG</span>
+          <span className="text-[13px] opacity-50 ml-1">KG</span>
         </div>
 
         <div className="flex gap-4 justify-center">
           {/* Internal fuel */}
           <div className="flex flex-col items-center">
             <div
-              className="text-[11px] opacity-50 mb-1"
+              className="text-[13px] opacity-50 mb-1"
               style={{ letterSpacing: '2px' }}
             >
               INT
@@ -74,20 +74,20 @@ export function FuelGauge({ internal, external, className = '' }: FuelGaugeProps
               ))}
             </div>
             <div
-              className={`text-sm font-bold tabular-nums mt-1 ${
+              className={`text-lg font-bold tabular-nums mt-1 ${
                 internal < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent'
               }`}
               style={{ letterSpacing: '1px' }}
             >
               {internalPct.toFixed(0)}%
             </div>
-            <div className="text-[10px] opacity-40 tabular-nums">{internalKg} kg</div>
+            <div className="text-[13px] opacity-40 tabular-nums">{internalKg} kg</div>
           </div>
 
           {/* External fuel */}
           <div className="flex flex-col items-center">
             <div
-              className="text-[11px] opacity-50 mb-1"
+              className="text-[13px] opacity-50 mb-1"
               style={{ letterSpacing: '2px' }}
             >
               EXT
@@ -117,20 +117,20 @@ export function FuelGauge({ internal, external, className = '' }: FuelGaugeProps
               ))}
             </div>
             <div
-              className={`text-sm font-bold tabular-nums mt-1 ${
+              className={`text-lg font-bold tabular-nums mt-1 ${
                 external < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent'
               }`}
               style={{ letterSpacing: '1px' }}
             >
               {externalPct.toFixed(0)}%
             </div>
-            <div className="text-[10px] opacity-40 tabular-nums">{externalKg} kg</div>
+            <div className="text-[13px] opacity-40 tabular-nums">{externalKg} kg</div>
           </div>
         </div>
 
         {/* Bingo label */}
         <div className="mt-2 text-center">
-          <span className="text-[10px] text-jarvis-warning" style={{ letterSpacing: '2px' }}>
+          <span className="text-[13px] text-jarvis-warning" style={{ letterSpacing: '2px' }}>
             BINGO @ {bingoPct}%
           </span>
         </div>

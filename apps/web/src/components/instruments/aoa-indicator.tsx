@@ -61,9 +61,9 @@ export function AoAIndicator({ aoaRad, className = '' }: AoAIndicatorProps) {
 
         {/* Indexer display */}
         <div className="flex justify-center gap-6 my-3">
-          <div className={`text-2xl ${colorClass}`}>{topSymbol}</div>
-          <div className={`text-2xl ${colorClass}`}>{middleSymbol}</div>
-          <div className={`text-2xl ${colorClass}`}>{bottomSymbol}</div>
+          <div className={`text-3xl ${colorClass}`}>{topSymbol}</div>
+          <div className={`text-3xl ${colorClass}`}>{middleSymbol}</div>
+          <div className={`text-3xl ${colorClass}`}>{bottomSymbol}</div>
         </div>
 
         {/* Numeric AoA */}
@@ -85,7 +85,7 @@ export function AoAIndicator({ aoaRad, className = '' }: AoAIndicatorProps) {
         </div>
 
         {/* Zone labels */}
-        <div className="flex justify-between mt-2 text-[9px] opacity-40" style={{ letterSpacing: '1px' }}>
+        <div className="flex justify-between mt-2 text-[13px] opacity-40" style={{ letterSpacing: '1px' }}>
           <span>FAST</span>
           <span>ON SPEED</span>
           <span>SLOW</span>
@@ -94,7 +94,7 @@ export function AoAIndicator({ aoaRad, className = '' }: AoAIndicatorProps) {
         {/* Stall warning */}
         {isStall && (
           <div className="mt-2 text-center animate-blink">
-            <span className="text-[11px] text-jarvis-danger font-bold" style={{ letterSpacing: '3px' }}>
+            <span className="text-[14px] text-jarvis-danger font-bold" style={{ letterSpacing: '3px' }}>
               ▲ STALL WARNING ▲
             </span>
           </div>
