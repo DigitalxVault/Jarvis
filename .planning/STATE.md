@@ -2,20 +2,20 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-04)
+See: .planning/PROJECT.md (updated 2026-03-13)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v2.0 -- PWA + Responsive Layout
+**Current focus:** v2.0 -- PWA + Responsive Layout + UI Amendments
 
 ## Current Position
 
-Phase: 8 -- PWA Foundation (COMPLETE)
-Plan: 4 of 4 (08-04 complete)
-Status: Phase 8 complete, ready for Phase 9
-Last activity: 2026-03-04 -- Completed 08-04-PLAN.md (Install Prompt)
+Phase: 9 -- Font Size Overhaul (NOT STARTED)
+Plan: --
+Status: Phase 9 planning required
+Last activity: 2026-03-13 -- Expanded v2.0 milestone with UI amendments (phases 9-14)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [####......] 40% IN PROGRESS
+Progress: v2.0 [##........] 20% IN PROGRESS (Phase 8 complete, 6 phases remaining)
 
 ## Performance Metrics
 
@@ -36,8 +36,12 @@ Progress: v2.0 [####......] 40% IN PROGRESS
 | 6. Telemetry UI | v1.0 | 3 |
 | 7. Resilience and Stability | v1.0 | 2 |
 | 8. PWA Foundation | v2.0 | 4 complete (DONE) |
-| 9. Responsive Layout | v2.0 | -- |
-| 10. Offline Shell & Polish | v2.0 | -- |
+| 9. Font Size Overhaul | v2.0 | -- |
+| 10. Smart Connection Status | v2.0 | -- |
+| 11. Collapsible Widgets | v2.0 | -- |
+| 12. Draggable Layout | v2.0 | -- |
+| 13. Responsive Layout | v2.0 | -- |
+| 14. Offline Shell & Polish | v2.0 | -- |
 
 *Updated after each plan completion*
 
@@ -75,6 +79,12 @@ v2.0 research completed:
 - D-843: iOS detection uses Mac+ontouchend heuristic -- iPadOS 13+ reports as Mac UA
 - D-844: Install prompt fixed at bottom, update banner at top -- no visual overlap
 
+Amendment decisions (2026-03-13):
+- D-901: Font sizes increased for in-flight readability -- Amendment 2
+- D-902: Smart connection status replaces START SESSION / DEV MODE buttons -- Amendment 3 + 4a + 4c
+- D-903: Collapsible widget panels for screen declutter -- Amendment 4d
+- D-904: react-grid-layout for draggable widget layout with localStorage persistence -- Amendment 1
+
 | ID | Decision | Outcome |
 |----|----------|---------|
 | D-801 | Separate maskable icon entry | 3 icon entries: 192/any, 512/any, 512/maskable |
@@ -91,11 +101,19 @@ v2.0 research completed:
 | D-842 | appinstalled cleanup in useEffect return | Prevents stale closures on unmount |
 | D-843 | Mac+ontouchend iOS heuristic | Catches iPadOS 13+ which reports as Mac UA |
 | D-844 | Install prompt at bottom, update banner at top | No visual overlap between banners |
+| D-901 | Font sizes for in-flight readability | Amendment 2 — Phase 9 |
+| D-902 | Smart connection status panel | Amendment 3 + 4a + 4c — Phase 10 |
+| D-903 | Collapsible widget panels | Amendment 4d — Phase 11 |
+| D-904 | react-grid-layout draggable layout | Amendment 1 — Phase 12 |
 
 ### Pending Todos
 
-- Plan Phase 9: Responsive Layout
-- Plan Phase 10: Offline Shell and Polish
+- Plan Phase 9: Font Size Overhaul
+- Plan Phase 10: Smart Connection Status
+- Plan Phase 11: Collapsible Widgets
+- Plan Phase 12: Draggable Layout
+- Plan Phase 13: Responsive Layout (rewrite for react-grid-layout)
+- Plan Phase 14: Offline Shell and Polish
 
 ### Blockers/Concerns
 
@@ -106,9 +124,10 @@ v2.0 research completed:
 - RSC payloads excluded from SW caching (RESOLVED in 08-02 via two-path detection)
 - iOS WebSocket dies on background -- existing visibilitychange reconnection mitigates
 - pnpm sharp resolution: script uses fallback path to virtual store (not symlinked at top-level)
+- react-grid-layout compatibility with Next.js 16 / React 19 — needs research before Phase 12 planning
 
 ## Session Continuity
 
-Last session: 2026-03-04T10:01:15Z
-Stopped at: Completed 08-04-PLAN.md (Phase 8 complete)
+Last session: 2026-03-13
+Stopped at: Expanded v2.0 milestone with UI amendments
 Resume file: None -- begin Phase 9 planning

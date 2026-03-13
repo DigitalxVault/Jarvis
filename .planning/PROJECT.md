@@ -16,14 +16,18 @@ Pipeline proven: DCS (10 Hz UDP) → bridge (2-5 Hz downsample) → Supabase Rea
 Google OAuth placeholders configured but not yet tested with real credentials.
 Supabase RLS disabled for prototype — re-enable when addressing auth integration.
 
-## Current Milestone: v2.0 — PWA + Responsive Layout
+## Current Milestone: v2.0 — PWA + Responsive Layout + UI Amendments
 
-**Goal:** Make the JARVIS DCS dashboard installable as a PWA on desktop and mobile, with an offline app shell, service worker caching, and a responsive layout that works on phones and tablets alongside the PC.
+**Goal:** Make the JARVIS DCS dashboard installable as a PWA on desktop and mobile, with an offline app shell, service worker caching, a responsive layout, and major UI amendments for in-flight readability and layout customization.
 
 **Scope:**
 - Full PWA: installable on desktop (taskbar app) and mobile (home screen)
 - Service worker with offline app shell caching
-- Responsive layout for phones and tablets
+- Font size overhaul for in-flight readability (Amendment 2)
+- Smart connection status replacing START SESSION / DEV MODE buttons (Amendment 3 + 4a + 4c)
+- Collapsible widget panels (Amendment 4d)
+- Draggable modular layout with react-grid-layout (Amendment 1)
+- Responsive layout for phones and tablets (rewritten for react-grid-layout)
 - Web app manifest with JARVIS branding
 
 **Explicitly out of scope for v2.0:**
@@ -54,7 +58,12 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 - PWA manifest with JARVIS branding, icons, theme colors — v2.0
 - Service worker with offline app shell caching — v2.0
 - Install prompt for desktop and mobile — v2.0
-- Responsive layout for phones and tablets — v2.0
+- Font size overhaul for in-flight readability — v2.0 (Amendment 2)
+- Smart connection status panel replacing session buttons — v2.0 (Amendment 3 + 4a + 4c)
+- Collapsible widget panels — v2.0 (Amendment 4d)
+- Draggable modular layout with react-grid-layout — v2.0 (Amendment 1)
+- Responsive layout for phones and tablets (rewritten for react-grid-layout) — v2.0
+- Offline shell and quality polish — v2.0
 
 ### Out of Scope
 
@@ -98,6 +107,10 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 | Export.lua hook over mission scripting | Works with any mission; LoGetSelfData() is universal; no custom mission files needed | Good — dofile() chaining preserves TacView/SRS compatibility |
 | F-16C Viper as target aircraft | Popular module with good export support; primary test platform | Pending — not yet tested on hardware |
 | Desktop only (v1.0) | Pilot is at a PC; HUD layout optimized for wide screens; simplifies Phase 1 | Evolving — v2.0 adds responsive + PWA |
+| D-901: Font sizes increased for in-flight readability | Current sizes too small for a pilot to read at a glance while flying DCS | Amendment 2 — Phase 9 |
+| D-902: Smart connection status replaces session buttons | START SESSION / DEV MODE buttons are confusing; smart 4-state status display is more intuitive | Amendment 3 + 4a + 4c — Phase 10 |
+| D-903: Collapsible widget panels | Helps pilots declutter screen; collapsed panels easier to reposition in drag mode | Amendment 4d — Phase 11 |
+| D-904: react-grid-layout for draggable widgets | Pilots need to rearrange panels for their monitor layout / multi-screen setups; free positioning with localStorage persistence | Amendment 1 — Phase 12 |
 | Phase 1 scope only | Prove pipeline before adding scoring/coaching; clean separation of concerns | Good — pipeline proven, clean foundation for Phase 2 |
 | Monorepo structure | Bridge + web app in single repo for easier development during prototype | Good — pnpm workspaces + shared types work smoothly |
 | Port 7779 for JARVIS UDP | Avoids DCS internal port 12800 and TacView port 7778 | Good — no conflicts observed |
@@ -108,4 +121,4 @@ Supabase RLS disabled for prototype — re-enable when addressing auth integrati
 | heartbeatCallback + worker: true | Prevent tab-throttle WebSocket drops | Good — maintains connection in background tabs |
 
 ---
-*Last updated: 2026-03-04 — v2.0 milestone started (PWA + Responsive)*
+*Last updated: 2026-03-13 — v2.0 expanded with UI amendments (phases 9-14)*
