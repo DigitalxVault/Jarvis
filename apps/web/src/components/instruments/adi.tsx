@@ -63,7 +63,7 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
     // Pitch ladder (5° increments)
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)'
     ctx.lineWidth = 1
-    ctx.font = '10px "Courier New"'
+    ctx.font = '12px "Courier New"'
     ctx.textAlign = 'center'
     ctx.fillStyle = '#00d4ff'
 
@@ -85,8 +85,8 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
 
       // Degree labels on major lines
       if (isMajor) {
-        ctx.fillText(`${deg}°`, -radius * 0.7, y + 3)
-        ctx.fillText(`${deg}°`, radius * 0.7, y + 3)
+        ctx.fillText(`${deg}°`, -radius * 0.7, y + 4)
+        ctx.fillText(`${deg}°`, radius * 0.7, y + 4)
       }
     }
 
@@ -148,7 +148,7 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
     ctx.restore()
 
     // Bank angle numeric
-    ctx.font = 'bold 11px "Courier New"'
+    ctx.font = 'bold 14px "Courier New"'
     ctx.textAlign = 'center'
     ctx.fillStyle = '#00ffff'
     const bankDisplay = Math.round(bankDeg)
