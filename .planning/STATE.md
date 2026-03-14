@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-03-13)
 
 ## Current Position
 
-Phase: 9 -- Font Size Overhaul (IN PROGRESS)
-Plan: 02 of 3 complete
-Status: In progress
-Last activity: 2026-03-13 -- Completed 09-02-PLAN.md (canvas instrument font size overhaul)
+Phase: 9 -- Font Size Overhaul (DONE)
+Plan: 03 of 3 complete
+Status: Phase complete
+Last activity: 2026-03-13 -- Completed 09-03-PLAN.md (remaining components font size overhaul)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [####......] 26% IN PROGRESS (Phase 8 complete, Phase 9 in progress)
+Progress: v2.0 [#####.....] 33% IN PROGRESS (Phases 8-9 complete, 5 phases remaining)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 24 (18 v1.0 MVP + 6 v2.0)
-- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02)
+- Total plans completed: 25 (18 v1.0 MVP + 7 v2.0)
+- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02), ~6 min (09-03)
 - Total execution time: 1 day (2026-02-25) + ongoing
 
 **By Phase:**
@@ -36,7 +36,7 @@ Progress: v2.0 [####......] 26% IN PROGRESS (Phase 8 complete, Phase 9 in progre
 | 6. Telemetry UI | v1.0 | 3 |
 | 7. Resilience and Stability | v1.0 | 2 |
 | 8. PWA Foundation | v2.0 | 4 complete (DONE) |
-| 9. Font Size Overhaul | v2.0 | 2 of 3 complete |
+| 9. Font Size Overhaul | v2.0 | 3 complete (DONE) |
 | 10. Smart Connection Status | v2.0 | -- |
 | 11. Collapsible Widgets | v2.0 | -- |
 | 12. Draggable Layout | v2.0 | -- |
@@ -106,10 +106,11 @@ Amendment decisions (2026-03-13):
 | D-903 | Collapsible widget panels | Amendment 4d — Phase 11 |
 | D-904 | react-grid-layout draggable layout | Amendment 1 — Phase 12 |
 | D-921 | Y-offsets scaled to font metrics, not just size delta | Correct vertical spacing; no text overlap on canvas instruments |
+| D-931 | Canvas radar scope Y-offsets bumped +2px at ring labels and diag strip | Prevents label clipping after 9→12px upgrade |
+| D-932 | North indicator upgraded to bold 14px (from bold 11px) | Prominent cardinal reference at larger font size |
 
 ### Pending Todos
 
-- Complete Phase 9 plan 03: Font Size Overhaul (remaining items if any)
 - Plan Phase 10: Smart Connection Status
 - Plan Phase 11: Collapsible Widgets
 - Plan Phase 12: Draggable Layout
@@ -129,6 +130,6 @@ Amendment decisions (2026-03-13):
 
 ## Session Continuity
 
-Last session: 2026-03-13T09:23:38Z
-Stopped at: Completed 09-02-PLAN.md -- canvas instrument font sizes increased (G-meter 56px, VVI 48px, RPM 42px, ADI 12-14px)
-Resume file: None -- continue with 09-03 plan
+Last session: 2026-03-13T09:27:31Z
+Stopped at: Completed 09-03-PLAN.md -- Phase 9 Font Size Overhaul 100% complete. Zero sub-12px text in entire web app.
+Resume file: None -- begin Phase 10 planning
