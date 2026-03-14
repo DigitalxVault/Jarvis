@@ -11,6 +11,7 @@ import { AlertOverlay } from './alert-overlay'
 import { JarvisLogo } from './jarvis-logo'
 import { MiniTelemetryCard } from './mini-telemetry-card'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
+import { CollapsibleWidget } from './collapsible-widget'
 import type { CoachingBand, SmoothnessScore } from '@/hooks/use-coaching'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
@@ -65,15 +66,19 @@ export function Dashboard() {
             />
           </div>
 
-          <FuelGauge
-            internal={telemetry?.fuel?.internal ?? 0}
-            external={telemetry?.fuel?.external ?? 0}
-          />
+          <CollapsibleWidget panelId="fuel" title="FUEL">
+            <FuelGauge
+              internal={telemetry?.fuel?.internal ?? 0}
+              external={telemetry?.fuel?.external ?? 0}
+            />
+          </CollapsibleWidget>
 
-          <EnginePanel
-            rpmPct={telemetry?.eng?.rpm_pct ?? 0}
-            fuelCon={telemetry?.eng?.fuel_con ?? 0}
-          />
+          <CollapsibleWidget panelId="engine" title="ENGINE">
+            <EnginePanel
+              rpmPct={telemetry?.eng?.rpm_pct ?? 0}
+              fuelCon={telemetry?.eng?.fuel_con ?? 0}
+            />
+          </CollapsibleWidget>
         </div>
 
         {/* Center Panel — HUD display */}
@@ -134,9 +139,17 @@ export function Dashboard() {
 
         {/* Right Panel — G-Meter, AoA, VVI (compact, stacked) */}
         <div className="bg-jarvis-bar border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
-          <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
-          <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
-          <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
+          <CollapsibleWidget panelId="g-meter" title="G-METER">
+            <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
+          </CollapsibleWidget>
+
+          <CollapsibleWidget panelId="aoa" title="ANGLE OF ATTACK">
+            <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
+          </CollapsibleWidget>
+
+          <CollapsibleWidget panelId="vvi" title="VERTICAL SPEED">
+            <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
+          </CollapsibleWidget>
         </div>
       </div>
 

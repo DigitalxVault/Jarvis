@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useCallback } from 'react'
 
 interface CollapsibleWidgetProps {
   panelId: string
@@ -10,14 +10,10 @@ interface CollapsibleWidgetProps {
 }
 
 export function CollapsibleWidget({ panelId, title, children, className = '' }: CollapsibleWidgetProps) {
-  const [isExpanded, setIsExpanded] = useState(true)
-
-  useEffect(() => {
-    const stored = localStorage.getItem(`jarvis.panel.${panelId}`)
-    if (stored === 'collapsed') {
-      setIsExpanded(false)
-    }
-  }, [panelId])
+  const [isExpanded, setIsExpanded] = useState<boolean>(() => {
+    if (typeof window === 'undefined') return true
+    return localStorage.getItem(`jarvis.panel.${panelId}`) !== 'collapsed'
+  })
 
   const toggle = useCallback(() => {
     setIsExpanded((prev) => {
