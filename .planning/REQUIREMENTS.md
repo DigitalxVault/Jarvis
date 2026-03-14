@@ -30,18 +30,18 @@
 
 ## Font Size Overhaul (Amendment 2)
 
-- [ ] **REQ-228** — Primary telemetry values (IAS, ALT, HDG, Mach, TAS) at minimum 36px font size
-- [ ] **REQ-229** — Canvas instrument values at increased sizes: G-meter 56px, VVI 48px, RPM 42px
-- [ ] **REQ-230** — Secondary labels (section headers 14-15px, unit labels 13-14px, sub-labels 12-13px, coaching/status text 13-14px)
-- [ ] **REQ-231** — Font conventions preserved throughout: tabular-nums, Courier New monospace, letter-spacing, line-height adjusted for new sizes
+- [x] **REQ-228** — Primary telemetry values (IAS, ALT, HDG, Mach, TAS) at minimum 36px font size
+- [x] **REQ-229** — Canvas instrument values at increased sizes: G-meter 56px, VVI 48px, RPM 42px
+- [x] **REQ-230** — Secondary labels (section headers 14-15px, unit labels 13-14px, sub-labels 12-13px, coaching/status text 13-14px)
+- [x] **REQ-231** — Font conventions preserved throughout: tabular-nums, Courier New monospace, letter-spacing, line-height adjusted for new sizes
 
 ## Smart Connection Status (Amendment 3 + 4a + 4c)
 
-- [ ] **REQ-232** — ConnectionStatusPanel component with 4 states: INITIALIZING (amber pulsing) → SYSTEM INITIALIZED (cyan static) → DCS ONLINE (green solid) → DCS OFFLINE (red pulsing), replacing SessionPanel
-- [ ] **REQ-233** — DEV MODE button relocated from primary UI to CompactDebug strip as subtle [DEV] toggle
-- [ ] **REQ-234** — Top bar connection pill updated with state-aware labels/colors: INITIALIZING (amber) / STANDBY (cyan) / ONLINE (green) / OFFLINE (red)
-- [ ] **REQ-235** — Coaching strip state-aware text: no session → "CREATE SESSION TO BEGIN", session but not connected → "AWAITING DCS LAUNCH", connected → live coaching data
-- [ ] **REQ-236** — Pairing code UI retained in ConnectionStatusPanel when session exists and bridge is unclaimed
+- [x] **REQ-232** — ConnectionStatusPanel component with 4 states: INITIALIZING (cyan spinning) → SYSTEM INITIALIZED (amber static) → DCS ONLINE (green solid) → DCS OFFLINE (red static), replacing SessionPanel
+- [x] **REQ-233** — DEV MODE removed entirely (no relocation, no keyboard shortcut — per D-902)
+- [x] **REQ-234** — Top bar connection pill updated with state-aware labels/colors: INITIALIZING (cyan) / SYSTEM INIT (amber) / DCS ONLINE (green) / OFFLINE (red)
+- [x] **REQ-235** — Coaching strip state-aware text: no session → "CREATE SESSION TO BEGIN", session but not connected → "AWAITING DCS LAUNCH", connected → live coaching data
+- [x] **REQ-236** — Pairing code UI retained in ConnectionStatusPanel when session exists and bridge is unclaimed
 
 ## Collapsible Widgets (Amendment 4d)
 
@@ -96,7 +96,7 @@
 
 ---
 
-## Traceability
+## Traceability (v2.0)
 
 | REQ-ID | Category | Phase | Status |
 |--------|----------|-------|--------|
@@ -115,15 +115,15 @@
 | REQ-212 | Install Experience | 8 | Complete |
 | REQ-213 | Install Experience | 8 | Complete |
 | REQ-214 | Install Experience | 8 | Complete |
-| REQ-228 | Font Size Overhaul | 9 | Pending |
-| REQ-229 | Font Size Overhaul | 9 | Pending |
-| REQ-230 | Font Size Overhaul | 9 | Pending |
-| REQ-231 | Font Size Overhaul | 9 | Pending |
-| REQ-232 | Smart Connection Status | 10 | Pending |
-| REQ-233 | Smart Connection Status | 10 | Pending |
-| REQ-234 | Smart Connection Status | 10 | Pending |
-| REQ-235 | Smart Connection Status | 10 | Pending |
-| REQ-236 | Smart Connection Status | 10 | Pending |
+| REQ-228 | Font Size Overhaul | 9 | Complete |
+| REQ-229 | Font Size Overhaul | 9 | Complete |
+| REQ-230 | Font Size Overhaul | 9 | Complete |
+| REQ-231 | Font Size Overhaul | 9 | Complete |
+| REQ-232 | Smart Connection Status | 10 | Complete |
+| REQ-233 | Smart Connection Status | 10 | Complete |
+| REQ-234 | Smart Connection Status | 10 | Complete |
+| REQ-235 | Smart Connection Status | 10 | Complete |
+| REQ-236 | Smart Connection Status | 10 | Complete |
 | REQ-237 | Collapsible Widgets | 11 | Pending |
 | REQ-238 | Collapsible Widgets | 11 | Pending |
 | REQ-239 | Collapsible Widgets | 11 | Pending |
@@ -149,3 +149,157 @@
 | REQ-225 | Quality & Polish | 14 | Pending |
 | REQ-226 | Quality & Polish | 14 | Pending |
 | REQ-227 | Quality & Polish | 14 | Pending |
+
+---
+---
+
+# Requirements: v3.0 — Voice Co-Pilot & Trainer Platform
+
+**Milestone:** v3.0
+**Created:** 2026-03-14
+**Status:** Defined (awaiting v2.0 completion)
+
+---
+
+## Prerequisites (PREREQ)
+
+- [ ] **REQ-300** — DCS-gRPC server mod installed and verified in DCS World
+- [ ] **REQ-301** — API accounts created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine wake word)
+- [ ] **REQ-302** — Python bridge project scaffold (pyproject.toml, virtual env, project structure)
+
+## Python Bridge (BRIDGE)
+
+- [ ] **REQ-303** — Python bridge connects to DCS via DCS-gRPC and receives telemetry (position, attitude, speed, fuel, engine, weapons)
+- [ ] **REQ-304** — Python bridge publishes telemetry to Supabase REST broadcast (same channel format as v1.0: `session:{id}`)
+- [ ] **REQ-305** — Python bridge receives commands from Supabase Realtime (trainer actions) and executes via DCS-gRPC
+- [ ] **REQ-306** — Python bridge handles DCS disconnect with auto-retry and status reporting
+- [ ] **REQ-307** — Python bridge auto-opens browser to Jarvis web URL on startup
+- [ ] **REQ-308** — Heartbeat system (1 Hz) with DCS active/inactive status, packet count, queue depth
+
+## Session & Connection (SESSION)
+
+- [ ] **REQ-309** — 4-digit numeric session codes (generated on player button press, not automatic)
+- [ ] **REQ-310** — Connection state machine: LAUNCHING → INITIALIZING → READY → SESSION_CREATED → CONNECTED → DCS_LINKED → IN_FLIGHT → DCS_DISCONNECTED (with auto-retry)
+- [ ] **REQ-311** — Player/trainer role routing on web app landing page
+- [ ] **REQ-312** — Session code registered in Supabase with metadata (player ID, timestamp, status)
+- [ ] **REQ-313** — Trainer joins session via 4-digit code; first trainer = controller, additional = observers
+
+## TTS & Voice Output (TTS)
+
+- [ ] **REQ-314** — ElevenLabs TTS integration with streaming API for low-latency speech
+- [ ] **REQ-315** — Voice cues for all connection state transitions (welcome, system init, session code readout, DCS connected, DCS disconnected/reconnected)
+- [ ] **REQ-316** — Speech priority queue: P1 (safety-critical) interrupts, P2 (warnings) queues, P3 (info) waits for silence
+- [ ] **REQ-317** — Browser audio playback management (play through default audio device)
+
+## Wake Word & STT (STT)
+
+- [ ] **REQ-318** — Picovoice Porcupine wake word detection ("Jarvis") running in-browser via WebAssembly
+- [ ] **REQ-319** — Audio buffering via Web Audio API after wake word detection (buffer until silence/timeout)
+- [ ] **REQ-320** — OpenAI Whisper API transcription of buffered audio clips
+- [ ] **REQ-321** — Voice input UI feedback (listening indicator, transcription display)
+
+## Command Processing (CMD)
+
+- [ ] **REQ-322** — Rule engine for known commands: altitude, fuel, heading, airspeed, systems status (instant response from telemetry, no LLM call)
+- [ ] **REQ-323** — GPT-4o integration for complex/contextual queries with current DCS state as context
+- [ ] **REQ-324** — Response routing: rule engine gets first pass, LLM fallback for unmatched commands
+
+## Flight Phase & Personality (PHASE)
+
+- [ ] **REQ-325** — Flight phase detection from telemetry: STARTUP, TAXI, CRUISE, COMBAT, LANDING
+- [ ] **REQ-326** — Personality adapter: tone/brevity adjusts per flight phase (relaxed cruise, sharp combat, focused landing)
+- [ ] **REQ-327** — Phase tag passed to rule engine (response templates) and GPT-4o (system prompt)
+
+## Proactive Alerts (ALERT)
+
+- [ ] **REQ-328** — Threshold monitoring system with configurable limits (altitude, fuel, stall, RWR, engine temp, waypoint, phase change)
+- [ ] **REQ-329** — Alert generation with flight-phase-aware personality (casual cruise vs urgent combat callouts)
+- [ ] **REQ-330** — Priority queue integration: P1 alerts interrupt speech, P2 queue behind, P3 wait for silence
+
+## Trainer Visibility (TVIEW)
+
+- [ ] **REQ-331** — Trainer dashboard with live telemetry panels (altitude, airspeed, heading, fuel, engine, G-force)
+- [ ] **REQ-332** — Custom canvas Tactical Situation Display (TSD): player-centered square canvas with range rings (5/10/20nm), enemy contacts as hostile blips, waypoint markers, north-up orientation, JARVIS HUD aesthetic (dark bg, cyan/green/red, Courier New) — no real-world map library
+- [ ] **REQ-333** — Flight phase indicator and timestamped events log (weapons fired, targets destroyed, phase transitions)
+- [ ] **REQ-334** — Full Jarvis conversation log (player queries + Jarvis responses + proactive alerts)
+
+## Trainer Communication (TCOMM)
+
+- [ ] **REQ-335** — PTT voice input: trainer speaks → Whisper → GPT-4o rephrases to aviation terminology + Jarvis tone → ElevenLabs speaks as Jarvis
+- [ ] **REQ-336** — Template button system with configurable library (situational awareness, approach, combat, mission, encouragement categories)
+- [ ] **REQ-337** — Custom text box: trainer types → GPT-4o rephrases → ElevenLabs speaks as Jarvis
+- [ ] **REQ-338** — Player cannot distinguish trainer-relayed speech from AI-generated Jarvis speech
+
+## Trainer DCS Controls (TCTRL)
+
+- [ ] **REQ-339** — Spawn enemy units: type, count, distance, bearing, altitude → Python bridge → DCS-gRPC
+- [ ] **REQ-340** — Set AI objectives: target group, objective type (CAP, fighter sweep, idle) → DCS-gRPC
+- [ ] **REQ-341** — Alert threshold configuration: parameter, operator, value → updates threshold monitor
+- [ ] **REQ-342** — Mission injection: waypoint coordinates, objective description → DCS-gRPC
+
+## Trainer Roles (TROLE)
+
+- [ ] **REQ-343** — Controller role (first to join): full dashboard + communication + DCS controls
+- [ ] **REQ-344** — Observer role (additional trainers): read-only view of all panels, no controls
+
+---
+
+## Out of Scope (v3.0)
+
+- Mobile app (native iOS/Android)
+- Multiplayer squad sessions (multi-player in same session)
+- Standalone .exe packaging for Python bridge
+- Post-flight replay / debrief system
+- Custom voice cloning (use ElevenLabs library voice)
+
+---
+
+## Traceability (v3.0)
+
+| REQ-ID | Category | Phase | Status |
+|--------|----------|-------|--------|
+| REQ-300 | Prerequisites | 15 | Pending |
+| REQ-301 | Prerequisites | 17, 18 | Pending |
+| REQ-302 | Prerequisites | 15 | Pending |
+| REQ-303 | Python Bridge | 15 | Pending |
+| REQ-304 | Python Bridge | 15 | Pending |
+| REQ-305 | Python Bridge | 23 | Pending |
+| REQ-306 | Python Bridge | 15 | Pending |
+| REQ-307 | Python Bridge | 15 | Pending |
+| REQ-308 | Python Bridge | 15 | Pending |
+| REQ-309 | Session & Connection | 16 | Pending |
+| REQ-310 | Session & Connection | 16 | Pending |
+| REQ-311 | Session & Connection | 16 | Pending |
+| REQ-312 | Session & Connection | 16 | Pending |
+| REQ-313 | Session & Connection | 16 | Pending |
+| REQ-314 | TTS & Voice Output | 17 | Pending |
+| REQ-315 | TTS & Voice Output | 17 | Pending |
+| REQ-316 | TTS & Voice Output | 17 | Pending |
+| REQ-317 | TTS & Voice Output | 17 | Pending |
+| REQ-318 | Wake Word & STT | 18 | Pending |
+| REQ-319 | Wake Word & STT | 18 | Pending |
+| REQ-320 | Wake Word & STT | 18 | Pending |
+| REQ-321 | Wake Word & STT | 18 | Pending |
+| REQ-322 | Command Processing | 19 | Pending |
+| REQ-323 | Command Processing | 19 | Pending |
+| REQ-324 | Command Processing | 19 | Pending |
+| REQ-325 | Flight Phase & Personality | 20 | Pending |
+| REQ-326 | Flight Phase & Personality | 20 | Pending |
+| REQ-327 | Flight Phase & Personality | 20 | Pending |
+| REQ-328 | Proactive Alerts | 20 | Pending |
+| REQ-329 | Proactive Alerts | 20 | Pending |
+| REQ-330 | Proactive Alerts | 20 | Pending |
+| REQ-331 | Trainer Visibility | 21 | Pending |
+| REQ-332 | Trainer Visibility | 21 | Pending |
+| REQ-333 | Trainer Visibility | 21 | Pending |
+| REQ-334 | Trainer Visibility | 21 | Pending |
+| REQ-335 | Trainer Communication | 22 | Pending |
+| REQ-336 | Trainer Communication | 22 | Pending |
+| REQ-337 | Trainer Communication | 22 | Pending |
+| REQ-338 | Trainer Communication | 22 | Pending |
+| REQ-339 | Trainer DCS Controls | 23 | Pending |
+| REQ-340 | Trainer DCS Controls | 23 | Pending |
+| REQ-341 | Trainer DCS Controls | 23 | Pending |
+| REQ-342 | Trainer DCS Controls | 23 | Pending |
+| REQ-343 | Trainer Roles | 24 | Pending |
+| REQ-344 | Trainer Roles | 24 | Pending |

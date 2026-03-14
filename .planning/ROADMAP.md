@@ -4,6 +4,7 @@
 
 - SHIPPED **v1.0 MVP** -- Phases 1-7 (shipped 2026-02-25) -- [archive](milestones/v1.0-ROADMAP.md)
 - ACTIVE **v2.0 PWA + Responsive Layout + UI Amendments** -- Phases 8-14
+- DEFINED **v3.0 Voice Co-Pilot & Trainer Platform** -- Phases 15-24
 
 ## Phases
 
@@ -56,11 +57,12 @@ Plans:
 
 **Dependencies:** Phase 8 (PWA foundation complete; pure visual changes, safest to apply first)
 
-**Plans:** 2 plans
+**Plans:** 3 plans
 
 Plans:
-- [ ] 09-01-PLAN.md -- DOM component font sizes (mini-telemetry-cards, fuel-gauge, aoa-indicator, coaching/debug strips, bottom-bar)
-- [ ] 09-02-PLAN.md -- Canvas instrument font sizes (engine-panel, g-meter, vvi-tape) with Y-offset recalculation
+- [x] 09-01-PLAN.md -- DOM component font sizes (mini-telemetry-cards, fuel-gauge, aoa-indicator, coaching/debug strips, bottom-bar)
+- [x] 09-02-PLAN.md -- Canvas instrument font sizes (engine-panel, g-meter, vvi-tape, ADI) with Y-offset recalculation
+- [x] 09-03-PLAN.md -- Remaining component font sizes (top-bar, session-panel, dashboard, alert-overlay, tactical panels, radar scope canvas, PWA prompts, utility components)
 
 **Requirements:**
 - REQ-228 -- Primary telemetry values at minimum 36px
@@ -70,10 +72,11 @@ Plans:
 
 **Success Criteria:**
 1. Primary telemetry values (IAS, ALT, HDG, Mach, TAS) render at 36px+ and are readable at arm's length
-2. Canvas instruments (G-meter, VVI, RPM) display values at specified increased sizes with correct positioning
+2. Canvas instruments (G-meter, VVI, RPM, ADI) display values at specified increased sizes with correct positioning
 3. All secondary labels, unit text, and coaching/debug strips use increased font sizes per Amendment 2 spec
-4. Font styling conventions (tabular-nums, Courier New, letter-spacing, uppercase) are preserved throughout
-5. `pnpm typecheck` passes clean after all changes
+4. No component in the web app has font sizes below 12px
+5. Font styling conventions (tabular-nums, Courier New, letter-spacing, uppercase) are preserved throughout
+6. `pnpm typecheck` passes clean after all changes
 
 ---
 
@@ -86,22 +89,22 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [ ] 10-01-PLAN.md -- ConnectionStatusPanel component (replaces SessionPanel) with 4-state machine
-- [ ] 10-02-PLAN.md -- Top bar connection pill update (4a) + coaching strip state text (4c) + DEV MODE relocation to CompactDebug (3)
+- [x] 10-01-PLAN.md -- ConnectionStatusPanel component (replaces SessionPanel) with 4-state machine + DEV MODE removal from provider
+- [x] 10-02-PLAN.md -- Top bar connection pill update (4a) + coaching strip state text (4c) + dashboard wiring + session-panel.tsx deletion
 
 **Requirements:**
-- REQ-232 -- ConnectionStatusPanel with 4 states (INITIALIZING → SYSTEM INITIALIZED → DCS ONLINE → DCS OFFLINE)
-- REQ-233 -- DEV MODE relocated to CompactDebug strip
+- REQ-232 -- ConnectionStatusPanel with 4 states (INITIALIZING -> SYSTEM INITIALIZED -> DCS ONLINE -> DCS OFFLINE)
+- REQ-233 -- DEV MODE removed entirely (per CONTEXT.md -- no relocation, no keyboard shortcut)
 - REQ-234 -- Top bar connection pill with state-aware labels/colors
 - REQ-235 -- Coaching strip state-aware text (3 states)
 - REQ-236 -- Pairing code UI retained when applicable
 
 **Success Criteria:**
-1. ConnectionStatusPanel shows correct state based on connection lifecycle (no session → session created → telemetry flowing → connection lost)
-2. Status dot, title, and sub-text match the Amendment 3 visual spec for each state
-3. Top bar pill reflects connection state with correct labels and colors per Amendment 4a
+1. ConnectionStatusPanel shows correct state based on connection lifecycle (no session -> session created -> telemetry flowing -> connection lost)
+2. Status dot, title, and sub-text match the visual spec for each state
+3. Top bar pill reflects connection state with correct labels and colors
 4. Coaching strip shows "AWAITING DCS LAUNCH" when session exists but DCS not connected
-5. DEV MODE is accessible via CompactDebug strip, no longer visible in primary UI
+5. DEV MODE is removed entirely -- no button, no keyboard shortcut, no debug toggle
 6. `pnpm typecheck` passes clean
 
 ---
@@ -119,13 +122,13 @@ Plans:
 
 **Requirements:**
 - REQ-237 -- CollapsibleWidget wrapper component with title bar toggle
-- REQ-238 -- Chevron indicator (▾ open / ▸ closed)
+- REQ-238 -- Chevron indicator (open / closed)
 - REQ-239 -- Collapsed state shows title bar only
 - REQ-240 -- Non-collapsible components excluded (ConnectionStatusPanel, MiniTelemetryCards, coaching, debug)
 
 **Success Criteria:**
 1. Clicking a widget title bar (FUEL, ENGINE, G-METER, ANGLE OF ATTACK, VERTICAL SPEED) toggles collapse/expand
-2. Collapsed state shows only the title bar with ▸ chevron; expanded shows ▾ with full content
+2. Collapsed state shows only the title bar with closed chevron; expanded shows open chevron with full content
 3. ConnectionStatusPanel, top center telemetry cards, coaching strip, and debug strip are NOT collapsible
 4. `pnpm typecheck` passes clean
 
@@ -226,6 +229,285 @@ Plans:
 
 ---
 
+---
+
+### v3.0 Voice Co-Pilot & Trainer Platform
+
+---
+
+#### Phase 15: Python Bridge + DCS-gRPC Foundation
+
+**Goal:** Python bridge connects to DCS via gRPC, extracts telemetry, publishes to Supabase in the same format as the Node.js bridge.
+
+**Dependencies:** v2.0 complete (Phases 10-14); DCS-gRPC mod installed
+
+**Plans:** ~4 plans (scaffold, gRPC client, Supabase publisher, resilience)
+
+Plans:
+- [ ] 15-01-PLAN.md -- Python project scaffold (pyproject.toml, venv, structure)
+- [ ] 15-02-PLAN.md -- DCS-gRPC client (connect, extract telemetry)
+- [ ] 15-03-PLAN.md -- Supabase REST publisher (broadcast telemetry + heartbeat)
+- [ ] 15-04-PLAN.md -- Resilience (DCS disconnect retry, auto-open browser, status reporting)
+
+**Requirements:**
+- REQ-300 -- DCS-gRPC mod installed and verified
+- REQ-302 -- Python bridge scaffold
+- REQ-303 -- DCS-gRPC telemetry connection
+- REQ-304 -- Supabase REST broadcast
+- REQ-306 -- DCS disconnect handling
+- REQ-307 -- Auto-open browser
+- REQ-308 -- Heartbeat system
+
+**Success Criteria:**
+1. Python bridge receives telemetry from DCS via gRPC and publishes to Supabase at 4 Hz
+2. Existing web dashboard displays telemetry from Python bridge identically to Node.js bridge
+3. Bridge auto-retries on DCS disconnect with exponential backoff
+4. Heartbeat at 1 Hz with DCS status, packet count, queue depth
+5. Browser auto-opens to Jarvis web URL on bridge startup
+
+**Key Risk:** DCS-gRPC API surface — needs validation against actual mod
+
+---
+
+#### Phase 16: Session & Connection Overhaul
+
+**Goal:** New 4-digit session codes, updated connection state machine, player/trainer role routing.
+
+**Dependencies:** Phase 15 (Python bridge operational)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 16-01-PLAN.md -- Session overhaul (4-digit codes, player-initiated, Supabase metadata)
+- [ ] 16-02-PLAN.md -- Role routing + connection state machine (LAUNCHING → IN_FLIGHT → DCS_DISCONNECTED)
+
+**Requirements:**
+- REQ-309 -- 4-digit numeric session codes
+- REQ-310 -- Connection state machine (8 states)
+- REQ-311 -- Player/trainer role routing
+- REQ-312 -- Session metadata in Supabase
+- REQ-313 -- Trainer joins via code (controller/observer)
+
+**Success Criteria:**
+1. Player presses button to generate 4-digit code; code appears on screen and in Supabase
+2. Connection transitions through all 8 states with correct UI feedback
+3. Landing page presents player/trainer role choice
+4. Trainer can join session via 4-digit code; first trainer = controller
+
+---
+
+#### Phase 17: TTS Foundation + Voice Cues
+
+**Goal:** Jarvis speaks — connection state voice cues, streaming TTS, priority queue.
+
+**Dependencies:** Phase 16 (connection states defined for voice cues)
+
+**Plans:** ~3 plans
+
+Plans:
+- [ ] 17-01-PLAN.md -- ElevenLabs TTS client (streaming API, browser audio playback)
+- [ ] 17-02-PLAN.md -- Voice cue system (connection state transitions → speech)
+- [ ] 17-03-PLAN.md -- Speech priority queue (P1 interrupt, P2 queue, P3 wait)
+
+**Requirements:**
+- REQ-301 -- ElevenLabs API key
+- REQ-314 -- ElevenLabs TTS streaming integration
+- REQ-315 -- Voice cues for connection transitions
+- REQ-316 -- Speech priority queue (P1/P2/P3)
+- REQ-317 -- Browser audio playback management
+
+**Success Criteria:**
+1. Jarvis speaks welcome message on app load via ElevenLabs streaming TTS
+2. All connection state transitions trigger appropriate voice cues
+3. P1 speech interrupts current playback; P2 queues; P3 waits for silence
+4. Audio plays through default browser audio device
+
+---
+
+#### Phase 18: Wake Word + STT Pipeline
+
+**Goal:** Player can say "Jarvis" to activate, audio is captured and transcribed.
+
+**Dependencies:** Phase 17 (TTS must work for response playback)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 18-01-PLAN.md -- Porcupine wake word + Web Audio API buffering
+- [ ] 18-02-PLAN.md -- Whisper STT integration + voice input UI feedback
+
+**Requirements:**
+- REQ-301 -- Picovoice + OpenAI API keys
+- REQ-318 -- Porcupine wake word ("Jarvis") in-browser WASM
+- REQ-319 -- Audio buffering after wake word (until silence/timeout)
+- REQ-320 -- Whisper API transcription
+- REQ-321 -- Voice input UI (listening indicator, transcription display)
+
+**Success Criteria:**
+1. Saying "Jarvis" activates listening mode within 500ms
+2. Audio is buffered until silence (1.5s) or timeout (10s)
+3. Buffered audio is transcribed via Whisper API with >90% accuracy
+4. UI shows listening state and transcription result
+
+---
+
+#### Phase 19: Command Processing (Rule Engine + LLM)
+
+**Goal:** Jarvis understands and responds to player voice commands.
+
+**Dependencies:** Phase 18 (STT provides transcribed text)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 19-01-PLAN.md -- Rule engine (known commands → telemetry lookup → instant response)
+- [ ] 19-02-PLAN.md -- GPT-4o integration (complex queries with DCS state context)
+
+**Requirements:**
+- REQ-322 -- Rule engine for known commands (altitude, fuel, heading, airspeed, status)
+- REQ-323 -- GPT-4o for complex/contextual queries
+- REQ-324 -- Response routing (rule engine first, LLM fallback)
+
+**Success Criteria:**
+1. "What's my altitude?" returns instant telemetry response (no LLM call)
+2. Complex queries ("Am I on course for waypoint 3?") route to GPT-4o with current DCS state
+3. Rule engine responds in <200ms; LLM responds in <3s
+4. All responses spoken via TTS pipeline
+
+---
+
+#### Phase 20: Flight Phase, Personality & Proactive Alerts
+
+**Goal:** Jarvis adapts tone to flight phase and proactively alerts on dangerous conditions.
+
+**Dependencies:** Phase 19 (command processing provides response generation infrastructure)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 20-01-PLAN.md -- Flight phase detection + personality adapter
+- [ ] 20-02-PLAN.md -- Proactive alert system (thresholds → phase-aware callouts → priority queue)
+
+**Requirements:**
+- REQ-325 -- Flight phase detection (STARTUP, TAXI, CRUISE, COMBAT, LANDING)
+- REQ-326 -- Personality adapter (relaxed cruise, sharp combat, focused landing)
+- REQ-327 -- Phase tag for rule engine templates and GPT-4o system prompt
+- REQ-328 -- Threshold monitoring (altitude, fuel, stall, RWR, engine temp, waypoint, phase change)
+- REQ-329 -- Phase-aware alert personality
+- REQ-330 -- Alert priority queue integration (P1/P2/P3)
+
+**Success Criteria:**
+1. Flight phase correctly detected from telemetry (gear state, speed, altitude, weapons)
+2. Jarvis tone shifts noticeably between cruise ("You're looking good") and combat ("Bandit, 3 o'clock low")
+3. Low fuel alert fires with phase-appropriate urgency
+4. P1 alerts interrupt current speech; alerts don't spam during rapid state changes
+
+---
+
+#### Phase 21: Trainer Session & Dashboard
+
+**Goal:** Trainer can join a session, see live telemetry, tactical display, events, and conversation.
+
+**Dependencies:** Phase 20 (flight phases and alerts provide data for trainer panels)
+
+**Plans:** ~3 plans
+
+Plans:
+- [ ] 21-01-PLAN.md -- Trainer entry flow + live telemetry panels
+- [ ] 21-02-PLAN.md -- Canvas Tactical Situation Display (TSD)
+- [ ] 21-03-PLAN.md -- Events log + conversation log panels
+
+**Requirements:**
+- REQ-331 -- Trainer telemetry panels (altitude, airspeed, heading, fuel, engine, G-force)
+- REQ-332 -- Canvas TSD (player-centered, range rings, hostile blips, waypoints, JARVIS aesthetic)
+- REQ-333 -- Flight phase indicator + timestamped events log
+- REQ-334 -- Full Jarvis conversation log
+
+**Success Criteria:**
+1. Trainer sees live telemetry updating at same rate as player dashboard
+2. TSD shows player position centered with range rings (5/10/20nm), enemy blips, and waypoints
+3. Events log shows timestamped entries for weapons fired, targets destroyed, phase transitions
+4. Conversation log shows all player queries, Jarvis responses, and proactive alerts
+
+---
+
+#### Phase 22: Trainer Communication
+
+**Goal:** Trainer speaks through Jarvis — PTT voice, templates, text — player can't tell the difference.
+
+**Dependencies:** Phase 21 (trainer dashboard provides the UI context)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 22-01-PLAN.md -- PTT voice + text input → GPT-4o rephrase → ElevenLabs TTS
+- [ ] 22-02-PLAN.md -- Template button system (categorized library)
+
+**Requirements:**
+- REQ-335 -- PTT voice → Whisper → GPT-4o rephrase → ElevenLabs as Jarvis
+- REQ-336 -- Template buttons (SA, approach, combat, mission, encouragement)
+- REQ-337 -- Text box → GPT-4o rephrase → ElevenLabs as Jarvis
+- REQ-338 -- Player cannot distinguish trainer speech from AI speech
+
+**Success Criteria:**
+1. Trainer holds PTT, speaks naturally; player hears Jarvis voice with aviation terminology
+2. Template buttons produce contextual Jarvis speech in <2s
+3. Trainer text input rephrased and spoken as Jarvis in <3s
+4. Player has no way to tell if Jarvis is AI-driven or trainer-driven
+
+---
+
+#### Phase 23: Trainer DCS Controls
+
+**Goal:** Trainer can spawn enemies, set objectives, configure alerts, inject missions via DCS-gRPC.
+
+**Dependencies:** Phase 22 (trainer communication operational; controls complement voice interaction)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 23-01-PLAN.md -- Spawn units + set AI objectives (UI → bridge → gRPC)
+- [ ] 23-02-PLAN.md -- Alert threshold config + mission injection (waypoints, objectives)
+
+**Requirements:**
+- REQ-305 -- Python bridge receives commands from Supabase Realtime → DCS-gRPC
+- REQ-339 -- Spawn enemy units (type, count, distance, bearing, altitude)
+- REQ-340 -- Set AI objectives (CAP, fighter sweep, idle)
+- REQ-341 -- Alert threshold configuration
+- REQ-342 -- Mission injection (waypoint coordinates, objective description)
+
+**Success Criteria:**
+1. Trainer spawns 2x MiG-29 at 20nm, bearing 090, angels 20 — units appear in DCS within 2s
+2. Trainer sets fighter sweep objective — AI units begin engagement
+3. Trainer adjusts altitude floor alert — player gets new callout at configured threshold
+4. Mission waypoints appear on player's navigation system via DCS-gRPC
+
+---
+
+#### Phase 24: Roles, Integration & Polish
+
+**Goal:** Observer role works, end-to-end flows tested, error handling solid.
+
+**Dependencies:** Phase 23 (all features built; this phase integrates and polishes)
+
+**Plans:** ~2 plans
+
+Plans:
+- [ ] 24-01-PLAN.md -- Observer role (read-only dashboard, no controls)
+- [ ] 24-02-PLAN.md -- End-to-end integration testing + error handling polish
+
+**Requirements:**
+- REQ-343 -- Controller role (full access)
+- REQ-344 -- Observer role (read-only)
+
+**Success Criteria:**
+1. Observer sees all trainer panels but cannot send commands, speak, or modify alerts
+2. Full end-to-end flow works: player flies → trainer observes → trainer speaks through Jarvis → trainer spawns enemies → alerts fire → player responds
+3. All error paths handled gracefully (DCS disconnect, API timeout, mic permission denied)
+4. No memory leaks in 30-minute trainer session
+
+---
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -238,13 +520,23 @@ Plans:
 | 6. Telemetry UI | v1.0 | 3/3 | Complete | 2026-02-25 |
 | 7. Resilience and Stability | v1.0 | 2/2 | Complete | 2026-02-25 |
 | 8. PWA Foundation | v2.0 | 4/4 | Complete | 2026-03-04 |
-| 9. Font Size Overhaul | v2.0 | 0/2 | Not Started | -- |
-| 10. Smart Connection Status | v2.0 | 0/2 | Not Started | -- |
+| 9. Font Size Overhaul | v2.0 | 3/3 | Complete | 2026-03-13 |
+| 10. Smart Connection Status | v2.0 | 2/2 | Complete | 2026-03-14 |
 | 11. Collapsible Widgets | v2.0 | 0/1 | Not Started | -- |
 | 12. Draggable Layout | v2.0 | 0/3 | Not Started | -- |
 | 13. Responsive Layout | v2.0 | 0/4 | Not Started | -- |
 | 14. Offline Shell & Polish | v2.0 | 0/3 | Not Started | -- |
+| 15. Python Bridge + DCS-gRPC | v3.0 | 0/4 | Not Started | -- |
+| 16. Session & Connection Overhaul | v3.0 | 0/2 | Not Started | -- |
+| 17. TTS Foundation + Voice Cues | v3.0 | 0/3 | Not Started | -- |
+| 18. Wake Word + STT Pipeline | v3.0 | 0/2 | Not Started | -- |
+| 19. Command Processing | v3.0 | 0/2 | Not Started | -- |
+| 20. Flight Phase & Proactive Alerts | v3.0 | 0/2 | Not Started | -- |
+| 21. Trainer Session & Dashboard | v3.0 | 0/3 | Not Started | -- |
+| 22. Trainer Communication | v3.0 | 0/2 | Not Started | -- |
+| 23. Trainer DCS Controls | v3.0 | 0/2 | Not Started | -- |
+| 24. Roles, Integration & Polish | v3.0 | 0/2 | Not Started | -- |
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-13 -- Expanded v2.0 with UI amendments (phases 9-14)*
+*Last updated: 2026-03-14 -- Phase 10 complete*

@@ -5,10 +5,9 @@ import { mpsToFpm } from '@/lib/conversions'
 
 interface VVITapeProps {
   vviMps: number
-  className?: string
 }
 
-export function VVITape({ vviMps, className = '' }: VVITapeProps) {
+export function VVITape({ vviMps }: VVITapeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -136,18 +135,13 @@ export function VVITape({ vviMps, className = '' }: VVITapeProps) {
   }, [vviMps])
 
   return (
-    <div className={className}>
-      <div className="jarvis-panel">
-        <div className="panel-title">▸ VERTICAL SPEED</div>
-        <div className="flex justify-center mt-2">
-          <canvas
-            ref={canvasRef}
-            width={120}
-            height={200}
-            style={{ imageRendering: 'pixelated' }}
-          />
-        </div>
-      </div>
+    <div className="flex justify-center mt-2">
+      <canvas
+        ref={canvasRef}
+        width={120}
+        height={200}
+        style={{ imageRendering: 'pixelated' }}
+      />
     </div>
   )
 }

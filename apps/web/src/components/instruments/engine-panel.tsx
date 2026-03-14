@@ -5,10 +5,9 @@ import { useRef, useEffect } from 'react'
 interface EnginePanelProps {
   rpmPct: number
   fuelCon: number
-  className?: string
 }
 
-export function EnginePanel({ rpmPct, fuelCon, className = '' }: EnginePanelProps) {
+export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -107,30 +106,24 @@ export function EnginePanel({ rpmPct, fuelCon, className = '' }: EnginePanelProp
   }, [rpmPct])
 
   return (
-    <div className={className}>
-      <div className="jarvis-panel p-2.5">
-        <div className="panel-title">▸ ENGINE</div>
+    <div className="flex flex-col items-center mt-2">
+      {/* RPM gauge */}
+      <canvas
+        ref={canvasRef}
+        width={200}
+        height={140}
+        style={{ imageRendering: 'pixelated' }}
+      />
 
-        <div className="flex flex-col items-center mt-2">
-          {/* RPM gauge */}
-          <canvas
-            ref={canvasRef}
-            width={200}
-            height={140}
-            style={{ imageRendering: 'pixelated' }}
-          />
-
-          {/* Fuel flow */}
-          <div className="w-full mt-2 pt-2 border-t border-jarvis-border/30">
-            <div className="flex justify-between items-center">
-              <span className="text-[13px] opacity-50" style={{ letterSpacing: '2px' }}>
-                FUEL FLOW
-              </span>
-              <span className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">
-                {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
-              </span>
-            </div>
-          </div>
+      {/* Fuel flow */}
+      <div className="w-full mt-2 pt-2 border-t border-jarvis-border/30">
+        <div className="flex justify-between items-center">
+          <span className="text-[13px] opacity-50" style={{ letterSpacing: '2px' }}>
+            FUEL FLOW
+          </span>
+          <span className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">
+            {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
+          </span>
         </div>
       </div>
     </div>

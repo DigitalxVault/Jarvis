@@ -4,10 +4,9 @@ import { useRef, useEffect } from 'react'
 
 interface GMeterProps {
   gY: number  // Vertical G-load
-  className?: string
 }
 
-export function GMeter({ gY, className = '' }: GMeterProps) {
+export function GMeter({ gY }: GMeterProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -124,18 +123,13 @@ export function GMeter({ gY, className = '' }: GMeterProps) {
   }, [gY])
 
   return (
-    <div className={className}>
-      <div className="jarvis-panel">
-        <div className="panel-title">▸ G-METER</div>
-        <div className="flex justify-center mt-2">
-          <canvas
-            ref={canvasRef}
-            width={120}
-            height={220}
-            style={{ imageRendering: 'pixelated' }}
-          />
-        </div>
-      </div>
+    <div className="flex justify-center mt-2">
+      <canvas
+        ref={canvasRef}
+        width={120}
+        height={220}
+        style={{ imageRendering: 'pixelated' }}
+      />
     </div>
   )
 }

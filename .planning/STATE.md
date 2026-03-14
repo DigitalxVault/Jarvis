@@ -10,19 +10,19 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 10 of 14 (Smart Connection Status)
-Plan: 01 of 2 complete
-Status: In progress
-Last activity: 2026-03-14 — Completed 10-01-PLAN.md (ConnectionStatusPanel + DEV MODE removal)
+Plan: 02 of 2 complete — PHASE COMPLETE
+Status: In progress (Phase 10 done, Phase 11 next)
+Last activity: 2026-03-14 — Completed 10-02-PLAN.md (dashboard wiring + top bar pill + coaching strip + session-panel deletion)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [######....] 40% IN PROGRESS (Phases 8-10 in progress, 4 phases remaining)
+Progress: v2.0 [#######...] 50% IN PROGRESS (Phases 8-10 complete, 4 phases remaining)
 Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 25 (18 v1.0 MVP + 7 v2.0)
-- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02), ~6 min (09-03)
+- Total plans completed: 27 (18 v1.0 MVP + 9 v2.0)
+- Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02), ~6 min (09-03), ~3 min (10-02)
 - Total execution time: 1 day (2026-02-25) + ongoing
 
 **By Phase:**
@@ -38,7 +38,7 @@ Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 | 7. Resilience and Stability | v1.0 | 2 |
 | 8. PWA Foundation | v2.0 | 4 complete (DONE) |
 | 9. Font Size Overhaul | v2.0 | 3 complete (DONE) |
-| 10. Smart Connection Status | v2.0 | -- |
+| 10. Smart Connection Status | v2.0 | 2 complete (DONE) |
 | 11. Collapsible Widgets | v2.0 | -- |
 | 12. Draggable Layout | v2.0 | -- |
 | 13. Responsive Layout | v2.0 | -- |
@@ -122,12 +122,15 @@ Amendment decisions (2026-03-13):
 | D-1001 | hadTelemetryRef inside ConnectionStatusPanel for SYSTEM_INITIALIZED vs DCS_OFFLINE | Avoids polluting TelemetryContextValue; purely presentational distinction |
 | D-1002 | DEV MODE removed entirely — no relocation | D-902 decision; single flow for pilots, no debug toggles in primary UI |
 | D-1003 | animate-fade-in uses translateY(2px) + opacity | Matches slide-up pattern in globals.css; polished crossfade on state change |
+| D-1004 | Top bar pill uses SYSTEM INIT (not SYSTEM INITIALIZED) | Panel handles hadTelemetry nuance; top bar is intentionally simpler |
+| D-1005 | Spinning ring via absolute animate-spin border-t-jarvis-accent w-4 h-4 | Visual ring effect around static w-3 h-3 dot; only border-t colored |
+| D-1006 | CompactCoaching early return pattern for non-live states | Clean state machine; no nested conditionals; !hasSession check before connectionState check |
 
 ### Pending Todos
 
 **v2.0 (remaining):**
-- Plan Phase 10: Smart Connection Status — 10-01 DONE, 10-02 next
-- Plan Phase 11: Collapsible Widgets
+- Phase 10: Smart Connection Status — COMPLETE
+- Plan Phase 11: Collapsible Widgets — NEXT
 - Plan Phase 12: Draggable Layout
 - Plan Phase 13: Responsive Layout (rewrite for react-grid-layout)
 - Plan Phase 14: Offline Shell and Polish
@@ -155,5 +158,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-14
-Stopped at: Completed 10-01-PLAN.md — ConnectionStatusPanel created, DEV MODE removed from provider
-Resume file: None — run 10-02-PLAN.md next (dashboard.tsx swap + top bar pill update + coaching strip)
+Stopped at: Completed 10-02-PLAN.md — Phase 10 complete (dashboard wired, top bar pill updated, session-panel.tsx deleted)
+Resume file: None — run Phase 11 (Collapsible Widgets) next

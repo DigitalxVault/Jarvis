@@ -4,7 +4,6 @@ import { radToDegSigned } from '@/lib/conversions'
 
 interface AoAIndicatorProps {
   aoaRad: number
-  className?: string
 }
 
 // F-16 AoA indexer zones (in degrees)
@@ -12,7 +11,7 @@ const ON_SPEED_MIN = 8
 const ON_SPEED_MAX = 13
 const STALL_WARNING = 15
 
-export function AoAIndicator({ aoaRad, className = '' }: AoAIndicatorProps) {
+export function AoAIndicator({ aoaRad }: AoAIndicatorProps) {
   // Clamp to realistic AoA range (-10° to 40°) before display
   const rawDeg = radToDegSigned(aoaRad)
   const aoaDeg = Math.abs(Math.max(-10, Math.min(40, rawDeg)))
@@ -55,51 +54,47 @@ export function AoAIndicator({ aoaRad, className = '' }: AoAIndicatorProps) {
       : 'text-jarvis-accent'
 
   return (
-    <div className={className}>
-      <div className="jarvis-panel">
-        <div className="panel-title">▸ ANGLE OF ATTACK</div>
-
-        {/* Indexer display */}
-        <div className="flex justify-center gap-6 my-3">
-          <div className={`text-3xl ${colorClass}`}>{topSymbol}</div>
-          <div className={`text-3xl ${colorClass}`}>{middleSymbol}</div>
-          <div className={`text-3xl ${colorClass}`}>{bottomSymbol}</div>
-        </div>
-
-        {/* Numeric AoA */}
-        <div className="text-center">
-          <div
-            className={`text-4xl font-bold tabular-nums ${
-              isStall
-                ? 'text-jarvis-danger glow-danger'
-                : isFast
-                  ? 'text-jarvis-warning'
-                  : isOnSpeed
-                    ? 'text-jarvis-success glow-success'
-                    : 'text-jarvis-accent'
-            }`}
-            style={{ letterSpacing: '2px' }}
-          >
-            {aoaDeg.toFixed(1)}°
-          </div>
-        </div>
-
-        {/* Zone labels */}
-        <div className="flex justify-between mt-2 text-[13px] opacity-40" style={{ letterSpacing: '1px' }}>
-          <span>FAST</span>
-          <span>ON SPEED</span>
-          <span>SLOW</span>
-        </div>
-
-        {/* Stall warning */}
-        {isStall && (
-          <div className="mt-2 text-center animate-blink">
-            <span className="text-[14px] text-jarvis-danger font-bold" style={{ letterSpacing: '3px' }}>
-              ▲ STALL WARNING ▲
-            </span>
-          </div>
-        )}
+    <>
+      {/* Indexer display */}
+      <div className="flex justify-center gap-6 my-3">
+        <div className={`text-3xl ${colorClass}`}>{topSymbol}</div>
+        <div className={`text-3xl ${colorClass}`}>{middleSymbol}</div>
+        <div className={`text-3xl ${colorClass}`}>{bottomSymbol}</div>
       </div>
-    </div>
+
+      {/* Numeric AoA */}
+      <div className="text-center">
+        <div
+          className={`text-4xl font-bold tabular-nums ${
+            isStall
+              ? 'text-jarvis-danger glow-danger'
+              : isFast
+                ? 'text-jarvis-warning'
+                : isOnSpeed
+                  ? 'text-jarvis-success glow-success'
+                  : 'text-jarvis-accent'
+          }`}
+          style={{ letterSpacing: '2px' }}
+        >
+          {aoaDeg.toFixed(1)}°
+        </div>
+      </div>
+
+      {/* Zone labels */}
+      <div className="flex justify-between mt-2 text-[13px] opacity-40" style={{ letterSpacing: '1px' }}>
+        <span>FAST</span>
+        <span>ON SPEED</span>
+        <span>SLOW</span>
+      </div>
+
+      {/* Stall warning */}
+      {isStall && (
+        <div className="mt-2 text-center animate-blink">
+          <span className="text-[14px] text-jarvis-danger font-bold" style={{ letterSpacing: '3px' }}>
+            ▲ STALL WARNING ▲
+          </span>
+        </div>
+      )}
+    </>
   )
 }

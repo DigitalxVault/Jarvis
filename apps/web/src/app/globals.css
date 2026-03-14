@@ -131,6 +131,12 @@ body::after {
   margin-bottom: 6px;
 }
 
+/* ── Collapsible title hover glow ── */
+.collapsible-title:hover {
+  color: var(--color-jarvis-accent);
+  text-shadow: 0 0 8px var(--color-jarvis-accent);
+}
+
 /* ── Status dot ── */
 .status-dot {
   width: 8px;
