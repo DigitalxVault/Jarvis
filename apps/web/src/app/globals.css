@@ -190,3 +190,15 @@ canvas {
   image-rendering: pixelated;
   image-rendering: crisp-edges;
 }
+
+/* ── Edit mode (draggable layout) ── */
+.panel-edit-mode {
+  border: 1px solid rgba(0, 255, 255, 0.35);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.15);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.panel-dragging {
+  z-index: 100;
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.3);
+}

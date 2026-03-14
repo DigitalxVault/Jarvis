@@ -7,9 +7,15 @@ interface CollapsibleWidgetProps {
   title: string
   children: React.ReactNode
   className?: string
+  editMode?: boolean
+  dragHandlers?: {
+    onPointerDown: (e: React.PointerEvent) => void
+    onPointerMove: (e: React.PointerEvent) => void
+    onPointerUp: (e: React.PointerEvent) => void
+  }
 }
 
-export function CollapsibleWidget({ panelId, title, children, className = '' }: CollapsibleWidgetProps) {
+export function CollapsibleWidget({ panelId, title, children, className = '', editMode = false, dragHandlers }: CollapsibleWidgetProps) {
   const [isExpanded, setIsExpanded] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true
     return localStorage.getItem(`jarvis.panel.${panelId}`) !== 'collapsed'
@@ -28,8 +34,18 @@ export function CollapsibleWidget({ panelId, title, children, className = '' }: 
       <button
         onClick={toggle}
         aria-expanded={isExpanded}
-        className="w-full flex items-center gap-2 px-2.5 py-1.5 collapsible-title cursor-pointer select-none text-[14px] tracking-[3px] opacity-50 uppercase transition-colors"
+        className={`w-full flex items-center gap-2 px-2.5 py-1.5 collapsible-title select-none text-[14px] tracking-[3px] opacity-50 uppercase transition-colors ${
+          editMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
+        }`}
+        {...(editMode && dragHandlers ? {
+          onPointerDown: dragHandlers.onPointerDown,
+          onPointerMove: dragHandlers.onPointerMove,
+          onPointerUp: dragHandlers.onPointerUp,
+        } : {})}
       >
+        {editMode && (
+          <span className="opacity-40 text-[16px] mr-1">⠿</span>
+        )}
         <span
           className="transition-transform duration-150 inline-block"
           style={{ transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)' }}

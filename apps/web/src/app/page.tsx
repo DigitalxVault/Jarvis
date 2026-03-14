@@ -1,4 +1,10 @@
-import { Dashboard } from '@/components/dashboard'
+'use client'
+
+import dynamic from 'next/dynamic'
+
+const Dashboard = dynamic(() => import('@/components/dashboard').then(m => m.Dashboard), {
+  ssr: false,
+})
 
 export default function Home() {
   return <Dashboard />

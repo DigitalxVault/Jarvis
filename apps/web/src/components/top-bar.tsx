@@ -8,9 +8,11 @@ import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TopBarProps {
   connectionState: ConnectionState
+  editMode?: boolean
+  onToggleEditMode?: () => void
 }
 
-export function TopBar({ connectionState }: TopBarProps) {
+export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarProps) {
   const [clock, setClock] = useState('--:--:--')
   const [date, setDate] = useState('')
   const pathname = usePathname()
@@ -83,6 +85,19 @@ export function TopBar({ connectionState }: TopBarProps) {
 
       {/* Status + Clock */}
       <div className="flex items-center gap-4">
+        {onToggleEditMode && (
+          <button
+            onClick={onToggleEditMode}
+            className={`px-3 py-1.5 text-[13px] font-bold border transition-all ${
+              editMode
+                ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
+                : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
+            }`}
+            style={{ letterSpacing: '2px' }}
+          >
+            LAYOUT
+          </button>
+        )}
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
           <div className="text-lg font-bold glow-text tabular-nums">{clock}</div>

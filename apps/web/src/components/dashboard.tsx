@@ -2,16 +2,16 @@
 
 import { useState } from 'react'
 import { useTelemetryContext } from '@/providers/telemetry-provider'
+import { usePanelPositions } from '@/hooks/use-panel-positions'
 import { TopBar } from './top-bar'
 import { BottomBar } from './bottom-bar'
 import { ConnectionStatusPanel } from './connection-status-panel'
-import { DebugPanel } from './debug-panel'
-import { RawPacketViewer } from './raw-packet-viewer'
 import { AlertOverlay } from './alert-overlay'
 import { JarvisLogo } from './jarvis-logo'
 import { MiniTelemetryCard } from './mini-telemetry-card'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
 import { CollapsibleWidget } from './collapsible-widget'
+import { DraggablePanel } from './draggable-panel'
 import type { CoachingBand, SmoothnessScore } from '@/hooks/use-coaching'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
@@ -42,43 +42,83 @@ export function Dashboard() {
 
   const sessionId = currentSession?.id ?? null
 
+  const [editMode, setEditMode] = useState(false)
+  const { getOffset, updateOffset, resetAll, hasCustomPositions } = usePanelPositions()
+
   return (
     <div className="w-full h-screen flex flex-col">
-      <TopBar connectionState={connectionState} />
+      <TopBar
+        connectionState={connectionState}
+        editMode={editMode}
+        onToggleEditMode={() => setEditMode(prev => !prev)}
+      />
+
+      {/* Edit mode toolbar */}
+      {editMode && (
+        <div className="bg-jarvis-bar border-b border-jarvis-accent/30 px-6 py-1.5 flex items-center gap-4 z-40">
+          <span className="text-[12px] text-jarvis-accent font-bold" style={{ letterSpacing: '2px' }}>
+            EDIT MODE
+          </span>
+          <span className="text-[11px] text-jarvis-muted">
+            Drag any panel to reposition
+          </span>
+          {hasCustomPositions && (
+            <button
+              onClick={() => {
+                if (window.confirm('Reset all panels to default positions?')) {
+                  resetAll()
+                }
+              }}
+              className="ml-auto border border-jarvis-border text-jarvis-muted hover:border-jarvis-danger hover:text-jarvis-danger text-[11px] font-bold px-3 py-0.5 transition-all"
+              style={{ letterSpacing: '2px' }}
+            >
+              RESET LAYOUT
+            </button>
+          )}
+        </div>
+      )}
 
       {/* Main content — 3-column: left instruments | center HUD | right instruments */}
       <div className="flex-1 grid grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg">
         {/* Left Panel — Session, ADI, Fuel, Engine */}
         <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
-          <ConnectionStatusPanel
-            currentSession={currentSession}
-            connectionState={connectionState}
-            onCreateSession={handleCreateSession}
-            isCreating={isCreating}
-            sessionError={sessionError}
-            onClearError={clearSessionError}
-          />
-
-          <div className="flex justify-center">
-            <ADI
-              pitchRad={telemetry?.att.pitch_rad ?? 0}
-              bankRad={telemetry?.att.bank_rad ?? 0}
+          <DraggablePanel panelId="connection" editMode={editMode} offset={getOffset('connection')} onUpdateOffset={updateOffset}>
+            <ConnectionStatusPanel
+              currentSession={currentSession}
+              connectionState={connectionState}
+              onCreateSession={handleCreateSession}
+              isCreating={isCreating}
+              sessionError={sessionError}
+              onClearError={clearSessionError}
             />
-          </div>
+          </DraggablePanel>
 
-          <CollapsibleWidget panelId="fuel" title="FUEL">
-            <FuelGauge
-              internal={telemetry?.fuel?.internal ?? 0}
-              external={telemetry?.fuel?.external ?? 0}
-            />
-          </CollapsibleWidget>
+          <DraggablePanel panelId="adi" editMode={editMode} offset={getOffset('adi')} onUpdateOffset={updateOffset}>
+            <div className="flex justify-center">
+              <ADI
+                pitchRad={telemetry?.att.pitch_rad ?? 0}
+                bankRad={telemetry?.att.bank_rad ?? 0}
+              />
+            </div>
+          </DraggablePanel>
 
-          <CollapsibleWidget panelId="engine" title="ENGINE">
-            <EnginePanel
-              rpmPct={telemetry?.eng?.rpm_pct ?? 0}
-              fuelCon={telemetry?.eng?.fuel_con ?? 0}
-            />
-          </CollapsibleWidget>
+          <DraggablePanel panelId="fuel" editMode={editMode} offset={getOffset('fuel')} onUpdateOffset={updateOffset}>
+            <CollapsibleWidget panelId="fuel" title="FUEL" editMode={editMode}>
+              <FuelGauge
+                internal={telemetry?.fuel?.internal ?? 0}
+                external={telemetry?.fuel?.external ?? 0}
+              />
+            </CollapsibleWidget>
+          </DraggablePanel>
+
+          <DraggablePanel panelId="engine" editMode={editMode} offset={getOffset('engine')} onUpdateOffset={updateOffset}>
+            <CollapsibleWidget panelId="engine" title="ENGINE" editMode={editMode}>
+              <EnginePanel
+                rpmPct={telemetry?.eng?.rpm_pct ?? 0}
+                fuelCon={telemetry?.eng?.fuel_con ?? 0}
+              />
+            </CollapsibleWidget>
+          </DraggablePanel>
         </div>
 
         {/* Center Panel — HUD display */}
@@ -92,13 +132,15 @@ export function Dashboard() {
           <div className="corner-bracket corner-br" />
 
           {/* Top: Mini telemetry cards */}
-          <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
-            <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
-            <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
-            <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
-            <MiniTelemetryCard label="MACH NO" value={formatMach(telemetry?.spd?.mach ?? null)} color="success" />
-            <MiniTelemetryCard label="TRUE AIRSPEED" value={formatTAS(telemetry?.spd?.tas_mps ?? null)} unit="KTS" color="accent" />
-          </div>
+          <DraggablePanel panelId="telemetry-cards" editMode={editMode} offset={getOffset('telemetry-cards')} onUpdateOffset={updateOffset}>
+            <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
+              <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
+              <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
+              <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
+              <MiniTelemetryCard label="MACH NO" value={formatMach(telemetry?.spd?.mach ?? null)} color="success" />
+              <MiniTelemetryCard label="TRUE AIRSPEED" value={formatTAS(telemetry?.spd?.tas_mps ?? null)} unit="KTS" color="accent" />
+            </div>
+          </DraggablePanel>
 
           {/* Center: JARVIS logo */}
           <div className="flex-1 flex items-center justify-center min-h-0">
@@ -139,17 +181,23 @@ export function Dashboard() {
 
         {/* Right Panel — G-Meter, AoA, VVI (compact, stacked) */}
         <div className="bg-jarvis-bar border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
-          <CollapsibleWidget panelId="g-meter" title="G-METER">
-            <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
-          </CollapsibleWidget>
+          <DraggablePanel panelId="g-meter" editMode={editMode} offset={getOffset('g-meter')} onUpdateOffset={updateOffset}>
+            <CollapsibleWidget panelId="g-meter" title="G-METER" editMode={editMode}>
+              <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
+            </CollapsibleWidget>
+          </DraggablePanel>
 
-          <CollapsibleWidget panelId="aoa" title="ANGLE OF ATTACK">
-            <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
-          </CollapsibleWidget>
+          <DraggablePanel panelId="aoa" editMode={editMode} offset={getOffset('aoa')} onUpdateOffset={updateOffset}>
+            <CollapsibleWidget panelId="aoa" title="ANGLE OF ATTACK" editMode={editMode}>
+              <AoAIndicator aoaRad={telemetry?.aero?.aoa_rad ?? 0} />
+            </CollapsibleWidget>
+          </DraggablePanel>
 
-          <CollapsibleWidget panelId="vvi" title="VERTICAL SPEED">
-            <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
-          </CollapsibleWidget>
+          <DraggablePanel panelId="vvi" editMode={editMode} offset={getOffset('vvi')} onUpdateOffset={updateOffset}>
+            <CollapsibleWidget panelId="vvi" title="VERTICAL SPEED" editMode={editMode}>
+              <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
+            </CollapsibleWidget>
+          </DraggablePanel>
         </div>
       </div>
 
