@@ -18,7 +18,6 @@ interface TelemetryContextValue {
   isCreating: boolean
   sessionError: string | null
   handleCreateSession: () => void
-  handleDevMode: () => void
   clearSessionError: () => void
   // Telemetry
   telemetry: TelemetryPacket | null
@@ -93,26 +92,12 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
 
   const clearSessionError = useCallback(() => setSessionError(null), [])
 
-  const handleDevMode = useCallback(() => {
-    setCurrentSession({
-      id: 'dev',
-      user_id: 'dev',
-      status: 'active',
-      pairing_code: null,
-      pairing_expires_at: null,
-      bridge_claimed: true,
-      created_at: new Date().toISOString(),
-      ended_at: null,
-    })
-  }, [])
-
   return (
     <TelemetryContext.Provider value={{
       currentSession,
       isCreating,
       sessionError,
       handleCreateSession,
-      handleDevMode,
       clearSessionError,
       telemetry,
       tactical,
