@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useTelemetryContext } from '@/providers/telemetry-provider'
 import { TopBar } from './top-bar'
 import { BottomBar } from './bottom-bar'
-import { SessionPanel } from './session-panel'
+import { ConnectionStatusPanel } from './connection-status-panel'
 import { DebugPanel } from './debug-panel'
 import { RawPacketViewer } from './raw-packet-viewer'
 import { AlertOverlay } from './alert-overlay'
@@ -12,6 +12,7 @@ import { JarvisLogo } from './jarvis-logo'
 import { MiniTelemetryCard } from './mini-telemetry-card'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
 import type { CoachingBand, SmoothnessScore } from '@/hooks/use-coaching'
+import type { ConnectionState } from '@/hooks/use-telemetry'
 
 const formatSpeed = (mps: number | null) => mps !== null ? (mps * 1.94384).toFixed(0) : '---'
 const formatAlt = (m: number | null) => m !== null ? (m * 3.28084).toFixed(0) : '---'
@@ -25,7 +26,6 @@ export function Dashboard() {
     isCreating,
     sessionError,
     handleCreateSession,
-    handleDevMode,
     clearSessionError,
     telemetry,
     connectionState,
@@ -49,11 +49,10 @@ export function Dashboard() {
       <div className="flex-1 grid grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg">
         {/* Left Panel — Session, ADI, Fuel, Engine */}
         <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
-          <SessionPanel
+          <ConnectionStatusPanel
             currentSession={currentSession}
             connectionState={connectionState}
             onCreateSession={handleCreateSession}
-            onDevMode={handleDevMode}
             isCreating={isCreating}
             sessionError={sessionError}
             onClearError={clearSessionError}
@@ -113,13 +112,6 @@ export function Dashboard() {
               ● SYSTEM NOMINAL
             </div>
           )}
-          {connectionState === 'offline' && !currentSession && (
-            <div className="flex-shrink-0 text-center text-[12px] text-jarvis-muted whitespace-nowrap pb-1"
-              style={{ letterSpacing: '2px' }}>
-              CREATE A SESSION TO BEGIN
-            </div>
-          )}
-
           {/* Bottom: Coaching compact bar + Debug compact bar */}
           <div className="flex-shrink-0 px-3 pb-2 flex flex-col gap-1">
             <CompactCoaching
@@ -127,6 +119,8 @@ export function Dashboard() {
               altBand={coaching.altBand}
               headingTrack={coaching.headingTrack}
               smoothness={coaching.smoothness}
+              connectionState={connectionState}
+              hasSession={!!currentSession}
             />
             <CompactDebug
               packetsPerSec={packetsPerSec}
@@ -153,13 +147,33 @@ export function Dashboard() {
 
 /** Compact single-row coaching summary */
 function CompactCoaching({
-  speedBand, altBand, headingTrack, smoothness,
+  speedBand, altBand, headingTrack, smoothness, connectionState, hasSession,
 }: {
   speedBand: CoachingBand
   altBand: CoachingBand
   headingTrack: CoachingBand
   smoothness: SmoothnessScore
+  connectionState: ConnectionState
+  hasSession: boolean
 }) {
+  if (!hasSession) {
+    return (
+      <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 flex items-center gap-4 text-[12px]">
+        <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>COACHING</span>
+        <span className="opacity-40 ml-2" style={{ letterSpacing: '2px' }}>CREATE SESSION TO BEGIN</span>
+      </div>
+    )
+  }
+
+  if (connectionState !== 'connected') {
+    return (
+      <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 flex items-center gap-4 text-[12px]">
+        <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>COACHING</span>
+        <span className="text-jarvis-warning opacity-70 ml-2" style={{ letterSpacing: '2px' }}>AWAITING DCS LAUNCH</span>
+      </div>
+    )
+  }
+
   return (
     <div className="bg-jarvis-panel/60 border border-jarvis-border/40 px-3 py-1.5 flex items-center gap-4 text-[12px]">
       <span className="opacity-40 font-bold" style={{ letterSpacing: '2px' }}>COACHING</span>

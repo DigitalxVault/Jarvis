@@ -2,20 +2,21 @@
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-13)
+See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v2.0 -- PWA + Responsive Layout + UI Amendments
+**Current focus:** v3.0 -- Voice Co-Pilot & Trainer Platform
 
 ## Current Position
 
-Phase: 9 -- Font Size Overhaul (DONE)
-Plan: 03 of 3 complete
-Status: Phase complete
-Last activity: 2026-03-13 -- Completed 09-03-PLAN.md (remaining components font size overhaul)
+Phase: 10 of 14 (Smart Connection Status)
+Plan: 01 of 2 complete
+Status: In progress
+Last activity: 2026-03-14 — Completed 10-01-PLAN.md (ConnectionStatusPanel + DEV MODE removal)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [#####.....] 33% IN PROGRESS (Phases 8-9 complete, 5 phases remaining)
+Progress: v2.0 [######....] 40% IN PROGRESS (Phases 8-10 in progress, 4 phases remaining)
+Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 
 ## Performance Metrics
 
@@ -42,6 +43,16 @@ Progress: v2.0 [#####.....] 33% IN PROGRESS (Phases 8-9 complete, 5 phases remai
 | 12. Draggable Layout | v2.0 | -- |
 | 13. Responsive Layout | v2.0 | -- |
 | 14. Offline Shell & Polish | v2.0 | -- |
+| 15. Python Bridge + DCS-gRPC | v3.0 | -- |
+| 16. Session & Connection Overhaul | v3.0 | -- |
+| 17. TTS Foundation + Voice Cues | v3.0 | -- |
+| 18. Wake Word + STT Pipeline | v3.0 | -- |
+| 19. Command Processing | v3.0 | -- |
+| 20. Flight Phase & Proactive Alerts | v3.0 | -- |
+| 21. Trainer Session & Dashboard | v3.0 | -- |
+| 22. Trainer Communication | v3.0 | -- |
+| 23. Trainer DCS Controls | v3.0 | -- |
+| 24. Roles, Integration & Polish | v3.0 | -- |
 
 *Updated after each plan completion*
 
@@ -108,14 +119,24 @@ Amendment decisions (2026-03-13):
 | D-921 | Y-offsets scaled to font metrics, not just size delta | Correct vertical spacing; no text overlap on canvas instruments |
 | D-931 | Canvas radar scope Y-offsets bumped +2px at ring labels and diag strip | Prevents label clipping after 9→12px upgrade |
 | D-932 | North indicator upgraded to bold 14px (from bold 11px) | Prominent cardinal reference at larger font size |
+| D-1001 | hadTelemetryRef inside ConnectionStatusPanel for SYSTEM_INITIALIZED vs DCS_OFFLINE | Avoids polluting TelemetryContextValue; purely presentational distinction |
+| D-1002 | DEV MODE removed entirely — no relocation | D-902 decision; single flow for pilots, no debug toggles in primary UI |
+| D-1003 | animate-fade-in uses translateY(2px) + opacity | Matches slide-up pattern in globals.css; polished crossfade on state change |
 
 ### Pending Todos
 
-- Plan Phase 10: Smart Connection Status
+**v2.0 (remaining):**
+- Plan Phase 10: Smart Connection Status — 10-01 DONE, 10-02 next
 - Plan Phase 11: Collapsible Widgets
 - Plan Phase 12: Draggable Layout
 - Plan Phase 13: Responsive Layout (rewrite for react-grid-layout)
 - Plan Phase 14: Offline Shell and Polish
+
+**v3.0 (new):**
+- Complete v2.0 first (Phases 10-14)
+- Plan Phase 15: Python Bridge + DCS-gRPC Foundation
+- Install DCS-gRPC mod in DCS World
+- Set up API accounts: OpenAI, ElevenLabs, Picovoice
 
 ### Blockers/Concerns
 
@@ -127,9 +148,12 @@ Amendment decisions (2026-03-13):
 - iOS WebSocket dies on background -- existing visibilitychange reconnection mitigates
 - pnpm sharp resolution: script uses fallback path to virtual store (not symlinked at top-level)
 - react-grid-layout compatibility with Next.js 16 / React 19 — needs research before Phase 12 planning
+- DCS-gRPC mod not yet installed — required before Phase 15 development
+- API keys not yet created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine) — required before Phases 17-18
+- Python bridge replaces Node.js bridge — need migration plan for existing sessions/channels
 
 ## Session Continuity
 
-Last session: 2026-03-13T09:27:31Z
-Stopped at: Completed 09-03-PLAN.md -- Phase 9 Font Size Overhaul 100% complete. Zero sub-12px text in entire web app.
-Resume file: None -- begin Phase 10 planning
+Last session: 2026-03-14
+Stopped at: Completed 10-01-PLAN.md — ConnectionStatusPanel created, DEV MODE removed from provider
+Resume file: None — run 10-02-PLAN.md next (dashboard.tsx swap + top bar pill update + coaching strip)
