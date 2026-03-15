@@ -34,20 +34,20 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
 
   return (
     <div
-      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-6 h-[52px] relative z-50"
+      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-3 sm:px-6 h-[44px] sm:h-[52px] relative z-50 safe-pl safe-pr safe-pt"
     >
       {/* Logo */}
       <div>
-        <div className="text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
+        <div className="text-[12px] sm:text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
           J·A·R·V·I·S
         </div>
-        <div className="text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
+        <div className="hidden sm:block text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
           TACTICAL HUD v2.0
         </div>
       </div>
 
-      {/* Navigation */}
-      <div className="flex gap-2">
+      {/* Navigation — hidden on mobile */}
+      <div className="hidden sm:flex gap-2">
         <Link
           href="/"
           className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
@@ -88,7 +88,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
         {onToggleEditMode && (
           <button
             onClick={onToggleEditMode}
-            className={`px-3 py-1.5 text-[13px] font-bold border transition-all ${
+            className={`hidden sm:inline-flex px-3 py-1.5 text-[13px] font-bold border transition-all ${
               editMode
                 ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
                 : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
@@ -101,7 +101,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
           <div className="text-lg font-bold glow-text tabular-nums">{clock}</div>
-          <div className="text-[12px] opacity-50" style={{ letterSpacing: '1px' }}>{date}</div>
+          <div className="hidden sm:block text-[12px] opacity-50" style={{ letterSpacing: '1px' }}>{date}</div>
         </div>
       </div>
     </div>
