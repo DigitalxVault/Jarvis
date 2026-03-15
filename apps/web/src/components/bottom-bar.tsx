@@ -49,7 +49,7 @@ export function BottomBar({ connectionState, telemetry }: BottomBarProps) {
 
   return (
     <div
-      className="bg-jarvis-bar border-t border-jarvis-border hidden sm:flex items-center justify-between px-4 h-[50px] text-[13px] safe-pb safe-pl safe-pr"
+      className="bg-jarvis-bar border-t border-jarvis-border hidden md:flex items-center justify-between px-4 h-[50px] text-[13px] safe-pb safe-pl safe-pr"
       style={{ letterSpacing: '0.5px' }}
     >
       {/* Position data */}

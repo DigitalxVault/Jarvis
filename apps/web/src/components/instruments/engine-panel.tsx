@@ -107,7 +107,7 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
 
   return (
     <>
-      <div className="hidden sm:flex flex-col items-center mt-2">
+      <div className="hidden md:flex flex-col items-center mt-2">
         {/* RPM gauge */}
         <canvas
           ref={canvasRef}
@@ -128,7 +128,7 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
           </div>
         </div>
       </div>
-      <div className="sm:hidden jarvis-panel py-2 px-3">
+      <div className="md:hidden jarvis-panel py-2 px-3">
         <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>ENGINE</div>
         <div className="flex justify-between items-baseline">
           <div>

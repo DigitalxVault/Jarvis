@@ -124,7 +124,7 @@ export function GMeter({ gY }: GMeterProps) {
 
   return (
     <>
-      <div className="hidden sm:flex justify-center mt-2">
+      <div className="hidden md:flex justify-center mt-2">
         <canvas
           ref={canvasRef}
           width={120}
@@ -132,7 +132,7 @@ export function GMeter({ gY }: GMeterProps) {
           style={{ imageRendering: 'pixelated' }}
         />
       </div>
-      <div className="sm:hidden jarvis-panel py-2 px-3">
+      <div className="md:hidden jarvis-panel py-2 px-3">
         <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>G-FORCE</div>
         <div className="text-center">
           <span className={`text-[28px] font-bold tabular-nums ${

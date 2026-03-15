@@ -136,7 +136,7 @@ export function VVITape({ vviMps }: VVITapeProps) {
 
   return (
     <>
-      <div className="hidden sm:flex justify-center mt-2">
+      <div className="hidden md:flex justify-center mt-2">
         <canvas
           ref={canvasRef}
           width={120}
@@ -144,7 +144,7 @@ export function VVITape({ vviMps }: VVITapeProps) {
           style={{ imageRendering: 'pixelated' }}
         />
       </div>
-      <div className="sm:hidden jarvis-panel py-2 px-3">
+      <div className="md:hidden jarvis-panel py-2 px-3">
         <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>VERT SPEED</div>
         <div className="text-center">
           <span className={`text-[24px] font-bold tabular-nums ${

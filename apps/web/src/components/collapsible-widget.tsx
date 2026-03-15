@@ -34,7 +34,7 @@ export function CollapsibleWidget({ panelId, title, children, className = '', ed
       <button
         onClick={toggle}
         aria-expanded={isExpanded}
-        className={`w-full flex items-center gap-2 px-2.5 py-1.5 collapsible-title select-none text-[14px] tracking-[3px] opacity-50 uppercase transition-colors min-h-[44px] sm:min-h-0 ${
+        className={`w-full flex items-center gap-2 px-2.5 py-1.5 collapsible-title select-none text-[14px] tracking-[3px] opacity-50 uppercase transition-colors min-h-[44px] md:min-h-0 ${
           editMode ? 'cursor-grab active:cursor-grabbing' : 'cursor-pointer'
         }`}
         {...(editMode && dragHandlers ? {

@@ -35,23 +35,23 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
 
   return (
     <div
-      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-3 sm:px-6 h-[44px] sm:h-[52px] relative z-50 safe-pl safe-pr safe-pt"
+      className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-3 md:px-6 h-[44px] md:h-[52px] relative z-50 safe-pl safe-pr safe-pt"
     >
       {/* Logo + Mini spinning reactor */}
       <div className="flex items-center gap-2">
         <JarvisLogo size={32} showText={false} />
         <div>
-          <div className="text-[12px] sm:text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
+          <div className="text-[12px] md:text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
             J·A·R·V·I·S
           </div>
-          <div className="hidden sm:block text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
+          <div className="hidden md:block text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
             TACTICAL HUD v2.0
           </div>
         </div>
       </div>
 
       {/* Navigation — hidden on mobile */}
-      <div className="hidden sm:flex gap-2">
+      <div className="hidden md:flex gap-2">
         <Link
           href="/"
           className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
@@ -92,7 +92,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
         {onToggleEditMode && (
           <button
             onClick={onToggleEditMode}
-            className={`hidden sm:inline-flex px-3 py-1.5 text-[13px] font-bold border transition-all ${
+            className={`hidden md:inline-flex px-3 py-1.5 text-[13px] font-bold border transition-all ${
               editMode
                 ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
                 : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
@@ -105,7 +105,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
           <div className="text-lg font-bold glow-text tabular-nums">{clock}</div>
-          <div className="hidden sm:block text-[12px] opacity-50" style={{ letterSpacing: '1px' }}>{date}</div>
+          <div className="hidden md:block text-[12px] opacity-50" style={{ letterSpacing: '1px' }}>{date}</div>
         </div>
       </div>
     </div>

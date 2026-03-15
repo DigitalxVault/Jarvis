@@ -174,10 +174,10 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
         ref={canvasRef}
         width={180}
         height={180}
-        className={`hidden sm:block ${className}`}
+        className={`hidden md:block ${className}`}
         style={{ imageRendering: 'pixelated' }}
       />
-      <div className="sm:hidden jarvis-panel py-2 px-3">
+      <div className="md:hidden jarvis-panel py-2 px-3">
         <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>ATTITUDE</div>
         <div className="flex justify-between items-baseline">
           <div>
