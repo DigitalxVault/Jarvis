@@ -60,7 +60,7 @@ export function CollapsibleWidget({ panelId, title, children, className = '', ed
         style={{ gridTemplateRows: isExpanded ? '1fr' : '0fr' }}
       >
         <div className="overflow-hidden">
-          <div className="px-2.5 pb-2.5">
+          <div className="px-2 pb-2">
             {children}
           </div>
         </div>

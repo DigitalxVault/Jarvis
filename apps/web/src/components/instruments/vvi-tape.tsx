@@ -146,11 +146,11 @@ export function VVITape({ vviMps, isOffline = false }: VVITapeProps) {
 
   return (
     <>
-      <div className="hidden md:flex justify-center mt-2">
+      <div className="hidden md:flex justify-center mt-1">
         <canvas
           ref={canvasRef}
           width={120}
-          height={200}
+          height={160}
           style={{ imageRendering: 'pixelated' }}
         />
       </div>

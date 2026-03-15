@@ -27,13 +27,13 @@ export function FuelGauge({ internal, external }: FuelGaugeProps) {
   return (
     <>
       {/* Total fuel readout */}
-      <div className="text-center mt-1 mb-2">
-        <span className={`text-4xl font-bold tabular-nums ${
+      <div className="text-center mb-1">
+        <span className={`text-2xl font-bold tabular-nums ${
           internal < 0.3 ? 'text-jarvis-danger glow-danger' : 'text-jarvis-accent glow-accent'
         }`}>
           {totalKg.toLocaleString()}
         </span>
-        <span className="text-[13px] opacity-50 ml-1">KG</span>
+        <span className="text-[11px] opacity-50 ml-1">KG</span>
       </div>
 
       <div className="flex gap-4 justify-center">
@@ -45,7 +45,7 @@ export function FuelGauge({ internal, external }: FuelGaugeProps) {
           >
             INT
           </div>
-          <div className="relative w-14 h-28 bg-jarvis-bar border border-jarvis-border rounded">
+          <div className="relative w-12 h-20 bg-jarvis-bar border border-jarvis-border rounded">
             {/* Bingo line */}
             <div
               className="absolute left-0 right-0 border-t-2 border-dashed border-jarvis-warning z-10"
@@ -88,7 +88,7 @@ export function FuelGauge({ internal, external }: FuelGaugeProps) {
           >
             EXT
           </div>
-          <div className="relative w-14 h-28 bg-jarvis-bar border border-jarvis-border rounded">
+          <div className="relative w-12 h-20 bg-jarvis-bar border border-jarvis-border rounded">
             {/* Bingo line */}
             <div
               className="absolute left-0 right-0 border-t-2 border-dashed border-jarvis-warning z-10"

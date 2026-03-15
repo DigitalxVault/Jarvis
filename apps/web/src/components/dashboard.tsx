@@ -105,7 +105,7 @@ export function Dashboard() {
       {/* Main content — flex-col on mobile, 3-column grid on tablet+ (md: = 768px) */}
       <div className="flex-1 flex flex-col md:grid md:grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg overflow-y-auto md:overflow-hidden">
         {/* Left Panel — Session, ADI, Fuel, Engine (hidden on mobile, shown on tablet+) */}
-        <div className="hidden md:flex bg-jarvis-bar md:border-r border-jarvis-border p-2 flex-col gap-2 overflow-hidden">
+        <div className="hidden md:flex bg-jarvis-bar md:border-r border-jarvis-border p-1.5 flex-col gap-1 overflow-hidden">
           <DraggablePanel panelId="connection" editMode={editMode} offset={getOffset('connection')} onUpdateOffset={updateOffset}>
             <ConnectionStatusPanel
               currentSession={currentSession}
@@ -208,7 +208,7 @@ export function Dashboard() {
         </div>
 
         {/* Right Panel — G-Meter, AoA, VVI (hidden on mobile, shown on tablet+) */}
-        <div className="hidden md:flex bg-jarvis-bar md:border-l border-jarvis-border p-2 flex-col gap-2 overflow-hidden">
+        <div className="hidden md:flex bg-jarvis-bar md:border-l border-jarvis-border p-1.5 flex-col gap-1 overflow-hidden">
           <DraggablePanel panelId="g-meter" editMode={editMode} offset={getOffset('g-meter')} onUpdateOffset={updateOffset}>
             <CollapsibleWidget panelId="g-meter" title="G-METER" editMode={editMode}>
               <GMeter gY={telemetry?.aero?.g?.y ?? 1} isOffline={isOffline} />

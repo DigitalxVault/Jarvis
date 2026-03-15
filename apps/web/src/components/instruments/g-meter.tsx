@@ -134,11 +134,11 @@ export function GMeter({ gY, isOffline = false }: GMeterProps) {
 
   return (
     <>
-      <div className="hidden md:flex justify-center mt-2">
+      <div className="hidden md:flex justify-center mt-1">
         <canvas
           ref={canvasRef}
           width={120}
-          height={220}
+          height={170}
           style={{ imageRendering: 'pixelated' }}
         />
       </div>

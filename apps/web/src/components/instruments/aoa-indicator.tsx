@@ -56,16 +56,16 @@ export function AoAIndicator({ aoaRad }: AoAIndicatorProps) {
   return (
     <>
       {/* Indexer display */}
-      <div className="flex justify-center gap-6 my-3">
-        <div className={`text-3xl ${colorClass}`}>{topSymbol}</div>
-        <div className={`text-3xl ${colorClass}`}>{middleSymbol}</div>
-        <div className={`text-3xl ${colorClass}`}>{bottomSymbol}</div>
+      <div className="flex justify-center gap-5 my-2">
+        <div className={`text-2xl ${colorClass}`}>{topSymbol}</div>
+        <div className={`text-2xl ${colorClass}`}>{middleSymbol}</div>
+        <div className={`text-2xl ${colorClass}`}>{bottomSymbol}</div>
       </div>
 
       {/* Numeric AoA */}
       <div className="text-center">
         <div
-          className={`text-4xl font-bold tabular-nums ${
+          className={`text-3xl font-bold tabular-nums ${
             isStall
               ? 'text-jarvis-danger glow-danger'
               : isFast

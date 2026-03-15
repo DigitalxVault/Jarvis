@@ -119,12 +119,12 @@ export function EnginePanel({ rpmPct, fuelCon, isOffline = false }: EnginePanelP
 
   return (
     <>
-      <div className="hidden md:flex flex-col items-center mt-2">
+      <div className="hidden md:flex flex-col items-center mt-1">
         {/* RPM gauge */}
         <canvas
           ref={canvasRef}
-          width={200}
-          height={140}
+          width={180}
+          height={110}
           style={{ imageRendering: 'pixelated' }}
         />
 

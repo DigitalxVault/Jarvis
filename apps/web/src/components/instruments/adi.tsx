@@ -185,8 +185,8 @@ export function ADI({ pitchRad, bankRad, className = '', isOffline = false }: AD
     <>
       <canvas
         ref={canvasRef}
-        width={180}
-        height={180}
+        width={150}
+        height={150}
         className={`hidden md:block ${className}`}
         style={{ imageRendering: 'pixelated' }}
       />
