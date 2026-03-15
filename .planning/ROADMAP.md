@@ -118,7 +118,7 @@ Plans:
 **Plans:** 1 plan
 
 Plans:
-- [ ] 11-01-PLAN.md -- CollapsibleWidget component + wrap instrument panels (Fuel, Engine, G-Meter, AoA, VVI)
+- [x] 11-01-PLAN.md -- CollapsibleWidget component + wrap instrument panels (Fuel, Engine, G-Meter, AoA, VVI)
 
 **Requirements:**
 - REQ-237 -- CollapsibleWidget wrapper component with title bar toggle
@@ -136,64 +136,56 @@ Plans:
 
 #### Phase 12: Draggable Layout (Amendment 1)
 
-**Goal:** Every telemetry widget is individually draggable and freely positionable using react-grid-layout, with localStorage persistence, edit mode toggle, and mobile fallback.
+**Goal:** Every telemetry widget is individually draggable and freely positionable using custom CSS transforms, with localStorage persistence, edit mode toggle, and mobile fallback.
 
 **Dependencies:** Phase 11 (collapsible widgets provide the wrapper components that become grid items)
 
-**Plans:** 3 plans
+**Plans:** 1 plan
 
 Plans:
-- [ ] 12-01-PLAN.md -- Install react-grid-layout, create useWidgetLayout hook with localStorage persistence
-- [ ] 12-02-PLAN.md -- Edit mode toggle in top bar + refactor dashboard.tsx to use ResponsiveGridLayout
-- [ ] 12-03-PLAN.md -- Visual polish (glow borders, drag handles, Reset Layout button, mobile fallback)
+- [x] 12-01-PLAN.md -- Custom CSS transform drag system with edit mode, localStorage persistence, reset layout
 
 **Requirements:**
-- REQ-241 -- react-grid-layout dependency
-- REQ-242 -- useWidgetLayout hook with localStorage persistence + SSR safety
+- REQ-242 -- usePanelPositions hook with localStorage persistence + SSR safety
 - REQ-243 -- Edit mode toggle in top bar (cyan glow when active)
-- REQ-244 -- ResponsiveGridLayout with 12-column grid, default positions match current layout
-- REQ-245 -- Edit mode visual indicators (glow borders, drag handles)
-- REQ-246 -- preventCollision + compactType=null (free positioning)
+- REQ-245 -- Edit mode visual indicators (glow borders)
 - REQ-247 -- Reset Layout button
-- REQ-248 -- Mobile fallback at <768px (stacked, no drag)
 
 **Success Criteria:**
-1. In edit mode, all panels are draggable and droppable with visible drag handles and glow borders
+1. In edit mode, all panels are draggable with visible glow borders
 2. Layout persists to localStorage and survives page refresh
 3. Reset Layout button restores default positions
-4. Widgets do not overlap (preventCollision enabled)
-5. Below 768px viewport, layout falls back to stacked column (no react-grid-layout)
-6. `pnpm typecheck` and `pnpm --filter @jarvis-dcs/web lint` pass clean
+4. `pnpm typecheck` and `pnpm --filter @jarvis-dcs/web lint` pass clean
 
 ---
 
-#### Phase 13: Responsive Layout (rewritten for react-grid-layout)
+#### Phase 13: Responsive Layout
 
 **Goal:** Dashboard renders correctly on phones, tablets, and desktops -- pilots can glance at key instruments on a phone mounted in their cockpit or use the full dashboard on a monitor.
 
-**Dependencies:** Phase 12 (draggable layout with react-grid-layout establishes the grid system that responsive breakpoints build on)
+**Dependencies:** Phase 12 (draggable layout with custom CSS transforms establishes the grid system that responsive breakpoints build on)
 
 **Plans:** 4 plans
 
 Plans:
-- [ ] 13-01-PLAN.md -- Viewport, breakpoints, and safe area foundation
-- [ ] 13-02-PLAN.md -- Responsive grid breakpoints for react-grid-layout
-- [ ] 13-03-PLAN.md -- Responsive canvas instruments
-- [ ] 13-04-PLAN.md -- Touch UX and polish
+- [x] 13-01-PLAN.md -- Viewport, safe area utilities, responsive top bar and bottom bar
+- [x] 13-02-PLAN.md -- Responsive dashboard grid with mobile single-column and drag disable
+- [x] 13-03-PLAN.md -- Canvas instrument text fallbacks for mobile
+- [x] 13-04-PLAN.md -- Touch UX polish, radar center, logo relocation, md breakpoint harmonization
 
 **Requirements:**
 - REQ-218 -- Breakpoint system: mobile (<640px), tablet (640-1024px), desktop (>1024px)
 - REQ-219 -- Mobile layout: single-column stack of key instruments
-- REQ-220 -- Tablet layout: 2-column grid
-- REQ-221 -- Desktop layout: existing 3-column grid preserved or react-grid-layout equivalent
+- REQ-220 -- Tablet layout: 3-column grid (scaled proportionally from desktop — D-1301)
+- REQ-221 -- Desktop layout: existing 3-column grid preserved with custom drag system
 - REQ-222 -- Touch-friendly controls (44px minimum tap targets)
 - REQ-223 -- Safe area insets for notched devices
 - REQ-224 -- Viewport meta tag with viewport-fit=cover
 
 **Success Criteria:**
 1. On a phone (<640px), dashboard displays a single-column stack of key instruments with no horizontal scrolling
-2. On a tablet (640-1024px), dashboard displays a 2-column grid with instruments and tactical panels
-3. On desktop (>1024px), existing layout preserved (react-grid-layout with default positions)
+2. On a tablet (640-1024px), dashboard displays 3-column grid with instruments and tactical panels
+3. On desktop (>1024px), existing layout preserved (custom drag system with default positions)
 4. All interactive elements meet 44px minimum tap target size on touch devices
 5. Content renders correctly on notched devices with no overlap into system UI areas
 
@@ -522,8 +514,8 @@ Plans:
 | 8. PWA Foundation | v2.0 | 4/4 | Complete | 2026-03-04 |
 | 9. Font Size Overhaul | v2.0 | 3/3 | Complete | 2026-03-13 |
 | 10. Smart Connection Status | v2.0 | 2/2 | Complete | 2026-03-14 |
-| 11. Collapsible Widgets | v2.0 | 0/1 | Not Started | -- |
-| 12. Draggable Layout | v2.0 | 0/3 | Not Started | -- |
+| 11. Collapsible Widgets | v2.0 | 1/1 | Complete | 2026-03-15 |
+| 12. Draggable Layout | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 13. Responsive Layout | v2.0 | 0/4 | Not Started | -- |
 | 14. Offline Shell & Polish | v2.0 | 0/3 | Not Started | -- |
 | 15. Python Bridge + DCS-gRPC | v3.0 | 0/4 | Not Started | -- |
@@ -539,4 +531,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-14 -- Phase 10 complete*
+*Last updated: 2026-03-15 -- Phase 13 planned*

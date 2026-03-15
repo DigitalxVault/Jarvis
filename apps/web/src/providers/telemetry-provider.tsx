@@ -4,6 +4,7 @@ import { createContext, useContext, useState, useCallback, useMemo } from 'react
 import { useTelemetry, type ConnectionState } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
 import { useCoaching } from '@/hooks/use-coaching'
+import { useOnlineStatus } from '@/hooks/use-online-status'
 import type {
   Session,
   TelemetryPacket,
@@ -34,11 +35,16 @@ interface TelemetryContextValue {
   hasWarning: boolean
   // Coaching
   coaching: ReturnType<typeof useCoaching>
+  // Network
+  isNetworkOffline: boolean
 }
 
 const TelemetryContext = createContext<TelemetryContextValue | null>(null)
 
 export function TelemetryProvider({ children }: { children: React.ReactNode }) {
+  const isOnline = useOnlineStatus()
+  const isNetworkOffline = !isOnline
+
   const [currentSession, setCurrentSession] = useState<Session | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [sessionError, setSessionError] = useState<string | null>(null)
@@ -111,6 +117,7 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
       hasCritical,
       hasWarning,
       coaching,
+      isNetworkOffline,
     }}>
       {children}
     </TelemetryContext.Provider>

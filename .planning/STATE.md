@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 13 of 14 (Responsive Layout)
-Plan: 03 of 4 complete
-Status: In progress (Phase 13 plans 01-03 done, plan 04 next)
-Last activity: 2026-03-15 — Completed 13-03 (canvas instrument mobile text fallbacks for ADI, G-meter, VVI, Engine)
+Phase: 13 of 14 (Responsive Layout) — COMPLETE
+Plan: 04 of 4 complete
+Status: Phase 13 complete — all 4 plans executed
+Last activity: 2026-03-15 — Completed 13-04 (touch UX, radar center, logo relocation, breakpoint harmonization)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [#########.] 75% IN PROGRESS (Phases 8-12 complete, Phase 13 in progress)
+Progress: v2.0 [#########.] 85% IN PROGRESS (Phases 8-13 complete, Phase 14 next)
 Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 
 ## Performance Metrics
@@ -41,7 +41,7 @@ Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 | 10. Smart Connection Status | v2.0 | 2 complete (DONE) |
 | 11. Collapsible Widgets | v2.0 | 1 complete (DONE) |
 | 12. Draggable Layout | v2.0 | 1 complete (DONE) |
-| 13. Responsive Layout | v2.0 | 13-01 complete (viewport, safe area, bars), 13-02 complete (responsive grid, mobile strip, drag disabled), 13-03 complete (instrument text fallbacks) |
+| 13. Responsive Layout | v2.0 | 4 complete (DONE) |
 | 14. Offline Shell & Polish | v2.0 | -- |
 | 15. Python Bridge + DCS-gRPC | v3.0 | -- |
 | 16. Session & Connection Overhaul | v3.0 | -- |
@@ -144,7 +144,7 @@ Amendment decisions (2026-03-13):
 - Phase 10: Smart Connection Status — COMPLETE
 - Phase 11: Collapsible Widgets — COMPLETE
 - Phase 12: Draggable Layout — COMPLETE
-- Phase 13: Responsive Layout — IN PROGRESS (13-01, 13-02, 13-03 done, 13-04 next)
+- Phase 13: Responsive Layout — COMPLETE
 - Plan Phase 14: Offline Shell and Polish
 
 **v3.0 (new):**
@@ -170,5 +170,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 13-03 — mobile text fallbacks for ADI (pitch/bank), G-meter (G force), VVI (FPM), Engine (RPM%/FF)
-Resume file: None — run 13-04 next (responsive instrument column layout)
+Stopped at: Completed Phase 13 — all responsive layout plans done
+Resume file: None — plan Phase 14 next (Offline Shell & Polish)

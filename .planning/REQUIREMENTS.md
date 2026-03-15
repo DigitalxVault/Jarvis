@@ -45,21 +45,21 @@
 
 ## Collapsible Widgets (Amendment 4d)
 
-- [ ] **REQ-237** — CollapsibleWidget wrapper component with title bar toggle (click to collapse/expand body)
-- [ ] **REQ-238** — Chevron indicator: ▾ when open, ▸ when collapsed, matching panel-title styling
-- [ ] **REQ-239** — Collapsed state shows title bar only (body hidden), collapsed height matches standard panel-title height
-- [ ] **REQ-240** — Non-collapsible components excluded: ConnectionStatusPanel, MiniTelemetryCards, coaching strip, debug strip
+- [x] **REQ-237** — CollapsibleWidget wrapper component with title bar toggle (click to collapse/expand body)
+- [x] **REQ-238** — Chevron indicator: ▾ when open, ▸ when collapsed, matching panel-title styling
+- [x] **REQ-239** — Collapsed state shows title bar only (body hidden), collapsed height matches standard panel-title height
+- [x] **REQ-240** — Non-collapsible components excluded: ConnectionStatusPanel, MiniTelemetryCards, coaching strip, debug strip
 
 ## Draggable Layout (Amendment 1)
 
-- [ ] **REQ-241** — react-grid-layout dependency installed and configured for Next.js 16 / React 19
-- [ ] **REQ-242** — useWidgetLayout hook with localStorage persistence (key: jarvis-widget-layout-v1) and SSR safety (typeof window check)
-- [ ] **REQ-243** — Edit mode toggle button in top bar with cyan glow when active; layout locked and clean when inactive
-- [ ] **REQ-244** — ResponsiveGridLayout with 12-column grid, default positions matching current 3-column layout (left: x:0 w:2, center: x:2 w:8, right: x:10 w:2)
-- [ ] **REQ-245** — Edit mode visual indicators: glowing border (1px solid rgba(0,255,255,0.4)) on widgets, drag handles (⠿) on hover
-- [ ] **REQ-246** — preventCollision={true} and compactType={null} for free positioning without auto-compaction
-- [ ] **REQ-247** — Reset Layout button to clear localStorage and restore default positions
-- [ ] **REQ-248** — Mobile fallback at <768px viewport: stacked column layout, no drag-and-drop
+- [x] **REQ-241** — Custom CSS transform drag system (react-grid-layout rejected per D-1201) with zero dependencies
+- [x] **REQ-242** — usePanelPositions hook with localStorage persistence (key: jarvis-panel-positions) and SSR safety (typeof window check)
+- [x] **REQ-243** — Edit mode toggle button in top bar with cyan glow when active; layout locked and clean when inactive
+- [x] **REQ-244** — DraggablePanel with CSS transform offsets, default positions matching current 3-column layout
+- [x] **REQ-245** — Edit mode visual indicators: glowing border (1px solid rgba(0,255,255,0.35)) on panels
+- [x] **REQ-246** — Free positioning via CSS transform offsets (no grid collision system needed)
+- [x] **REQ-247** — Reset Layout button to clear localStorage and restore default positions
+- [x] **REQ-248** — Mobile fallback at <768px viewport: stacked column layout, no drag-and-drop
 
 ## Offline Experience
 
@@ -69,13 +69,13 @@
 
 ## Responsive Layout
 
-- [ ] **REQ-218** — Breakpoint system: mobile (<640px), tablet (640-1024px), desktop (>1024px)
-- [ ] **REQ-219** — Mobile layout: single-column stack of key instruments (IAS, ALT, HDG, engine status)
-- [ ] **REQ-220** — Tablet layout: 2-column grid with instruments and tactical/status panels
-- [ ] **REQ-221** — Desktop layout: existing 3-column grid preserved (260px | 1fr | 280px) or react-grid-layout equivalent
-- [ ] **REQ-222** — Touch-friendly controls: minimum 44px tap targets, appropriate spacing
-- [ ] **REQ-223** — Safe area insets for notched devices (`env(safe-area-inset-*)`)
-- [ ] **REQ-224** — Viewport meta tag with `viewport-fit=cover` for edge-to-edge rendering
+- [x] **REQ-218** — Breakpoint system: mobile (<768px), tablet/desktop (≥768px) — updated from original 640px per user feedback
+- [x] **REQ-219** — Mobile layout: single-column with radar scope + telemetry strip (IAS, ALT, HDG, M), instrument panels hidden
+- [x] **REQ-220** — Tablet layout: 3-column grid (240px | 1fr | 200px — scaled proportionally from desktop — D-1301)
+- [x] **REQ-221** — Desktop layout: existing 3-column grid preserved with custom drag system
+- [x] **REQ-222** — Touch-friendly controls: minimum 44px tap targets, appropriate spacing
+- [x] **REQ-223** — Safe area insets for notched devices (`env(safe-area-inset-*)`)
+- [x] **REQ-224** — Viewport meta tag with `viewport-fit=cover` for edge-to-edge rendering
 
 ## Quality & Polish
 
@@ -124,25 +124,25 @@
 | REQ-234 | Smart Connection Status | 10 | Complete |
 | REQ-235 | Smart Connection Status | 10 | Complete |
 | REQ-236 | Smart Connection Status | 10 | Complete |
-| REQ-237 | Collapsible Widgets | 11 | Pending |
-| REQ-238 | Collapsible Widgets | 11 | Pending |
-| REQ-239 | Collapsible Widgets | 11 | Pending |
-| REQ-240 | Collapsible Widgets | 11 | Pending |
-| REQ-241 | Draggable Layout | 12 | Pending |
-| REQ-242 | Draggable Layout | 12 | Pending |
-| REQ-243 | Draggable Layout | 12 | Pending |
-| REQ-244 | Draggable Layout | 12 | Pending |
-| REQ-245 | Draggable Layout | 12 | Pending |
-| REQ-246 | Draggable Layout | 12 | Pending |
-| REQ-247 | Draggable Layout | 12 | Pending |
-| REQ-248 | Draggable Layout | 12 | Pending |
-| REQ-218 | Responsive Layout | 13 | Pending |
-| REQ-219 | Responsive Layout | 13 | Pending |
-| REQ-220 | Responsive Layout | 13 | Pending |
-| REQ-221 | Responsive Layout | 13 | Pending |
-| REQ-222 | Responsive Layout | 13 | Pending |
-| REQ-223 | Responsive Layout | 13 | Pending |
-| REQ-224 | Responsive Layout | 13 | Pending |
+| REQ-237 | Collapsible Widgets | 11 | Complete |
+| REQ-238 | Collapsible Widgets | 11 | Complete |
+| REQ-239 | Collapsible Widgets | 11 | Complete |
+| REQ-240 | Collapsible Widgets | 11 | Complete |
+| REQ-241 | Draggable Layout | 12 | Complete |
+| REQ-242 | Draggable Layout | 12 | Complete |
+| REQ-243 | Draggable Layout | 12 | Complete |
+| REQ-244 | Draggable Layout | 12 | Complete |
+| REQ-245 | Draggable Layout | 12 | Complete |
+| REQ-246 | Draggable Layout | 12 | Complete |
+| REQ-247 | Draggable Layout | 12 | Complete |
+| REQ-248 | Draggable Layout | 12 | Complete |
+| REQ-218 | Responsive Layout | 13 | Complete |
+| REQ-219 | Responsive Layout | 13 | Complete |
+| REQ-220 | Responsive Layout | 13 | Complete |
+| REQ-221 | Responsive Layout | 13 | Complete |
+| REQ-222 | Responsive Layout | 13 | Complete |
+| REQ-223 | Responsive Layout | 13 | Complete |
+| REQ-224 | Responsive Layout | 13 | Complete |
 | REQ-215 | Offline Experience | 14 | Pending |
 | REQ-216 | Offline Experience | 14 | Pending |
 | REQ-217 | Offline Experience | 14 | Pending |
