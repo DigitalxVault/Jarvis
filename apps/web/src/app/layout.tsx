@@ -3,6 +3,7 @@ import './globals.css'
 import { TelemetryProvider } from '@/providers/telemetry-provider'
 import { SwRegister } from '@/components/pwa/sw-register'
 import { UpdateBanner } from '@/components/pwa/update-banner'
+import { OfflineBanner } from '@/components/pwa/offline-banner'
 import { InstallPrompt } from '@/components/pwa/install-prompt'
 
 export const metadata: Metadata = {
@@ -39,6 +40,7 @@ export default function RootLayout({
         </TelemetryProvider>
         <SwRegister />
         <UpdateBanner />
+        <OfflineBanner />
         <InstallPrompt />
       </body>
     </html>
