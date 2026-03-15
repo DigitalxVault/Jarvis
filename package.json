@@ -7,7 +7,8 @@
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
     "smoke:bridge": "pnpm --filter @jarvis-dcs/bridge start -- --channel session:dev",
-    "smoke:web": "pnpm --filter @jarvis-dcs/web dev"
+    "smoke:web": "pnpm --filter @jarvis-dcs/web dev",
+    "schema:generate": "ts-json-schema-generator --path packages/shared/src/types.ts --type TelemetryPacket -o packages/shared/schema/telemetry-packet.schema.json"
   },
   "engines": {
     "node": ">=22"

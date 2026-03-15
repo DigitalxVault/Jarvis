@@ -200,9 +200,9 @@ Plans:
 **Plans:** 3 plans
 
 Plans:
-- [ ] 14-01-PLAN.md -- useOnlineStatus hook and offline overlay
-- [ ] 14-02-PLAN.md -- Offline dashboard shell (panels render with "waiting for connection" state)
-- [ ] 14-03-PLAN.md -- Lighthouse PWA audit, regression testing, final polish
+- [x] 14-01-PLAN.md -- useOnlineStatus hook and offline overlay
+- [x] 14-02-PLAN.md -- Offline dashboard shell (panels render with "waiting for connection" state)
+- [x] 14-03-PLAN.md -- Lighthouse PWA audit, regression testing, final polish
 
 **Requirements:**
 - REQ-215 -- Online/offline status detection hook (useOnlineStatus)
@@ -516,8 +516,8 @@ Plans:
 | 10. Smart Connection Status | v2.0 | 2/2 | Complete | 2026-03-14 |
 | 11. Collapsible Widgets | v2.0 | 1/1 | Complete | 2026-03-15 |
 | 12. Draggable Layout | v2.0 | 1/1 | Complete | 2026-03-15 |
-| 13. Responsive Layout | v2.0 | 0/4 | Not Started | -- |
-| 14. Offline Shell & Polish | v2.0 | 0/3 | Not Started | -- |
+| 13. Responsive Layout | v2.0 | 4/4 | Complete | 2026-03-15 |
+| 14. Offline Shell & Polish | v2.0 | 3/3 | Complete | 2026-03-15 |
 | 15. Python Bridge + DCS-gRPC | v3.0 | 0/4 | Not Started | -- |
 | 16. Session & Connection Overhaul | v3.0 | 0/2 | Not Started | -- |
 | 17. TTS Foundation + Voice Cues | v3.0 | 0/3 | Not Started | -- |
@@ -531,4 +531,4 @@ Plans:
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-15 -- Phase 13 planned*
+*Last updated: 2026-03-15 -- Phase 14 complete, v2.0 milestone complete*

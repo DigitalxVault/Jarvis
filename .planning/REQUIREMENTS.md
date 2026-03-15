@@ -63,9 +63,9 @@
 
 ## Offline Experience
 
-- [ ] **REQ-215** — Online/offline status detection hook (`useOnlineStatus`)
-- [ ] **REQ-216** — Offline overlay with "CONNECTION LOST" message and auto-reconnect indication
-- [ ] **REQ-217** — Dashboard shell renders offline (panels, layout, JARVIS theme) — data areas show "waiting for connection" state
+- [x] **REQ-215** — Online/offline status detection hook (`useOnlineStatus`)
+- [x] **REQ-216** — Offline overlay with "CONNECTION LOST" message and auto-reconnect indication
+- [x] **REQ-217** — Dashboard shell renders offline (panels, layout, JARVIS theme) — data areas show "waiting for connection" state
 
 ## Responsive Layout
 
@@ -79,9 +79,9 @@
 
 ## Quality & Polish
 
-- [ ] **REQ-225** — Lighthouse PWA-adjacent checks pass (manifest, SW, HTTPS, viewport, theme-color)
-- [ ] **REQ-226** — No regressions on desktop dashboard layout or functionality
-- [ ] **REQ-227** — Service worker does NOT interfere with Supabase Realtime WebSocket connections
+- [x] **REQ-225** — Lighthouse PWA-adjacent checks pass (manifest, SW, HTTPS, viewport, theme-color)
+- [x] **REQ-226** — No regressions on desktop dashboard layout or functionality
+- [x] **REQ-227** — Service worker does NOT interfere with Supabase Realtime WebSocket connections
 
 ---
 
@@ -143,12 +143,12 @@
 | REQ-222 | Responsive Layout | 13 | Complete |
 | REQ-223 | Responsive Layout | 13 | Complete |
 | REQ-224 | Responsive Layout | 13 | Complete |
-| REQ-215 | Offline Experience | 14 | Pending |
-| REQ-216 | Offline Experience | 14 | Pending |
-| REQ-217 | Offline Experience | 14 | Pending |
-| REQ-225 | Quality & Polish | 14 | Pending |
-| REQ-226 | Quality & Polish | 14 | Pending |
-| REQ-227 | Quality & Polish | 14 | Pending |
+| REQ-215 | Offline Experience | 14 | Complete |
+| REQ-216 | Offline Experience | 14 | Complete |
+| REQ-217 | Offline Experience | 14 | Complete |
+| REQ-225 | Quality & Polish | 14 | Complete |
+| REQ-226 | Quality & Polish | 14 | Complete |
+| REQ-227 | Quality & Polish | 14 | Complete |
 
 ---
 ---

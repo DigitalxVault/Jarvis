@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v3.0 -- Voice Co-Pilot & Trainer Platform
+**Current focus:** v2.0 COMPLETE — v3.0 Voice Co-Pilot & Trainer Platform next
 
 ## Current Position
 
-Phase: 14 of 14 (Offline Shell & Polish) — IN PROGRESS
-Plan: 02 of 3 complete
-Status: Phase 14 in progress — plans 01 and 02 executed
-Last activity: 2026-03-15 — Completed 14-02 (isOffline prop on all 4 canvas instruments, dashboard derivation and threading)
+Phase: 14 of 14 (Offline Shell & Polish) — COMPLETE
+Plan: 3 of 3 complete
+Status: v2.0 milestone complete — all 7 phases (8-14) shipped
+Last activity: 2026-03-15 — Phase 14 complete (offline shell, SW dev guard, responsive instrument sizing)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [#########.] 90% IN PROGRESS (Phases 8-13 complete, Phase 14 in progress)
+Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
 Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29 (18 v1.0 MVP + 11 v2.0)
+- Total plans completed: 33 (18 v1.0 MVP + 15 v2.0)
 - Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02), ~6 min (09-03), ~3 min (10-02)
 - Total execution time: 1 day (2026-02-25) + ongoing
 
@@ -42,7 +42,7 @@ Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 | 11. Collapsible Widgets | v2.0 | 1 complete (DONE) |
 | 12. Draggable Layout | v2.0 | 1 complete (DONE) |
 | 13. Responsive Layout | v2.0 | 4 complete (DONE) |
-| 14. Offline Shell & Polish | v2.0 | 2 complete (IN PROGRESS) |
+| 14. Offline Shell & Polish | v2.0 | 3 complete (DONE) |
 | 15. Python Bridge + DCS-gRPC | v3.0 | -- |
 | 16. Session & Connection Overhaul | v3.0 | -- |
 | 17. TTS Foundation + Voice Cues | v3.0 | -- |
@@ -149,17 +149,9 @@ Amendment decisions (2026-03-13):
 
 ### Pending Todos
 
-**v2.0 (remaining):**
-- Phase 10: Smart Connection Status — COMPLETE
-- Phase 11: Collapsible Widgets — COMPLETE
-- Phase 12: Draggable Layout — COMPLETE
-- Phase 13: Responsive Layout — COMPLETE
-- Phase 14 plan 01 complete: useOnlineStatus, OfflineBanner, TelemetryProvider isNetworkOffline
-- Phase 14 plan 02 complete: isOffline prop on GMeter/VVITape/EnginePanel/ADI; dashboard derives and threads isOffline
-- Plan Phase 14 plan 03: final polish (remaining REQ-2xx items)
+**v2.0:** COMPLETE — all 49 requirements shipped (REQ-200 to REQ-248)
 
-**v3.0 (new):**
-- Complete v2.0 first (Phases 10-14)
+**v3.0 (next):**
 - Plan Phase 15: Python Bridge + DCS-gRPC Foundation
 - Install DCS-gRPC mod in DCS World
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice
@@ -181,5 +173,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 14-02-PLAN (isOffline prop on all canvas instruments + dashboard wiring)
-Resume file: None — Phase 14 plan 03 next
+Stopped at: v2.0 milestone complete — all phases 8-14 shipped
+Resume file: None — v3.0 Phase 15 next

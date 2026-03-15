@@ -1,0 +1,197 @@
+{
+  "$ref": "#/definitions/TelemetryPacket",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "TelemetryPacket": {
+      "additionalProperties": false,
+      "description": "Telemetry packet from DCS Export.lua via UDP — all values in SI units",
+      "properties": {
+        "aero": {
+          "additionalProperties": false,
+          "description": "Aerodynamic data",
+          "properties": {
+            "ang_vel": {
+              "additionalProperties": false,
+              "description": "Angular velocity in rad/s",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ],
+              "type": "object"
+            },
+            "aoa_rad": {
+              "description": "Angle of attack in radians",
+              "type": "number"
+            },
+            "g": {
+              "additionalProperties": false,
+              "description": "G-loads (x=lateral, y=vertical/normal, z=longitudinal)",
+              "properties": {
+                "x": {
+                  "type": "number"
+                },
+                "y": {
+                  "type": "number"
+                },
+                "z": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "x",
+                "y",
+                "z"
+              ],
+              "type": "object"
+            }
+          },
+          "required": [
+            "aoa_rad",
+            "g",
+            "ang_vel"
+          ],
+          "type": "object"
+        },
+        "att": {
+          "additionalProperties": false,
+          "properties": {
+            "bank_rad": {
+              "type": "number"
+            },
+            "pitch_rad": {
+              "type": "number"
+            },
+            "yaw_rad": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "pitch_rad",
+            "bank_rad",
+            "yaw_rad"
+          ],
+          "type": "object"
+        },
+        "eng": {
+          "additionalProperties": false,
+          "description": "Engine data (primary engine)",
+          "properties": {
+            "fuel_con": {
+              "description": "Fuel consumption rate",
+              "type": "number"
+            },
+            "rpm_pct": {
+              "description": "RPM as percentage (0-100)",
+              "type": "number"
+            }
+          },
+          "required": [
+            "rpm_pct",
+            "fuel_con"
+          ],
+          "type": "object"
+        },
+        "fuel": {
+          "additionalProperties": false,
+          "description": "Fuel state as 0-1 fractions",
+          "properties": {
+            "external": {
+              "type": "number"
+            },
+            "internal": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "internal",
+            "external"
+          ],
+          "type": "object"
+        },
+        "hdg_rad": {
+          "description": "Magnetic heading in radians — LoGetMagneticYaw()",
+          "type": "number"
+        },
+        "pos": {
+          "additionalProperties": false,
+          "properties": {
+            "alt_agl_m": {
+              "description": "Altitude AGL in metres — LoGetAltitudeAboveGroundLevel()",
+              "type": "number"
+            },
+            "alt_m": {
+              "description": "Altitude MSL in metres",
+              "type": "number"
+            },
+            "lat": {
+              "type": "number"
+            },
+            "lon": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "lat",
+            "lon",
+            "alt_m"
+          ],
+          "type": "object"
+        },
+        "spd": {
+          "additionalProperties": false,
+          "properties": {
+            "ias_mps": {
+              "description": "Indicated airspeed in m/s",
+              "type": "number"
+            },
+            "mach": {
+              "type": "number"
+            },
+            "tas_mps": {
+              "description": "True airspeed in m/s",
+              "type": "number"
+            },
+            "vvi_mps": {
+              "description": "Vertical velocity in m/s (positive = climbing)",
+              "type": "number"
+            }
+          },
+          "required": [
+            "ias_mps",
+            "mach"
+          ],
+          "type": "object"
+        },
+        "t_model": {
+          "description": "LoGetModelTime() — mission elapsed seconds",
+          "type": "number"
+        },
+        "type": {
+          "const": "telemetry",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "t_model",
+        "pos",
+        "att",
+        "spd",
+        "hdg_rad"
+      ],
+      "type": "object"
+    }
+  }
+}
