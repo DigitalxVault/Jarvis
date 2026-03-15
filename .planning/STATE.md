@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 10 of 14 (Smart Connection Status)
-Plan: 02 of 2 complete — PHASE COMPLETE
-Status: In progress (Phase 10 done, Phase 11 next)
-Last activity: 2026-03-14 — Completed 10-02-PLAN.md (dashboard wiring + top bar pill + coaching strip + session-panel deletion)
+Phase: 13 of 14 (Responsive Layout)
+Plan: 01 of ? complete
+Status: In progress (Phase 13 plan 01 done, plan 02 next)
+Last activity: 2026-03-15 — Completed 13-01 (viewport viewportFit cover, safe area utilities, responsive top/bottom bars)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [#######...] 50% IN PROGRESS (Phases 8-10 complete, 4 phases remaining)
+Progress: v2.0 [#########.] 75% IN PROGRESS (Phases 8-12 complete, Phase 13 in progress)
 Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 27 (18 v1.0 MVP + 9 v2.0)
+- Total plans completed: 29 (18 v1.0 MVP + 11 v2.0)
 - Average duration: ~3 min (08-01), ~3 min (08-02), ~2.5 min (08-03), ~2 min (08-04), ~3.5 min (09-02), ~6 min (09-03), ~3 min (10-02)
 - Total execution time: 1 day (2026-02-25) + ongoing
 
@@ -39,9 +39,9 @@ Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 | 8. PWA Foundation | v2.0 | 4 complete (DONE) |
 | 9. Font Size Overhaul | v2.0 | 3 complete (DONE) |
 | 10. Smart Connection Status | v2.0 | 2 complete (DONE) |
-| 11. Collapsible Widgets | v2.0 | -- |
-| 12. Draggable Layout | v2.0 | -- |
-| 13. Responsive Layout | v2.0 | -- |
+| 11. Collapsible Widgets | v2.0 | 1 complete (DONE) |
+| 12. Draggable Layout | v2.0 | 1 complete (DONE) |
+| 13. Responsive Layout | v2.0 | 13-01 complete (viewport, safe area, bars) |
 | 14. Offline Shell & Polish | v2.0 | -- |
 | 15. Python Bridge + DCS-gRPC | v3.0 | -- |
 | 16. Session & Connection Overhaul | v3.0 | -- |
@@ -115,7 +115,7 @@ Amendment decisions (2026-03-13):
 | D-901 | Font sizes for in-flight readability | Amendment 2 — Phase 9 |
 | D-902 | Smart connection status panel | Amendment 3 + 4a + 4c — Phase 10 |
 | D-903 | Collapsible widget panels | Amendment 4d — Phase 11 |
-| D-904 | react-grid-layout draggable layout | Amendment 1 — Phase 12 |
+| D-904 | Custom CSS transform drag layout (react-grid-layout rejected) | Amendment 1 — Phase 12 |
 | D-921 | Y-offsets scaled to font metrics, not just size delta | Correct vertical spacing; no text overlap on canvas instruments |
 | D-931 | Canvas radar scope Y-offsets bumped +2px at ring labels and diag strip | Prevents label clipping after 9→12px upgrade |
 | D-932 | North indicator upgraded to bold 14px (from bold 11px) | Prominent cardinal reference at larger font size |
@@ -125,14 +125,20 @@ Amendment decisions (2026-03-13):
 | D-1004 | Top bar pill uses SYSTEM INIT (not SYSTEM INITIALIZED) | Panel handles hadTelemetry nuance; top bar is intentionally simpler |
 | D-1005 | Spinning ring via absolute animate-spin border-t-jarvis-accent w-4 h-4 | Visual ring effect around static w-3 h-3 dot; only border-t colored |
 | D-1006 | CompactCoaching early return pattern for non-live states | Clean state machine; no nested conditionals; !hasSession check before connectionState check |
+| D-1201 | Custom CSS transform drag instead of react-grid-layout | RGL v2 ships full editor UI that broke JARVIS aesthetic; zero-dep custom approach |
+| D-1202 | Dashboard dynamic import with ssr:false | React 19 hydration refuses to patch style attributes; client-only render avoids mismatch |
+| D-1203 | localStorage lazy initializer in usePanelPositions | SSR-safe with typeof window check; positions loaded during client-side useState init |
+| D-1301 | Tablet uses 3-column grid (not 2-column) | Same grid structure as desktop, scaled proportionally; REQ-220 updated to match design decision |
+| D-1302 | Safe area as CSS utility classes (.safe-pt/pb/pl/pr) | Applied at component level for precision; not on body globally |
+| D-1303 | Bottom bar fully hidden on mobile | LAT/LON/AGL and ticker non-essential on small screens; 50px reclaimed for instrument panels |
 
 ### Pending Todos
 
 **v2.0 (remaining):**
 - Phase 10: Smart Connection Status — COMPLETE
-- Plan Phase 11: Collapsible Widgets — NEXT
-- Plan Phase 12: Draggable Layout
-- Plan Phase 13: Responsive Layout (rewrite for react-grid-layout)
+- Phase 11: Collapsible Widgets — COMPLETE
+- Phase 12: Draggable Layout — COMPLETE
+- Phase 13: Responsive Layout — IN PROGRESS (13-01 done, 13-02 next)
 - Plan Phase 14: Offline Shell and Polish
 
 **v3.0 (new):**
@@ -150,13 +156,13 @@ Amendment decisions (2026-03-13):
 - RSC payloads excluded from SW caching (RESOLVED in 08-02 via two-path detection)
 - iOS WebSocket dies on background -- existing visibilitychange reconnection mitigates
 - pnpm sharp resolution: script uses fallback path to virtual store (not symlinked at top-level)
-- react-grid-layout compatibility with Next.js 16 / React 19 — needs research before Phase 12 planning
+- react-grid-layout v2 rejected — ships full editor UI that broke JARVIS aesthetic; custom CSS transform approach used instead (zero deps)
 - DCS-gRPC mod not yet installed — required before Phase 15 development
 - API keys not yet created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine) — required before Phases 17-18
 - Python bridge replaces Node.js bridge — need migration plan for existing sessions/channels
 
 ## Session Continuity
 
-Last session: 2026-03-14
-Stopped at: Completed 10-02-PLAN.md — Phase 10 complete (dashboard wired, top bar pill updated, session-panel.tsx deleted)
-Resume file: None — run Phase 11 (Collapsible Widgets) next
+Last session: 2026-03-15
+Stopped at: Completed 13-01 — viewport viewportFit cover, safe area CSS utilities, responsive top bar, hidden mobile bottom bar
+Resume file: None — run 13-02 next (dashboard responsive grid)

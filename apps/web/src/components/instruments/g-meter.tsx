@@ -123,13 +123,26 @@ export function GMeter({ gY }: GMeterProps) {
   }, [gY])
 
   return (
-    <div className="flex justify-center mt-2">
-      <canvas
-        ref={canvasRef}
-        width={120}
-        height={220}
-        style={{ imageRendering: 'pixelated' }}
-      />
-    </div>
+    <>
+      <div className="hidden sm:flex justify-center mt-2">
+        <canvas
+          ref={canvasRef}
+          width={120}
+          height={220}
+          style={{ imageRendering: 'pixelated' }}
+        />
+      </div>
+      <div className="sm:hidden jarvis-panel py-2 px-3">
+        <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>G-FORCE</div>
+        <div className="text-center">
+          <span className={`text-[28px] font-bold tabular-nums ${
+            gY > 7 || gY < -2 ? 'text-jarvis-danger' : gY > 5 ? 'text-jarvis-warning' : 'text-jarvis-accent'
+          }`}>
+            {gY.toFixed(1)}
+          </span>
+          <span className="text-[13px] opacity-40 ml-1">G</span>
+        </div>
+      </div>
+    </>
   )
 }

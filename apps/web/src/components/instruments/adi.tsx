@@ -169,12 +169,31 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
   }, [pitchRad, bankRad])
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={180}
-      height={180}
-      className={className}
-      style={{ imageRendering: 'pixelated' }}
-    />
+    <>
+      <canvas
+        ref={canvasRef}
+        width={180}
+        height={180}
+        className={`hidden sm:block ${className}`}
+        style={{ imageRendering: 'pixelated' }}
+      />
+      <div className="sm:hidden jarvis-panel py-2 px-3">
+        <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>ATTITUDE</div>
+        <div className="flex justify-between items-baseline">
+          <div>
+            <span className="text-[11px] opacity-40">PITCH </span>
+            <span className="text-jarvis-accent text-[18px] font-bold tabular-nums">
+              {(pitchRad * 57.2958).toFixed(1)}°
+            </span>
+          </div>
+          <div>
+            <span className="text-[11px] opacity-40">BANK </span>
+            <span className="text-jarvis-success text-[18px] font-bold tabular-nums">
+              {(bankRad * 57.2958).toFixed(1)}°
+            </span>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
