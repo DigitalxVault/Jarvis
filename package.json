@@ -2,11 +2,11 @@
   "name": "jarvis-dcs",
   "private": true,
   "scripts": {
-    "dev:bridge": "pnpm --filter @jarvis-dcs/bridge dev",
+    "dev:bridge": "uv run --project bridge-py jarvis-bridge",
     "dev:web": "pnpm --filter @jarvis-dcs/web dev",
     "build": "pnpm -r build",
     "typecheck": "pnpm -r typecheck",
-    "smoke:bridge": "pnpm --filter @jarvis-dcs/bridge start -- --channel session:dev",
+    "smoke:bridge": "uv run --project bridge-py jarvis-bridge --channel session:dev",
     "smoke:web": "pnpm --filter @jarvis-dcs/web dev",
     "schema:generate": "ts-json-schema-generator --path packages/shared/src/types.ts --type TelemetryPacket -o packages/shared/schema/telemetry-packet.schema.json"
   },

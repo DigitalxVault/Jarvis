@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 15 of 24 (Python Bridge + DCS-gRPC) — In progress
-Plan: 1 of 4 complete
+Plan: 3 of 4 complete (15-01, 15-02, 15-03 done; 15-04 pending)
 Status: In progress
-Last activity: 2026-03-15 — Completed 15-01-PLAN.md (Python scaffold, Pydantic models, proto files, stubs, minimal Export.lua)
+Last activity: 2026-03-15 — Completed 15-02-PLAN.md (gRPC client + UDP listener + Normalizer stream merger)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [#.........] 10% Phase 15-01 done (1 of 10 phases started)
+Progress: v3.0 [###.......] 30% Phase 15 plans 01+02+03 done (plan 04 pending)
 
 ## Performance Metrics
 
@@ -150,14 +150,20 @@ Amendment decisions (2026-03-13):
 | D-1502 | bridge-py/generated/ gitignored | Generated files regenerated via gen_stubs.sh from committed protos |
 | D-1503 | uv + hatchling for Python project | Fast installs, pinned Python 3.12.11, modern Python practices |
 | D-1504 | Real DCS-gRPC protos from official repo | Accurate stubs for actual gRPC server API |
+| D-1511 | StreamUnits on MissionService (not UnitService) | MissionService is the correct service per generated stubs |
+| D-1512 | sys.path insert for generated/ at module level | Runtime path addition; stubs not packaged separately |
+| D-1513 | max(grpc.t_model, cockpit.t_model) for packet timestamp | Uses fresher simulation clock value |
+| D-1514 | Optional tas_mps/vvi_mps (None when zero) | Distinguishes "no data" from "actual zero velocity" |
+| D-1505 | broadcast() raises; publish_telemetry() catches | Clean separation — raw broadcast usable by heartbeat; telemetry path handles all errors |
+| D-1506 | flush_buffer() oldest-first, stop on first error | Preserves order; cleanly re-enters backoff on flush failure |
+| D-1507 | Heartbeat swallows errors except CancelledError | Non-critical path; CancelledError must propagate for stop() to work correctly |
 
 ### Pending Todos
 
 **v2.0:** COMPLETE — all 49 requirements shipped (REQ-200 to REQ-248)
 
 **v3.0 (in progress):**
-- Plan 15-02: Python UDP cockpit listener (next)
-- Plan 15-03: Python gRPC client for position/attitude/heading
+- Plan 15-02: COMPLETE — gRPC client + UDP listener + Normalizer
 - Plan 15-04: Integration + full TelemetryPacket assembly + Supabase publish
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
@@ -179,5 +185,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 15-01-PLAN.md
-Resume file: .planning/phases/15-python-bridge-dcs-grpc/15-02-PLAN.md
+Stopped at: Completed 15-02-PLAN.md (gRPC client + UDP listener + Normalizer)
+Resume file: .planning/phases/15-python-bridge-dcs-grpc/15-04-PLAN.md
