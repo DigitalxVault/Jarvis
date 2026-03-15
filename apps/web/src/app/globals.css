@@ -21,7 +21,7 @@ body {
   overflow: hidden;
 }
 
-@media (max-width: 639px) {
+@media (max-width: 767px) {
   body {
     overflow-y: auto;
     overflow-x: hidden;
@@ -217,7 +217,7 @@ canvas {
 .safe-pr { padding-right: env(safe-area-inset-right); }
 
 /* -- Mobile: zero panel transforms so desktop drag positions don't break single-column flow -- */
-@media (max-width: 639px) {
+@media (max-width: 767px) {
   [data-panel-id] {
     transform: none !important;
   }

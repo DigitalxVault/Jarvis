@@ -4,9 +4,11 @@ import { useRef, useEffect, useState } from 'react'
 
 interface JarvisLogoProps {
   className?: string
+  size?: number
+  showText?: boolean
 }
 
-export function JarvisLogo({ className = '' }: JarvisLogoProps) {
+export function JarvisLogo({ className = '', size = 200, showText = true }: JarvisLogoProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const [time, setTime] = useState(0)
 
@@ -127,21 +129,17 @@ export function JarvisLogo({ className = '' }: JarvisLogoProps) {
       }
       ctx.shadowBlur = 0
 
-      // JARVIS text
-      ctx.fillStyle = `rgba(0, 255, 255, ${0.7 + Math.sin(now * 2) * 0.15})`
-      ctx.font = 'bold 14px "Courier New"'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.shadowColor = '#00ffff'
-      ctx.shadowBlur = 8
-      ctx.fillText('JARVIS', cx, cy + baseRadius * 0.55)
-      ctx.shadowBlur = 0
-
-      // Small tech text below
-      ctx.fillStyle = 'rgba(0, 212, 255, 0.4)'
-      ctx.font = '12px "Courier New"'
-      ctx.letterSpacing = '2px'
-      ctx.fillText('TACTICAL INTERFACE', cx, cy + baseRadius * 0.7)
+      // JARVIS text (only when showText enabled and size is large enough)
+      if (showText && size >= 100) {
+        ctx.fillStyle = `rgba(0, 255, 255, ${0.7 + Math.sin(now * 2) * 0.15})`
+        ctx.font = 'bold 14px "Courier New"'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.shadowColor = '#00ffff'
+        ctx.shadowBlur = 8
+        ctx.fillText('JARVIS', cx, cy + baseRadius * 0.55)
+        ctx.shadowBlur = 0
+      }
 
       animationId = requestAnimationFrame(animate)
     }
@@ -155,8 +153,8 @@ export function JarvisLogo({ className = '' }: JarvisLogoProps) {
     <div className={className}>
       <canvas
         ref={canvasRef}
-        width={200}
-        height={200}
+        width={size}
+        height={size}
         className="rounded-full"
         style={{ imageRendering: 'pixelated' }}
       />

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectionStatus } from './connection-status'
+import { JarvisLogo } from './jarvis-logo'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TopBarProps {
@@ -36,13 +37,16 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
     <div
       className="bg-jarvis-bar border-b border-jarvis-border flex items-center justify-between px-3 sm:px-6 h-[44px] sm:h-[52px] relative z-50 safe-pl safe-pr safe-pt"
     >
-      {/* Logo */}
-      <div>
-        <div className="text-[12px] sm:text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
-          J·A·R·V·I·S
-        </div>
-        <div className="hidden sm:block text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
-          TACTICAL HUD v2.0
+      {/* Logo + Mini spinning reactor */}
+      <div className="flex items-center gap-2">
+        <JarvisLogo size={32} showText={false} />
+        <div>
+          <div className="text-[12px] sm:text-[14px] font-bold glow-text" style={{ letterSpacing: '4px' }}>
+            J·A·R·V·I·S
+          </div>
+          <div className="hidden sm:block text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
+            TACTICAL HUD v2.0
+          </div>
         </div>
       </div>
 

@@ -7,8 +7,8 @@ import { TopBar } from './top-bar'
 import { BottomBar } from './bottom-bar'
 import { ConnectionStatusPanel } from './connection-status-panel'
 import { AlertOverlay } from './alert-overlay'
-import { JarvisLogo } from './jarvis-logo'
 import { MiniTelemetryCard } from './mini-telemetry-card'
+import { RadarScope } from './tactical/radar-scope'
 import { ADI, FuelGauge, EnginePanel, GMeter, AoAIndicator, VVITape } from './instruments'
 import { CollapsibleWidget } from './collapsible-widget'
 import { DraggablePanel } from './draggable-panel'
@@ -38,6 +38,7 @@ export function Dashboard() {
     hasCritical,
     hasWarning,
     coaching,
+    tactical,
   } = useTelemetryContext()
 
   const sessionId = currentSession?.id ?? null
@@ -45,9 +46,9 @@ export function Dashboard() {
   const [editMode, setEditMode] = useState(false)
   const { getOffset, updateOffset, resetAll, hasCustomPositions } = usePanelPositions()
 
-  // Auto-clear edit mode when viewport shrinks below mobile breakpoint (640px)
+  // Auto-clear edit mode when viewport shrinks below tablet breakpoint (768px)
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 640px)')
+    const mq = window.matchMedia('(min-width: 768px)')
     const handler = (e: MediaQueryListEvent) => {
       if (!e.matches) setEditMode(false)
     }
@@ -67,7 +68,7 @@ export function Dashboard() {
 
       {/* Edit mode toolbar — hidden on mobile */}
       {editMode && (
-        <div className="bg-jarvis-bar border-b border-jarvis-accent/30 px-6 py-1.5 hidden sm:flex items-center gap-4 z-40">
+        <div className="bg-jarvis-bar border-b border-jarvis-accent/30 px-6 py-1.5 hidden md:flex items-center gap-4 z-40">
           <span className="text-[12px] text-jarvis-accent font-bold" style={{ letterSpacing: '2px' }}>
             EDIT MODE
           </span>
@@ -91,17 +92,17 @@ export function Dashboard() {
       )}
 
       {/* Mobile-only mini telemetry strip */}
-      <div className="sm:hidden sticky top-0 z-30 bg-jarvis-bar border-b border-jarvis-border px-3 py-2 flex justify-between text-[13px]">
+      <div className="md:hidden sticky top-0 z-30 bg-jarvis-bar border-b border-jarvis-border px-3 py-2 flex justify-between text-[13px]">
         <span><span className="opacity-40">IAS </span><span className="text-jarvis-accent tabular-nums font-bold">{formatSpeed(telemetry?.spd?.ias_mps ?? null)}</span></span>
         <span><span className="opacity-40">ALT </span><span className="text-jarvis-primary tabular-nums font-bold">{formatAlt(telemetry?.pos?.alt_m ?? null)}</span></span>
         <span><span className="opacity-40">HDG </span><span className="text-jarvis-accent tabular-nums font-bold">{formatHdg(telemetry?.hdg_rad ?? null)}</span></span>
         <span><span className="opacity-40">M </span><span className="text-jarvis-success tabular-nums font-bold">{formatMach(telemetry?.spd?.mach ?? null)}</span></span>
       </div>
 
-      {/* Main content — flex-col on mobile, 3-column grid on tablet+ */}
-      <div className="flex-1 flex flex-col sm:grid sm:grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg">
-        {/* Left Panel — Session, ADI, Fuel, Engine */}
-        <div className="bg-jarvis-bar border-r-0 sm:border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-y-auto sm:overflow-hidden">
+      {/* Main content — flex-col on mobile, 3-column grid on tablet+ (md: = 768px) */}
+      <div className="flex-1 flex flex-col md:grid md:grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg overflow-y-auto md:overflow-hidden">
+        {/* Left Panel — Session, ADI, Fuel, Engine (hidden on mobile, shown on tablet+) */}
+        <div className="hidden md:flex bg-jarvis-bar md:border-r border-jarvis-border p-2 flex-col gap-2 overflow-hidden">
           <DraggablePanel panelId="connection" editMode={editMode} offset={getOffset('connection')} onUpdateOffset={updateOffset}>
             <ConnectionStatusPanel
               currentSession={currentSession}
@@ -145,14 +146,14 @@ export function Dashboard() {
         <div className="relative flex flex-col min-h-0 overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 45%, #001b3a 0%, #010a1a 65%)' }}
         >
-          {/* Corner brackets — hidden on mobile (decorative, wastes space) */}
-          <div className="hidden sm:block corner-bracket corner-tl" />
-          <div className="hidden sm:block corner-bracket corner-tr" />
-          <div className="hidden sm:block corner-bracket corner-bl" />
-          <div className="hidden sm:block corner-bracket corner-br" />
+          {/* Corner brackets — hidden on mobile (decorative) */}
+          <div className="hidden md:block corner-bracket corner-tl" />
+          <div className="hidden md:block corner-bracket corner-tr" />
+          <div className="hidden md:block corner-bracket corner-bl" />
+          <div className="hidden md:block corner-bracket corner-br" />
 
           {/* Top: Mini telemetry cards — hidden on mobile (mobile strip shown instead) */}
-          <div className="hidden sm:block">
+          <div className="hidden md:block">
             <DraggablePanel panelId="telemetry-cards" editMode={editMode} offset={getOffset('telemetry-cards')} onUpdateOffset={updateOffset}>
               <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
                 <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
@@ -164,13 +165,13 @@ export function Dashboard() {
             </DraggablePanel>
           </div>
 
-          {/* Center: JARVIS logo — hidden on mobile (decorative, wastes space) */}
-          <div className="hidden sm:flex flex-1 items-center justify-center min-h-0">
-            <JarvisLogo />
+          {/* Center: Radar scope — always visible */}
+          <div className="flex-1 min-h-0 relative">
+            <RadarScope telemetry={telemetry} tactical={tactical} />
           </div>
 
           {/* Alert overlay — compact banner on mobile, full overlay above coaching on desktop */}
-          <div className="absolute bottom-2 sm:bottom-24 left-1/2 -translate-x-1/2 w-full max-w-[calc(100%-1rem)] sm:max-w-lg z-20 px-2 sm:px-0">
+          <div className="absolute bottom-2 md:bottom-24 left-1/2 -translate-x-1/2 w-full max-w-[calc(100%-1rem)] md:max-w-lg z-20 px-2 md:px-0">
             <AlertOverlay alerts={alerts} />
           </div>
 
@@ -201,8 +202,8 @@ export function Dashboard() {
           </div>
         </div>
 
-        {/* Right Panel — G-Meter, AoA, VVI (compact, stacked) */}
-        <div className="bg-jarvis-bar border-l-0 sm:border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
+        {/* Right Panel — G-Meter, AoA, VVI (hidden on mobile, shown on tablet+) */}
+        <div className="hidden md:flex bg-jarvis-bar md:border-l border-jarvis-border p-2 flex-col gap-2 overflow-hidden">
           <DraggablePanel panelId="g-meter" editMode={editMode} offset={getOffset('g-meter')} onUpdateOffset={updateOffset}>
             <CollapsibleWidget panelId="g-meter" title="G-METER" editMode={editMode}>
               <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
