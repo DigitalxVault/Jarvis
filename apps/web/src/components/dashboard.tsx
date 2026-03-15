@@ -160,7 +160,7 @@ export function Dashboard() {
           {/* Top: Mini telemetry cards — hidden on mobile (mobile strip shown instead) */}
           <div className="hidden md:block">
             <DraggablePanel panelId="telemetry-cards" editMode={editMode} offset={getOffset('telemetry-cards')} onUpdateOffset={updateOffset}>
-              <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
+              <div className="flex justify-center gap-3 pt-3 pb-6 px-4 flex-shrink-0">
                 <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
                 <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
                 <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
