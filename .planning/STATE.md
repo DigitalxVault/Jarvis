@@ -9,13 +9,13 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 13 of 14 (Responsive Layout) — COMPLETE
-Plan: 04 of 4 complete
-Status: Phase 13 complete — all 4 plans executed
-Last activity: 2026-03-15 — Completed 13-04 (touch UX, radar center, logo relocation, breakpoint harmonization)
+Phase: 14 of 14 (Offline Shell & Polish) — IN PROGRESS
+Plan: 01 of ? complete
+Status: Phase 14 in progress — plan 01 executed
+Last activity: 2026-03-15 — Completed 14-01 (useOnlineStatus hook, OfflineBanner component, TelemetryProvider isNetworkOffline, layout mount)
 
 Progress: v1.0 [##########] 100% SHIPPED
-Progress: v2.0 [#########.] 85% IN PROGRESS (Phases 8-13 complete, Phase 14 next)
+Progress: v2.0 [#########.] 90% IN PROGRESS (Phases 8-13 complete, Phase 14 in progress)
 Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 
 ## Performance Metrics
@@ -42,7 +42,7 @@ Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 | 11. Collapsible Widgets | v2.0 | 1 complete (DONE) |
 | 12. Draggable Layout | v2.0 | 1 complete (DONE) |
 | 13. Responsive Layout | v2.0 | 4 complete (DONE) |
-| 14. Offline Shell & Polish | v2.0 | -- |
+| 14. Offline Shell & Polish | v2.0 | 1 complete (IN PROGRESS) |
 | 15. Python Bridge + DCS-gRPC | v3.0 | -- |
 | 16. Session & Connection Overhaul | v3.0 | -- |
 | 17. TTS Foundation + Voice Cues | v3.0 | -- |
@@ -137,6 +137,12 @@ Amendment decisions (2026-03-13):
 | D-1307 | Canvas wrappers (div) use hidden sm:flex | Hides entire wrapper+margins; not just canvas child |
 | D-1308 | Engine panel text fallback matches canvas PPH unit | Consistency between mobile/desktop views; plan suggested KG/H was incorrect |
 | D-1309 | VVI text fallback uses inline 196.85 multiplier | Self-contained; avoids importing mpsToFpm for a single JSX expression |
+| D-1401 | 2s debounce on recovery in useOnlineStatus | Prevents banner flicker during network flaps (mobile handoff, brief drops) |
+| D-1402 | Offline detection immediate (no debounce) | Pilots need instant visual feedback when network is lost |
+| D-1403 | No dismiss button on OfflineBanner | Flight safety requires persistent notification per CONTEXT.md |
+| D-1404 | OfflineBanner z-[10001] above UpdateBanner z-[10000] | Network loss is higher priority than software update availability |
+| D-1405 | Attempt counter increments every 5s via setInterval | Shows reconnection activity without overwhelming; matches staleness timeout scale |
+| D-1406 | Fade-out at 1800ms, hidden at 2500ms after recovery | Smooth visual exit after connection restored |
 
 ### Pending Todos
 
@@ -145,7 +151,8 @@ Amendment decisions (2026-03-13):
 - Phase 11: Collapsible Widgets — COMPLETE
 - Phase 12: Draggable Layout — COMPLETE
 - Phase 13: Responsive Layout — COMPLETE
-- Plan Phase 14: Offline Shell and Polish
+- Phase 14 plan 01 complete: useOnlineStatus, OfflineBanner, TelemetryProvider isNetworkOffline
+- Plan Phase 14 plan 02+: continue offline shell and polish
 
 **v3.0 (new):**
 - Complete v2.0 first (Phases 10-14)
@@ -170,5 +177,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed Phase 13 — all responsive layout plans done
-Resume file: None — plan Phase 14 next (Offline Shell & Polish)
+Stopped at: Completed 14-01-PLAN (useOnlineStatus hook + OfflineBanner + TelemetryProvider isNetworkOffline)
+Resume file: None — Phase 14 plan 02 next

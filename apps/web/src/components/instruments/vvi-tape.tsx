@@ -5,9 +5,10 @@ import { mpsToFpm } from '@/lib/conversions'
 
 interface VVITapeProps {
   vviMps: number
+  isOffline?: boolean
 }
 
-export function VVITape({ vviMps }: VVITapeProps) {
+export function VVITape({ vviMps, isOffline = false }: VVITapeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -77,62 +78,71 @@ export function VVITape({ vviMps }: VVITapeProps) {
     ctx.lineTo(width - 15, cy)
     ctx.stroke()
 
-    // Current VVI indicator (extends from center)
-    const indicatorY = cy - vviFpm * pixelsPerFpm
-    const clampedY = Math.max(10, Math.min(height - 10, indicatorY))
+    if (!isOffline) {
+      // Current VVI indicator (extends from center)
+      const indicatorY = cy - vviFpm * pixelsPerFpm
+      const clampedY = Math.max(10, Math.min(height - 10, indicatorY))
 
-    // Determine color based on rate
-    const absVvi = Math.abs(vviFpm)
-    const indicatorColor = absVvi > 4000
-      ? '#ff4444'
-      : absVvi > 2000
-        ? '#ffaa00'
-        : '#00ffff'
+      // Determine color based on rate
+      const absVvi = Math.abs(vviFpm)
+      const indicatorColor = absVvi > 4000
+        ? '#ff4444'
+        : absVvi > 2000
+          ? '#ffaa00'
+          : '#00ffff'
 
-    // Draw connecting line from center to indicator
-    if (Math.abs(vviFpm) > 100) {
-      ctx.strokeStyle = indicatorColor
-      ctx.lineWidth = 3
+      // Draw connecting line from center to indicator
+      if (Math.abs(vviFpm) > 100) {
+        ctx.strokeStyle = indicatorColor
+        ctx.lineWidth = 3
+        ctx.beginPath()
+        ctx.moveTo(cx, cy)
+        ctx.lineTo(cx, clampedY)
+        ctx.stroke()
+      }
+
+      // Indicator triangle
+      ctx.fillStyle = indicatorColor
       ctx.beginPath()
-      ctx.moveTo(cx, cy)
-      ctx.lineTo(cx, clampedY)
-      ctx.stroke()
+      ctx.moveTo(cx - 8, clampedY - 6)
+      ctx.lineTo(cx + 8, clampedY - 6)
+      ctx.lineTo(cx, clampedY + 6)
+      ctx.closePath()
+      ctx.fill()
+
+      // Glow
+      ctx.shadowColor = indicatorColor
+      ctx.shadowBlur = 8
+      ctx.fill()
+      ctx.shadowBlur = 0
+
+      // Center value display
+      ctx.fillStyle = indicatorColor
+      ctx.font = 'bold 48px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+
+      const sign = vviFpm >= 0 ? '+' : ''
+      const displayValue = `${sign}${Math.round(vviFpm)}`
+      ctx.fillText(displayValue, cx, cy + 30)
+
+      ctx.font = '14px "Courier New"'
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
+      ctx.fillText('FPM', cx, cy + 52)
+    } else {
+      // Offline: draw NO DATA text at center
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'
+      ctx.font = '11px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('NO DATA', cx, cy)
     }
-
-    // Indicator triangle
-    ctx.fillStyle = indicatorColor
-    ctx.beginPath()
-    ctx.moveTo(cx - 8, clampedY - 6)
-    ctx.lineTo(cx + 8, clampedY - 6)
-    ctx.lineTo(cx, clampedY + 6)
-    ctx.closePath()
-    ctx.fill()
-
-    // Glow
-    ctx.shadowColor = indicatorColor
-    ctx.shadowBlur = 8
-    ctx.fill()
-    ctx.shadowBlur = 0
-
-    // Center value display
-    ctx.fillStyle = indicatorColor
-    ctx.font = 'bold 48px "Courier New"'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-
-    const sign = vviFpm >= 0 ? '+' : ''
-    const displayValue = `${sign}${Math.round(vviFpm)}`
-    ctx.fillText(displayValue, cx, cy + 30)
-
-    ctx.font = '14px "Courier New"'
-    ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-    ctx.fillText('FPM', cx, cy + 52)
 
     // Border
     ctx.strokeStyle = '#00d4ff'
     ctx.lineWidth = 1
     ctx.strokeRect(5, 5, width - 10, height - 10)
-  }, [vviMps])
+  }, [vviMps, isOffline])
 
   return (
     <>
@@ -147,12 +157,21 @@ export function VVITape({ vviMps }: VVITapeProps) {
       <div className="md:hidden jarvis-panel py-2 px-3">
         <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>VERT SPEED</div>
         <div className="text-center">
-          <span className={`text-[24px] font-bold tabular-nums ${
-            Math.abs(vviMps * 196.85) > 3000 ? 'text-jarvis-warning' : 'text-jarvis-accent'
-          }`}>
-            {vviMps >= 0 ? '+' : ''}{Math.round(vviMps * 196.85).toLocaleString()}
-          </span>
-          <span className="text-[13px] opacity-40 ml-1">FPM</span>
+          {isOffline ? (
+            <>
+              <span className="text-[24px] font-bold tabular-nums text-jarvis-muted opacity-40">---</span>
+              <span className="text-[13px] opacity-40 ml-1">FPM</span>
+            </>
+          ) : (
+            <>
+              <span className={`text-[24px] font-bold tabular-nums ${
+                Math.abs(vviMps * 196.85) > 3000 ? 'text-jarvis-warning' : 'text-jarvis-accent'
+              }`}>
+                {vviMps >= 0 ? '+' : ''}{Math.round(vviMps * 196.85).toLocaleString()}
+              </span>
+              <span className="text-[13px] opacity-40 ml-1">FPM</span>
+            </>
+          )}
         </div>
       </div>
     </>

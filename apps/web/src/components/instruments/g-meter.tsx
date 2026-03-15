@@ -4,9 +4,10 @@ import { useRef, useEffect } from 'react'
 
 interface GMeterProps {
   gY: number  // Vertical G-load
+  isOffline?: boolean
 }
 
-export function GMeter({ gY }: GMeterProps) {
+export function GMeter({ gY, isOffline = false }: GMeterProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -81,46 +82,55 @@ export function GMeter({ gY }: GMeterProps) {
       }
     }
 
-    // Clamp G for display
-    const clampedG = Math.max(minG, Math.min(maxG, gY))
-    const needleY = centerY + (minG - clampedG) * pixelsPerG
+    if (!isOffline) {
+      // Clamp G for display
+      const clampedG = Math.max(minG, Math.min(maxG, gY))
+      const needleY = centerY + (minG - clampedG) * pixelsPerG
 
-    // Needle/bar indicator
-    const barColor = gY > 7 ? '#ff4444' : gY > 5 ? '#ffaa00' : gY < -1 ? '#ff4444' : '#00ffff'
-    ctx.fillStyle = barColor
+      // Needle/bar indicator
+      const barColor = gY > 7 ? '#ff4444' : gY > 5 ? '#ffaa00' : gY < -1 ? '#ff4444' : '#00ffff'
+      ctx.fillStyle = barColor
 
-    // Draw needle as filled triangle
-    ctx.beginPath()
-    ctx.moveTo(centerX, needleY - 8)
-    ctx.lineTo(centerX + 12, needleY)
-    ctx.lineTo(centerX, needleY + 8)
-    ctx.lineTo(centerX - 12, needleY)
-    ctx.closePath()
-    ctx.fill()
+      // Draw needle as filled triangle
+      ctx.beginPath()
+      ctx.moveTo(centerX, needleY - 8)
+      ctx.lineTo(centerX + 12, needleY)
+      ctx.lineTo(centerX, needleY + 8)
+      ctx.lineTo(centerX - 12, needleY)
+      ctx.closePath()
+      ctx.fill()
 
-    // Glow effect for needle
-    ctx.shadowColor = barColor
-    ctx.shadowBlur = 10
-    ctx.fill()
-    ctx.shadowBlur = 0
+      // Glow effect for needle
+      ctx.shadowColor = barColor
+      ctx.shadowBlur = 10
+      ctx.fill()
+      ctx.shadowBlur = 0
 
-    // Center display of current G (clamped to realistic range)
-    const displayG = Math.max(-4, Math.min(10, gY))
-    ctx.fillStyle = barColor
-    ctx.font = 'bold 56px "Courier New"'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(displayG.toFixed(1), centerX, centerY)
+      // Center display of current G (clamped to realistic range)
+      const displayG = Math.max(-4, Math.min(10, gY))
+      ctx.fillStyle = barColor
+      ctx.font = 'bold 56px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(displayG.toFixed(1), centerX, centerY)
 
-    ctx.font = '14px "Courier New"'
-    ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-    ctx.fillText('G-LOAD', centerX, centerY + 38)
+      ctx.font = '14px "Courier New"'
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
+      ctx.fillText('G-LOAD', centerX, centerY + 38)
+    } else {
+      // Offline: draw NO DATA text at center
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'
+      ctx.font = '11px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('NO DATA', centerX, centerY)
+    }
 
     // Border
     ctx.strokeStyle = '#00d4ff'
     ctx.lineWidth = 1
     ctx.strokeRect(5, 5, width - 10, height - 10)
-  }, [gY])
+  }, [gY, isOffline])
 
   return (
     <>
@@ -135,12 +145,21 @@ export function GMeter({ gY }: GMeterProps) {
       <div className="md:hidden jarvis-panel py-2 px-3">
         <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>G-FORCE</div>
         <div className="text-center">
-          <span className={`text-[28px] font-bold tabular-nums ${
-            gY > 7 || gY < -2 ? 'text-jarvis-danger' : gY > 5 ? 'text-jarvis-warning' : 'text-jarvis-accent'
-          }`}>
-            {gY.toFixed(1)}
-          </span>
-          <span className="text-[13px] opacity-40 ml-1">G</span>
+          {isOffline ? (
+            <>
+              <span className="text-[28px] font-bold tabular-nums text-jarvis-muted opacity-40">---</span>
+              <span className="text-[13px] opacity-40 ml-1">G</span>
+            </>
+          ) : (
+            <>
+              <span className={`text-[28px] font-bold tabular-nums ${
+                gY > 7 || gY < -2 ? 'text-jarvis-danger' : gY > 5 ? 'text-jarvis-warning' : 'text-jarvis-accent'
+              }`}>
+                {gY.toFixed(1)}
+              </span>
+              <span className="text-[13px] opacity-40 ml-1">G</span>
+            </>
+          )}
         </div>
       </div>
     </>

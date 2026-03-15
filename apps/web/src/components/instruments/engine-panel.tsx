@@ -5,9 +5,10 @@ import { useRef, useEffect } from 'react'
 interface EnginePanelProps {
   rpmPct: number
   fuelCon: number
+  isOffline?: boolean
 }
 
-export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
+export function EnginePanel({ rpmPct, fuelCon, isOffline = false }: EnginePanelProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -35,25 +36,27 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
     const rpmRatio = Math.max(0, Math.min(100, rpmPct)) / 100
     const currentAngle = startAngle + (endAngle - startAngle) * rpmRatio
 
-    // Background arc
+    // Background arc (static chrome — always visible)
     ctx.beginPath()
     ctx.arc(cx, cy, radius, startAngle, endAngle)
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.2)'
     ctx.lineWidth = 8
     ctx.stroke()
 
-    // Active arc
-    ctx.beginPath()
-    ctx.arc(cx, cy, radius, startAngle, currentAngle)
-    const gradient = ctx.createLinearGradient(0, cy + radius, 0, cy - radius)
-    gradient.addColorStop(0, '#00ff88')
-    gradient.addColorStop(0.5, '#00ffff')
-    gradient.addColorStop(1, '#00d4ff')
-    ctx.strokeStyle = gradient
-    ctx.lineWidth = 8
-    ctx.stroke()
+    if (!isOffline) {
+      // Active arc
+      ctx.beginPath()
+      ctx.arc(cx, cy, radius, startAngle, currentAngle)
+      const gradient = ctx.createLinearGradient(0, cy + radius, 0, cy - radius)
+      gradient.addColorStop(0, '#00ff88')
+      gradient.addColorStop(0.5, '#00ffff')
+      gradient.addColorStop(1, '#00d4ff')
+      ctx.strokeStyle = gradient
+      ctx.lineWidth = 8
+      ctx.stroke()
+    }
 
-    // Tick marks every 10%
+    // Tick marks every 10% (static chrome — always visible)
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.4)'
     ctx.lineWidth = 1
     ctx.font = '12px "Courier New"'
@@ -86,24 +89,33 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
       }
     }
 
-    // Center RPM value
-    ctx.font = 'bold 42px "Courier New"'
-    ctx.fillStyle = '#00ffff'
-    ctx.textAlign = 'center'
-    ctx.textBaseline = 'middle'
-    ctx.fillText(Math.round(rpmPct).toString(), cx, cy - 8)
+    if (!isOffline) {
+      // Center RPM value
+      ctx.font = 'bold 42px "Courier New"'
+      ctx.fillStyle = '#00ffff'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(Math.round(rpmPct).toString(), cx, cy - 8)
 
-    ctx.font = '14px "Courier New"'
-    ctx.fillStyle = 'rgba(0, 212, 255, 0.6)'
-    ctx.fillText('% RPM', cx, cy + 22)
+      ctx.font = '14px "Courier New"'
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.6)'
+      ctx.fillText('% RPM', cx, cy + 22)
+    } else {
+      // Offline: draw NO DATA text at center
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'
+      ctx.font = '11px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('NO DATA', cx, cy)
+    }
 
-    // Outer ring
+    // Outer ring (static chrome — always visible)
     ctx.beginPath()
     ctx.arc(cx, cy, radius + 2, 0, Math.PI * 2)
     ctx.strokeStyle = '#00d4ff'
     ctx.lineWidth = 1
     ctx.stroke()
-  }, [rpmPct])
+  }, [rpmPct, isOffline])
 
   return (
     <>
@@ -123,7 +135,7 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
               FUEL FLOW
             </span>
             <span className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">
-              {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
+              {isOffline ? '--.-' : fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
             </span>
           </div>
         </div>
@@ -133,16 +145,20 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
         <div className="flex justify-between items-baseline">
           <div>
             <span className="text-[11px] opacity-40">RPM </span>
-            <span className={`text-[18px] font-bold tabular-nums ${
-              rpmPct > 100 ? 'text-jarvis-danger' : rpmPct > 90 ? 'text-jarvis-warning' : 'text-jarvis-accent'
-            }`}>
-              {rpmPct.toFixed(0)}%
-            </span>
+            {isOffline ? (
+              <span className="text-[18px] font-bold tabular-nums text-jarvis-muted opacity-40">---%</span>
+            ) : (
+              <span className={`text-[18px] font-bold tabular-nums ${
+                rpmPct > 100 ? 'text-jarvis-danger' : rpmPct > 90 ? 'text-jarvis-warning' : 'text-jarvis-accent'
+              }`}>
+                {rpmPct.toFixed(0)}%
+              </span>
+            )}
           </div>
           <div>
             <span className="text-[11px] opacity-40">FF </span>
-            <span className="text-jarvis-accent text-[18px] font-bold tabular-nums">
-              {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'}
+            <span className={`text-[18px] font-bold tabular-nums ${isOffline ? 'text-jarvis-muted opacity-40' : 'text-jarvis-accent'}`}>
+              {isOffline ? '--.-' : fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'}
             </span>
             <span className="text-[11px] opacity-40 ml-0.5">PPH</span>
           </div>

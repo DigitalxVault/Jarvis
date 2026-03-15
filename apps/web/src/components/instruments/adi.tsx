@@ -6,9 +6,10 @@ interface ADIProps {
   pitchRad: number
   bankRad: number
   className?: string
+  isOffline?: boolean
 }
 
-export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
+export function ADI({ pitchRad, bankRad, className = '', isOffline = false }: ADIProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -44,6 +45,7 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
     ctx.translate(cx, cy)
     ctx.rotate(-bankDeg * Math.PI / 180)
 
+    // Sky/ground split and horizon (static chrome — always visible)
     // Sky (top half - lighter blue)
     ctx.fillStyle = 'rgba(0, 100, 150, 0.3)'
     ctx.fillRect(-radius, -radius, radius * 2, radius)
@@ -60,39 +62,41 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
     ctx.lineTo(radius, 0)
     ctx.stroke()
 
-    // Pitch ladder (5° increments)
-    ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)'
-    ctx.lineWidth = 1
-    ctx.font = '12px "Courier New"'
-    ctx.textAlign = 'center'
-    ctx.fillStyle = '#00d4ff'
+    if (!isOffline) {
+      // Pitch ladder (5° increments)
+      ctx.strokeStyle = 'rgba(0, 212, 255, 0.6)'
+      ctx.lineWidth = 1
+      ctx.font = '12px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.fillStyle = '#00d4ff'
 
-    const pixelsPerDegree = radius / 30
-    const pitchOffset = pitchDeg * pixelsPerDegree
+      const pixelsPerDegree = radius / 30
+      const pitchOffset = pitchDeg * pixelsPerDegree
 
-    for (let deg = -85; deg <= 85; deg += 5) {
-      if (deg === 0) continue
-      const y = -deg * pixelsPerDegree - pitchOffset
-      if (y < -radius || y > radius) continue
+      for (let deg = -85; deg <= 85; deg += 5) {
+        if (deg === 0) continue
+        const y = -deg * pixelsPerDegree - pitchOffset
+        if (y < -radius || y > radius) continue
 
-      const isMajor = deg % 10 === 0
-      const lineWidth = isMajor ? radius * 0.6 : radius * 0.25
+        const isMajor = deg % 10 === 0
+        const lineWidth = isMajor ? radius * 0.6 : radius * 0.25
 
-      ctx.beginPath()
-      ctx.moveTo(-lineWidth / 2, y)
-      ctx.lineTo(lineWidth / 2, y)
-      ctx.stroke()
+        ctx.beginPath()
+        ctx.moveTo(-lineWidth / 2, y)
+        ctx.lineTo(lineWidth / 2, y)
+        ctx.stroke()
 
-      // Degree labels on major lines
-      if (isMajor) {
-        ctx.fillText(`${deg}°`, -radius * 0.7, y + 4)
-        ctx.fillText(`${deg}°`, radius * 0.7, y + 4)
+        // Degree labels on major lines
+        if (isMajor) {
+          ctx.fillText(`${deg}°`, -radius * 0.7, y + 4)
+          ctx.fillText(`${deg}°`, radius * 0.7, y + 4)
+        }
       }
     }
 
     ctx.restore()
 
-    // Bank angle tick marks around circumference
+    // Bank angle tick marks around circumference (static chrome — always visible)
     ctx.strokeStyle = 'rgba(0, 212, 255, 0.4)'
     ctx.lineWidth = 1
     for (let deg = -180; deg <= 180; deg += 10) {
@@ -110,7 +114,7 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
       ctx.stroke()
     }
 
-    // Top index (wings level reference)
+    // Top index (wings level reference — static chrome, always visible)
     ctx.strokeStyle = '#00ffff'
     ctx.lineWidth = 2
     ctx.beginPath()
@@ -119,54 +123,63 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
     ctx.lineTo(cx + 15, cy - radius + 15)
     ctx.stroke()
 
-    // Aircraft reference symbol (fixed "W" shape)
-    ctx.strokeStyle = '#00ff88'
-    ctx.lineWidth = 2
-    ctx.beginPath()
-    // Left wing
-    ctx.moveTo(cx - 30, cy)
-    ctx.lineTo(cx - 10, cy + 5)
-    ctx.lineTo(cx - 10, cy)
-    // Center
-    ctx.lineTo(cx + 10, cy)
-    ctx.lineTo(cx + 10, cy + 5)
-    // Right wing
-    ctx.lineTo(cx + 30, cy)
-    ctx.stroke()
+    if (!isOffline) {
+      // Aircraft reference symbol (fixed "W" shape)
+      ctx.strokeStyle = '#00ff88'
+      ctx.lineWidth = 2
+      ctx.beginPath()
+      // Left wing
+      ctx.moveTo(cx - 30, cy)
+      ctx.lineTo(cx - 10, cy + 5)
+      ctx.lineTo(cx - 10, cy)
+      // Center
+      ctx.lineTo(cx + 10, cy)
+      ctx.lineTo(cx + 10, cy + 5)
+      // Right wing
+      ctx.lineTo(cx + 30, cy)
+      ctx.stroke()
 
-    // Bank angle indicator (pointer at top)
-    ctx.fillStyle = '#00ffff'
-    ctx.save()
-    ctx.translate(cx, cy - radius + 12)
-    ctx.rotate(bankRad)
-    ctx.beginPath()
-    ctx.moveTo(-5, 0)
-    ctx.lineTo(0, -8)
-    ctx.lineTo(5, 0)
-    ctx.closePath()
-    ctx.fill()
+      // Bank angle indicator (pointer at top)
+      ctx.fillStyle = '#00ffff'
+      ctx.save()
+      ctx.translate(cx, cy - radius + 12)
+      ctx.rotate(bankRad)
+      ctx.beginPath()
+      ctx.moveTo(-5, 0)
+      ctx.lineTo(0, -8)
+      ctx.lineTo(5, 0)
+      ctx.closePath()
+      ctx.fill()
+      ctx.restore()
+
+      // Bank angle numeric
+      ctx.font = 'bold 14px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.fillStyle = '#00ffff'
+      const bankDisplay = Math.round(bankDeg)
+      ctx.fillText(
+        bankDisplay >= 0 ? `R ${bankDisplay}°` : `L ${Math.abs(bankDisplay)}°`,
+        cx,
+        cy + radius - 5
+      )
+    } else {
+      // Offline: draw NO DATA text at center
+      ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'
+      ctx.font = '11px "Courier New"'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText('NO DATA', cx, cy)
+    }
+
     ctx.restore()
 
-    // Bank angle numeric
-    ctx.font = 'bold 14px "Courier New"'
-    ctx.textAlign = 'center'
-    ctx.fillStyle = '#00ffff'
-    const bankDisplay = Math.round(bankDeg)
-    ctx.fillText(
-      bankDisplay >= 0 ? `R ${bankDisplay}°` : `L ${Math.abs(bankDisplay)}°`,
-      cx,
-      cy + radius - 5
-    )
-
-    ctx.restore()
-
-    // Outer ring
+    // Outer ring (static chrome — always visible)
     ctx.strokeStyle = '#00d4ff'
     ctx.lineWidth = 2
     ctx.beginPath()
     ctx.arc(cx, cy, radius, 0, Math.PI * 2)
     ctx.stroke()
-  }, [pitchRad, bankRad])
+  }, [pitchRad, bankRad, isOffline])
 
   return (
     <>
@@ -182,15 +195,23 @@ export function ADI({ pitchRad, bankRad, className = '' }: ADIProps) {
         <div className="flex justify-between items-baseline">
           <div>
             <span className="text-[11px] opacity-40">PITCH </span>
-            <span className="text-jarvis-accent text-[18px] font-bold tabular-nums">
-              {(pitchRad * 57.2958).toFixed(1)}°
-            </span>
+            {isOffline ? (
+              <span className="text-[18px] font-bold tabular-nums text-jarvis-muted opacity-40">---°</span>
+            ) : (
+              <span className="text-jarvis-accent text-[18px] font-bold tabular-nums">
+                {(pitchRad * 57.2958).toFixed(1)}°
+              </span>
+            )}
           </div>
           <div>
             <span className="text-[11px] opacity-40">BANK </span>
-            <span className="text-jarvis-success text-[18px] font-bold tabular-nums">
-              {(bankRad * 57.2958).toFixed(1)}°
-            </span>
+            {isOffline ? (
+              <span className="text-[18px] font-bold tabular-nums text-jarvis-muted opacity-40">---°</span>
+            ) : (
+              <span className="text-jarvis-success text-[18px] font-bold tabular-nums">
+                {(bankRad * 57.2958).toFixed(1)}°
+              </span>
+            )}
           </div>
         </div>
       </div>
