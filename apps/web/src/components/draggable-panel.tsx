@@ -88,6 +88,7 @@ export function DraggablePanel({
         transform: `translate(${offset.dx}px, ${offset.dy}px)`,
         position: 'relative',
         zIndex: editMode ? 10 : undefined,
+        touchAction: editMode ? 'none' : 'auto',
       }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
