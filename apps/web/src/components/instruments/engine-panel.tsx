@@ -106,26 +106,48 @@ export function EnginePanel({ rpmPct, fuelCon }: EnginePanelProps) {
   }, [rpmPct])
 
   return (
-    <div className="flex flex-col items-center mt-2">
-      {/* RPM gauge */}
-      <canvas
-        ref={canvasRef}
-        width={200}
-        height={140}
-        style={{ imageRendering: 'pixelated' }}
-      />
+    <>
+      <div className="hidden sm:flex flex-col items-center mt-2">
+        {/* RPM gauge */}
+        <canvas
+          ref={canvasRef}
+          width={200}
+          height={140}
+          style={{ imageRendering: 'pixelated' }}
+        />
 
-      {/* Fuel flow */}
-      <div className="w-full mt-2 pt-2 border-t border-jarvis-border/30">
-        <div className="flex justify-between items-center">
-          <span className="text-[13px] opacity-50" style={{ letterSpacing: '2px' }}>
-            FUEL FLOW
-          </span>
-          <span className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">
-            {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
-          </span>
+        {/* Fuel flow */}
+        <div className="w-full mt-2 pt-2 border-t border-jarvis-border/30">
+          <div className="flex justify-between items-center">
+            <span className="text-[13px] opacity-50" style={{ letterSpacing: '2px' }}>
+              FUEL FLOW
+            </span>
+            <span className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">
+              {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
+            </span>
+          </div>
         </div>
       </div>
-    </div>
+      <div className="sm:hidden jarvis-panel py-2 px-3">
+        <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>ENGINE</div>
+        <div className="flex justify-between items-baseline">
+          <div>
+            <span className="text-[11px] opacity-40">RPM </span>
+            <span className={`text-[18px] font-bold tabular-nums ${
+              rpmPct > 100 ? 'text-jarvis-danger' : rpmPct > 90 ? 'text-jarvis-warning' : 'text-jarvis-accent'
+            }`}>
+              {rpmPct.toFixed(0)}%
+            </span>
+          </div>
+          <div>
+            <span className="text-[11px] opacity-40">FF </span>
+            <span className="text-jarvis-accent text-[18px] font-bold tabular-nums">
+              {fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'}
+            </span>
+            <span className="text-[11px] opacity-40 ml-0.5">PPH</span>
+          </div>
+        </div>
+      </div>
+    </>
   )
 }

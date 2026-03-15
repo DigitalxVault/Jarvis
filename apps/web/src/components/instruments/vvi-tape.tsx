@@ -135,13 +135,26 @@ export function VVITape({ vviMps }: VVITapeProps) {
   }, [vviMps])
 
   return (
-    <div className="flex justify-center mt-2">
-      <canvas
-        ref={canvasRef}
-        width={120}
-        height={200}
-        style={{ imageRendering: 'pixelated' }}
-      />
-    </div>
+    <>
+      <div className="hidden sm:flex justify-center mt-2">
+        <canvas
+          ref={canvasRef}
+          width={120}
+          height={200}
+          style={{ imageRendering: 'pixelated' }}
+        />
+      </div>
+      <div className="sm:hidden jarvis-panel py-2 px-3">
+        <div className="text-[11px] opacity-50 font-bold mb-1" style={{ letterSpacing: '2px' }}>VERT SPEED</div>
+        <div className="text-center">
+          <span className={`text-[24px] font-bold tabular-nums ${
+            Math.abs(vviMps * 196.85) > 3000 ? 'text-jarvis-warning' : 'text-jarvis-accent'
+          }`}>
+            {vviMps >= 0 ? '+' : ''}{Math.round(vviMps * 196.85).toLocaleString()}
+          </span>
+          <span className="text-[13px] opacity-40 ml-1">FPM</span>
+        </div>
+      </div>
+    </>
   )
 }
