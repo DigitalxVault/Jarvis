@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v2.0 COMPLETE — v3.0 Voice Co-Pilot & Trainer Platform next
+**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 15 Python Bridge + DCS-gRPC
 
 ## Current Position
 
-Phase: 14 of 14 (Offline Shell & Polish) — COMPLETE
-Plan: 3 of 3 complete
-Status: v2.0 milestone complete — all 7 phases (8-14) shipped
-Last activity: 2026-03-15 — Phase 14 complete (offline shell, SW dev guard, responsive instrument sizing)
+Phase: 15 of 24 (Python Bridge + DCS-gRPC) — In progress
+Plan: 1 of 4 complete
+Status: In progress
+Last activity: 2026-03-15 — Completed 15-01-PLAN.md (Python scaffold, Pydantic models, proto files, stubs, minimal Export.lua)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
+Progress: v3.0 [#.........] 10% Phase 15-01 done (1 of 10 phases started)
 
 ## Performance Metrics
 
@@ -146,15 +146,21 @@ Amendment decisions (2026-03-13):
 | D-1421 | isOffline = isNetworkOffline || telemetry === null | Both network-down and initial null state show unpowered look; no brief flash of live data during ramp-up |
 | D-1422 | Static chrome always visible when offline | Unpowered gauge aesthetic: frame/scale visible, needle gone; caution zones, ticks, arcs, outer ring, sky/ground all draw |
 | D-1423 | NO DATA text at rgba(0, 212, 255, 0.15) opacity | Very faint — matches subdued unpowered palette; not a bright error indicator |
+| D-1501 | type="cockpit" in minimal Lua | Clean split between UDP cockpit data and gRPC position/attitude/heading |
+| D-1502 | bridge-py/generated/ gitignored | Generated files regenerated via gen_stubs.sh from committed protos |
+| D-1503 | uv + hatchling for Python project | Fast installs, pinned Python 3.12.11, modern Python practices |
+| D-1504 | Real DCS-gRPC protos from official repo | Accurate stubs for actual gRPC server API |
 
 ### Pending Todos
 
 **v2.0:** COMPLETE — all 49 requirements shipped (REQ-200 to REQ-248)
 
-**v3.0 (next):**
-- Plan Phase 15: Python Bridge + DCS-gRPC Foundation
-- Install DCS-gRPC mod in DCS World
-- Set up API accounts: OpenAI, ElevenLabs, Picovoice
+**v3.0 (in progress):**
+- Plan 15-02: Python UDP cockpit listener (next)
+- Plan 15-03: Python gRPC client for position/attitude/heading
+- Plan 15-04: Integration + full TelemetryPacket assembly + Supabase publish
+- Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
+- Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
 
 ### Blockers/Concerns
 
@@ -173,5 +179,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: v2.0 milestone complete — all phases 8-14 shipped
-Resume file: None — v3.0 Phase 15 next
+Stopped at: Completed 15-01-PLAN.md
+Resume file: .planning/phases/15-python-bridge-dcs-grpc/15-02-PLAN.md
