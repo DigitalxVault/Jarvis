@@ -169,8 +169,8 @@ export function Dashboard() {
             <JarvisLogo />
           </div>
 
-          {/* Alert overlay — adjusted bottom position for mobile */}
-          <div className="absolute bottom-4 sm:bottom-24 left-1/2 -translate-x-1/2 w-full max-w-lg z-20">
+          {/* Alert overlay — compact banner on mobile, full overlay above coaching on desktop */}
+          <div className="absolute bottom-2 sm:bottom-24 left-1/2 -translate-x-1/2 w-full max-w-[calc(100%-1rem)] sm:max-w-lg z-20 px-2 sm:px-0">
             <AlertOverlay alerts={alerts} />
           </div>
 

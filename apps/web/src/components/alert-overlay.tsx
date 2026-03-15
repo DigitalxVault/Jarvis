@@ -24,12 +24,12 @@ export function AlertOverlay({ alerts, className = '' }: AlertOverlayProps) {
     <div className={`${className} alert-overlay`}>
       <div
         className={`
-          border-l-4 border-r-4 px-6 py-3 text-center
+          border-l-4 border-r-4 px-2 py-1.5 sm:px-6 sm:py-3 text-center max-w-full sm:max-w-lg mx-auto
           ${colorClass}
         `}
         style={{ letterSpacing: '3px' }}
       >
-        <div className="text-[14px] font-bold animate-blink">
+        <div className="text-[12px] sm:text-[14px] font-bold animate-blink">
           {primaryAlert.message}
         </div>
 

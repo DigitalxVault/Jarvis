@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 13 of 14 (Responsive Layout)
-Plan: 01 of ? complete
-Status: In progress (Phase 13 plan 01 done, plan 02 next)
-Last activity: 2026-03-15 — Completed 13-01 (viewport viewportFit cover, safe area utilities, responsive top/bottom bars)
+Plan: 03 of 4 complete
+Status: In progress (Phase 13 plans 01-03 done, plan 04 next)
+Last activity: 2026-03-15 — Completed 13-03 (canvas instrument mobile text fallbacks for ADI, G-meter, VVI, Engine)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [#########.] 75% IN PROGRESS (Phases 8-12 complete, Phase 13 in progress)
@@ -41,7 +41,7 @@ Progress: v3.0 [..........] 0% REQUIREMENTS DEFINED (Phases 15-24)
 | 10. Smart Connection Status | v2.0 | 2 complete (DONE) |
 | 11. Collapsible Widgets | v2.0 | 1 complete (DONE) |
 | 12. Draggable Layout | v2.0 | 1 complete (DONE) |
-| 13. Responsive Layout | v2.0 | 13-01 complete (viewport, safe area, bars) |
+| 13. Responsive Layout | v2.0 | 13-01 complete (viewport, safe area, bars), 13-02 complete (responsive grid, mobile strip, drag disabled), 13-03 complete (instrument text fallbacks) |
 | 14. Offline Shell & Polish | v2.0 | -- |
 | 15. Python Bridge + DCS-gRPC | v3.0 | -- |
 | 16. Session & Connection Overhaul | v3.0 | -- |
@@ -131,6 +131,12 @@ Amendment decisions (2026-03-13):
 | D-1301 | Tablet uses 3-column grid (not 2-column) | Same grid structure as desktop, scaled proportionally; REQ-220 updated to match design decision |
 | D-1302 | Safe area as CSS utility classes (.safe-pt/pb/pl/pr) | Applied at component level for precision; not on body globally |
 | D-1303 | Bottom bar fully hidden on mobile | LAT/LON/AGL and ticker non-essential on small screens; 50px reclaimed for instrument panels |
+| D-1304 | Mobile strip: IAS/ALT/HDG/Mach only | Priority pilot data in 4 compact values; full mini cards too tall for phone |
+| D-1305 | CSS-only for layout breakpoints, matchMedia for JS state only | Layout purely declarative; matchMedia only for editMode imperative clear |
+| D-1306 | [data-panel-id] transform: none !important in CSS | Overrides inline drag transforms; cleaner than conditional JS logic |
+| D-1307 | Canvas wrappers (div) use hidden sm:flex | Hides entire wrapper+margins; not just canvas child |
+| D-1308 | Engine panel text fallback matches canvas PPH unit | Consistency between mobile/desktop views; plan suggested KG/H was incorrect |
+| D-1309 | VVI text fallback uses inline 196.85 multiplier | Self-contained; avoids importing mpsToFpm for a single JSX expression |
 
 ### Pending Todos
 
@@ -138,7 +144,7 @@ Amendment decisions (2026-03-13):
 - Phase 10: Smart Connection Status — COMPLETE
 - Phase 11: Collapsible Widgets — COMPLETE
 - Phase 12: Draggable Layout — COMPLETE
-- Phase 13: Responsive Layout — IN PROGRESS (13-01 done, 13-02 next)
+- Phase 13: Responsive Layout — IN PROGRESS (13-01, 13-02, 13-03 done, 13-04 next)
 - Plan Phase 14: Offline Shell and Polish
 
 **v3.0 (new):**
@@ -164,5 +170,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 13-01 — viewport viewportFit cover, safe area CSS utilities, responsive top bar, hidden mobile bottom bar
-Resume file: None — run 13-02 next (dashboard responsive grid)
+Stopped at: Completed 13-03 — mobile text fallbacks for ADI (pitch/bank), G-meter (G force), VVI (FPM), Engine (RPM%/FF)
+Resume file: None — run 13-04 next (responsive instrument column layout)
