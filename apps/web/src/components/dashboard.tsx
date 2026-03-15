@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTelemetryContext } from '@/providers/telemetry-provider'
 import { usePanelPositions } from '@/hooks/use-panel-positions'
 import { TopBar } from './top-bar'
@@ -45,6 +45,18 @@ export function Dashboard() {
   const [editMode, setEditMode] = useState(false)
   const { getOffset, updateOffset, resetAll, hasCustomPositions } = usePanelPositions()
 
+  // Auto-clear edit mode when viewport shrinks below mobile breakpoint (640px)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 640px)')
+    const handler = (e: MediaQueryListEvent) => {
+      if (!e.matches) setEditMode(false)
+    }
+    // Clear on mount if already mobile
+    if (!mq.matches) setEditMode(false)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
   return (
     <div className="w-full h-screen flex flex-col">
       <TopBar
@@ -53,9 +65,9 @@ export function Dashboard() {
         onToggleEditMode={() => setEditMode(prev => !prev)}
       />
 
-      {/* Edit mode toolbar */}
+      {/* Edit mode toolbar — hidden on mobile */}
       {editMode && (
-        <div className="bg-jarvis-bar border-b border-jarvis-accent/30 px-6 py-1.5 flex items-center gap-4 z-40">
+        <div className="bg-jarvis-bar border-b border-jarvis-accent/30 px-6 py-1.5 hidden sm:flex items-center gap-4 z-40">
           <span className="text-[12px] text-jarvis-accent font-bold" style={{ letterSpacing: '2px' }}>
             EDIT MODE
           </span>
@@ -78,10 +90,18 @@ export function Dashboard() {
         </div>
       )}
 
-      {/* Main content — 3-column: left instruments | center HUD | right instruments */}
-      <div className="flex-1 grid grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg">
+      {/* Mobile-only mini telemetry strip */}
+      <div className="sm:hidden sticky top-0 z-30 bg-jarvis-bar border-b border-jarvis-border px-3 py-2 flex justify-between text-[13px]">
+        <span><span className="opacity-40">IAS </span><span className="text-jarvis-accent tabular-nums font-bold">{formatSpeed(telemetry?.spd?.ias_mps ?? null)}</span></span>
+        <span><span className="opacity-40">ALT </span><span className="text-jarvis-primary tabular-nums font-bold">{formatAlt(telemetry?.pos?.alt_m ?? null)}</span></span>
+        <span><span className="opacity-40">HDG </span><span className="text-jarvis-accent tabular-nums font-bold">{formatHdg(telemetry?.hdg_rad ?? null)}</span></span>
+        <span><span className="opacity-40">M </span><span className="text-jarvis-success tabular-nums font-bold">{formatMach(telemetry?.spd?.mach ?? null)}</span></span>
+      </div>
+
+      {/* Main content — flex-col on mobile, 3-column grid on tablet+ */}
+      <div className="flex-1 flex flex-col sm:grid sm:grid-cols-[240px_1fr_200px] min-h-0 bg-jarvis-bg">
         {/* Left Panel — Session, ADI, Fuel, Engine */}
-        <div className="bg-jarvis-bar border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
+        <div className="bg-jarvis-bar border-r-0 sm:border-r border-jarvis-border p-2 flex flex-col gap-2 overflow-y-auto sm:overflow-hidden">
           <DraggablePanel panelId="connection" editMode={editMode} offset={getOffset('connection')} onUpdateOffset={updateOffset}>
             <ConnectionStatusPanel
               currentSession={currentSession}
@@ -125,30 +145,32 @@ export function Dashboard() {
         <div className="relative flex flex-col min-h-0 overflow-hidden"
           style={{ background: 'radial-gradient(ellipse at 50% 45%, #001b3a 0%, #010a1a 65%)' }}
         >
-          {/* Corner brackets */}
-          <div className="corner-bracket corner-tl" />
-          <div className="corner-bracket corner-tr" />
-          <div className="corner-bracket corner-bl" />
-          <div className="corner-bracket corner-br" />
+          {/* Corner brackets — hidden on mobile (decorative, wastes space) */}
+          <div className="hidden sm:block corner-bracket corner-tl" />
+          <div className="hidden sm:block corner-bracket corner-tr" />
+          <div className="hidden sm:block corner-bracket corner-bl" />
+          <div className="hidden sm:block corner-bracket corner-br" />
 
-          {/* Top: Mini telemetry cards */}
-          <DraggablePanel panelId="telemetry-cards" editMode={editMode} offset={getOffset('telemetry-cards')} onUpdateOffset={updateOffset}>
-            <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
-              <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
-              <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
-              <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
-              <MiniTelemetryCard label="MACH NO" value={formatMach(telemetry?.spd?.mach ?? null)} color="success" />
-              <MiniTelemetryCard label="TRUE AIRSPEED" value={formatTAS(telemetry?.spd?.tas_mps ?? null)} unit="KTS" color="accent" />
-            </div>
-          </DraggablePanel>
+          {/* Top: Mini telemetry cards — hidden on mobile (mobile strip shown instead) */}
+          <div className="hidden sm:block">
+            <DraggablePanel panelId="telemetry-cards" editMode={editMode} offset={getOffset('telemetry-cards')} onUpdateOffset={updateOffset}>
+              <div className="flex justify-center gap-3 pt-3 px-4 flex-shrink-0">
+                <MiniTelemetryCard label="IND AIRSPEED" value={formatSpeed(telemetry?.spd?.ias_mps ?? null)} unit="KTS" color="accent" />
+                <MiniTelemetryCard label="ALTITUDE" value={formatAlt(telemetry?.pos?.alt_m ?? null)} unit="FT" color="primary" />
+                <MiniTelemetryCard label="HEADING" value={formatHdg(telemetry?.hdg_rad ?? null)} unit="°" color="accent" />
+                <MiniTelemetryCard label="MACH NO" value={formatMach(telemetry?.spd?.mach ?? null)} color="success" />
+                <MiniTelemetryCard label="TRUE AIRSPEED" value={formatTAS(telemetry?.spd?.tas_mps ?? null)} unit="KTS" color="accent" />
+              </div>
+            </DraggablePanel>
+          </div>
 
-          {/* Center: JARVIS logo */}
-          <div className="flex-1 flex items-center justify-center min-h-0">
+          {/* Center: JARVIS logo — hidden on mobile (decorative, wastes space) */}
+          <div className="hidden sm:flex flex-1 items-center justify-center min-h-0">
             <JarvisLogo />
           </div>
 
-          {/* Alert overlay */}
-          <div className="absolute bottom-24 left-1/2 -translate-x-1/2 w-full max-w-lg z-20">
+          {/* Alert overlay — adjusted bottom position for mobile */}
+          <div className="absolute bottom-4 sm:bottom-24 left-1/2 -translate-x-1/2 w-full max-w-lg z-20">
             <AlertOverlay alerts={alerts} />
           </div>
 
@@ -180,7 +202,7 @@ export function Dashboard() {
         </div>
 
         {/* Right Panel — G-Meter, AoA, VVI (compact, stacked) */}
-        <div className="bg-jarvis-bar border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
+        <div className="bg-jarvis-bar border-l-0 sm:border-l border-jarvis-border p-2 flex flex-col gap-2 overflow-hidden">
           <DraggablePanel panelId="g-meter" editMode={editMode} offset={getOffset('g-meter')} onUpdateOffset={updateOffset}>
             <CollapsibleWidget panelId="g-meter" title="G-METER" editMode={editMode}>
               <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
