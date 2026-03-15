@@ -39,7 +39,10 @@ export function Dashboard() {
     hasWarning,
     coaching,
     tactical,
+    isNetworkOffline,
   } = useTelemetryContext()
+
+  const isOffline = isNetworkOffline || telemetry === null
 
   const sessionId = currentSession?.id ?? null
 
@@ -119,6 +122,7 @@ export function Dashboard() {
               <ADI
                 pitchRad={telemetry?.att.pitch_rad ?? 0}
                 bankRad={telemetry?.att.bank_rad ?? 0}
+                isOffline={isOffline}
               />
             </div>
           </DraggablePanel>
@@ -137,6 +141,7 @@ export function Dashboard() {
               <EnginePanel
                 rpmPct={telemetry?.eng?.rpm_pct ?? 0}
                 fuelCon={telemetry?.eng?.fuel_con ?? 0}
+                isOffline={isOffline}
               />
             </CollapsibleWidget>
           </DraggablePanel>
@@ -206,7 +211,7 @@ export function Dashboard() {
         <div className="hidden md:flex bg-jarvis-bar md:border-l border-jarvis-border p-2 flex-col gap-2 overflow-hidden">
           <DraggablePanel panelId="g-meter" editMode={editMode} offset={getOffset('g-meter')} onUpdateOffset={updateOffset}>
             <CollapsibleWidget panelId="g-meter" title="G-METER" editMode={editMode}>
-              <GMeter gY={telemetry?.aero?.g?.y ?? 1} />
+              <GMeter gY={telemetry?.aero?.g?.y ?? 1} isOffline={isOffline} />
             </CollapsibleWidget>
           </DraggablePanel>
 
@@ -218,7 +223,7 @@ export function Dashboard() {
 
           <DraggablePanel panelId="vvi" editMode={editMode} offset={getOffset('vvi')} onUpdateOffset={updateOffset}>
             <CollapsibleWidget panelId="vvi" title="VERTICAL SPEED" editMode={editMode}>
-              <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} />
+              <VVITape vviMps={telemetry?.spd?.vvi_mps ?? 0} isOffline={isOffline} />
             </CollapsibleWidget>
           </DraggablePanel>
         </div>
