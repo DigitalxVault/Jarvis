@@ -222,3 +222,30 @@ canvas {
     transform: none !important;
   }
 }
+
+/* -- Reduced motion: disable volatile animations for screenshot stability -- */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blink {
+    animation: none;
+  }
+
+  .animate-pulse-glow {
+    animation: none;
+  }
+
+  .ticker-scroll {
+    animation: none;
+  }
+
+  .animate-warning {
+    animation: none;
+  }
+
+  .alert-overlay {
+    animation: none;
+  }
+
+  .animate-fade-in {
+    animation: none;
+  }
+}
