@@ -36,9 +36,6 @@ _DEFAULT_SUPABASE_KEY = (
     "G3rQI-x6cxAWEN9No8AWWyC_hBTj_vFRzm6QKyMX3sU"
 )
 
-# Web dashboard URL — defaults to localhost; set JARVIS_WEB_URL to override
-_WEB_URL_DEFAULT = "http://localhost:3000"
-
 log = logging.getLogger(__name__)
 
 
@@ -172,14 +169,12 @@ def main() -> None:
     # Also try the current working directory
     load_dotenv(override=False)
 
-    # --- Logging setup ---
+    # --- Logging setup (suppress all — TUI is the user interface) ---
     logging.basicConfig(
-        level=logging.WARNING,
+        level=logging.CRITICAL,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
         datefmt="%H:%M:%S",
     )
-    # Suppress noisy gRPC logs
-    logging.getLogger("grpc").setLevel(logging.ERROR)
 
     # --- CLI args ---
     parser = argparse.ArgumentParser(
@@ -200,31 +195,21 @@ def main() -> None:
 
     # --- Credential resolution ---
     supabase_url, api_key = _resolve_credentials()
-    using_defaults = supabase_url == _DEFAULT_SUPABASE_URL
-
-    print(f"[BRIDGE] Supabase URL: {supabase_url}")
-    print(f"[BRIDGE] Credentials: {'embedded defaults (anon key)' if using_defaults else 'from environment'}")
 
     # --- Channel resolution ---
     if args.channel:
         channel_topic = args.channel
-        print(f"[BRIDGE] Dev mode — using channel: {channel_topic}")
     elif args.code:
-        # POST /api/bridge/claim to exchange code → channel
-        # For now, construct channel name directly (same fallback as Node.js bridge)
         channel_topic = f"session:{args.code}"
-        print(f"[BRIDGE] Pairing code: {args.code} → channel: {channel_topic}")
     else:
         channel_topic = "session:dev"
-        print("[BRIDGE] No --channel or --code provided, using dev channel: session:dev")
 
-    # --- Auto-open browser ---
-    web_url = os.environ.get("JARVIS_WEB_URL", _WEB_URL_DEFAULT)
-    print(f"[BRIDGE] Opening browser: {web_url}")
-    webbrowser.open(web_url)
+    # --- Auto-open browser (only if JARVIS_WEB_URL is set) ---
+    web_url = os.environ.get("JARVIS_WEB_URL")
+    if web_url:
+        print(f"[BRIDGE] Opening browser: {web_url}")
+        webbrowser.open(web_url)
 
-    print(f"[BRIDGE] Starting bridge on channel: {channel_topic}")
-    print("[BRIDGE] Press Ctrl+C to stop\n")
 
     # --- Run asyncio event loop ---
     loop = asyncio.new_event_loop()

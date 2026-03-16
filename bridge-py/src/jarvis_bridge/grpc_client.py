@@ -76,15 +76,15 @@ class GrpcClient:
             async with grpc.aio.insecure_channel(self._target) as channel:
                 stub = mission_pb2_grpc.MissionServiceStub(channel)
                 request = mission_pb2.StreamUnitsRequest(poll_rate=1)
-                self._connected = True
-                self._ever_connected = True
-                log.info("gRPC: stream started (StreamUnits, poll_rate=1)")
                 async for response in stub.StreamUnits(request):
+                    if not self._connected:
+                        self._connected = True
+                        self._ever_connected = True
                     self._process_response(response)
-        except grpc.aio.AioRpcError as exc:
-            log.error("gRPC: stream error — %s: %s", exc.code(), exc.details())
-        except Exception as exc:  # noqa: BLE001
-            log.error("gRPC: unexpected error — %s", exc)
+        except grpc.aio.AioRpcError:
+            pass  # Handled by reconnect loop
+        except Exception:  # noqa: BLE001
+            pass  # Handled by reconnect loop
         finally:
             self._connected = False
             log.info("gRPC: stream ended")
