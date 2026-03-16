@@ -204,11 +204,9 @@ def main() -> None:
     else:
         channel_topic = "session:dev"
 
-    # --- Auto-open browser (only if JARVIS_WEB_URL is set) ---
-    web_url = os.environ.get("JARVIS_WEB_URL")
-    if web_url:
-        print(f"[BRIDGE] Opening browser: {web_url}")
-        webbrowser.open(web_url)
+    # --- Auto-open browser ---
+    web_url = os.environ.get("JARVIS_WEB_URL", "https://jarvis-web-ecru.vercel.app")
+    webbrowser.open(web_url)
 
 
     # --- Run asyncio event loop ---
