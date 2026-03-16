@@ -135,7 +135,7 @@ export function EnginePanel({ rpmPct, fuelCon, isOffline = false }: EnginePanelP
               FUEL FLOW
             </span>
             <span className="text-xl font-bold text-jarvis-accent glow-accent tabular-nums">
-              {isOffline ? '--.-' : fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'} <span className="text-[13px] opacity-60">PPH</span>
+              {isOffline ? '---' : fuelCon > 0 ? Math.round(fuelCon * 7937).toLocaleString() : '---'} <span className="text-[13px] opacity-60">PPH</span>
             </span>
           </div>
         </div>
@@ -158,7 +158,7 @@ export function EnginePanel({ rpmPct, fuelCon, isOffline = false }: EnginePanelP
           <div>
             <span className="text-[11px] opacity-40">FF </span>
             <span className={`text-[18px] font-bold tabular-nums ${isOffline ? 'text-jarvis-muted opacity-40' : 'text-jarvis-accent'}`}>
-              {isOffline ? '--.-' : fuelCon > 0 ? fuelCon.toFixed(1) : '--.-'}
+              {isOffline ? '---' : fuelCon > 0 ? Math.round(fuelCon * 7937).toLocaleString() : '---'}
             </span>
             <span className="text-[11px] opacity-40 ml-0.5">PPH</span>
           </div>
