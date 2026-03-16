@@ -1,7 +1,32 @@
 /**
  * ElevenLabs TTS client — calls our /api/tts proxy route (server-side key).
- * Plays audio via Web Audio API.
+ * Plays audio via Web Audio API. Reuses a single AudioContext to avoid
+ * browser gesture restrictions.
  */
+
+let _sharedAudioCtx: AudioContext | null = null
+
+function getAudioContext(): AudioContext {
+  if (!_sharedAudioCtx || _sharedAudioCtx.state === 'closed') {
+    _sharedAudioCtx = new AudioContext()
+  }
+  // Resume if suspended (browser auto-suspends without user gesture)
+  if (_sharedAudioCtx.state === 'suspended') {
+    _sharedAudioCtx.resume()
+  }
+  return _sharedAudioCtx
+}
+
+// Pre-warm AudioContext on first user gesture
+if (typeof document !== 'undefined') {
+  const warmUp = () => {
+    getAudioContext()
+    document.removeEventListener('click', warmUp)
+    document.removeEventListener('keydown', warmUp)
+  }
+  document.addEventListener('click', warmUp, { once: true })
+  document.addEventListener('keydown', warmUp, { once: true })
+}
 
 export interface TTSOptions {
   text: string
@@ -72,11 +97,11 @@ export function speakWithElevenLabs(
       offset += chunk.length
     }
 
-    // Decode and play
-    const audioCtx = new AudioContext()
-    const audioBuffer = await audioCtx.decodeAudioData(combined.buffer)
+    // Decode and play using shared AudioContext
+    const audioCtx = getAudioContext()
+    const audioBuffer = await audioCtx.decodeAudioData(combined.buffer.slice(0))
 
-    if (aborted) { await audioCtx.close(); return }
+    if (aborted) return
 
     sourceNode = audioCtx.createBufferSource()
     sourceNode.buffer = audioBuffer
@@ -84,7 +109,6 @@ export function speakWithElevenLabs(
 
     return new Promise<void>((resolve) => {
       sourceNode!.onended = () => {
-        audioCtx.close()
         resolve()
       }
       sourceNode!.start()

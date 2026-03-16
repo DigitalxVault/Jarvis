@@ -9,15 +9,18 @@ import { useJarvisVoice } from '@/providers/jarvis-voice-provider'
 export function VoiceIndicator() {
   const { voiceState } = useJarvisVoice()
 
-  const config = {
-    idle: { color: 'text-jarvis-muted', pulse: false, label: 'VOICE OFF' },
+  const configs: Record<string, { color: string; pulse: boolean; label: string }> = {
+    idle: { color: 'text-jarvis-muted', pulse: false, label: 'CLICK TO ENABLE' },
     listening: { color: 'text-jarvis-accent', pulse: false, label: 'LISTENING' },
     'wake-detected': { color: 'text-jarvis-success', pulse: true, label: 'JARVIS' },
     recording: { color: 'text-jarvis-danger', pulse: true, label: 'RECORDING' },
     processing: { color: 'text-jarvis-warning', pulse: true, label: 'THINKING' },
     speaking: { color: 'text-jarvis-success', pulse: true, label: 'SPEAKING' },
     error: { color: 'text-jarvis-danger', pulse: false, label: 'MIC ERR' },
-  }[voiceState]
+    limit: { color: 'text-jarvis-warning', pulse: false, label: 'MIC IN USE' },
+  }
+
+  const config = configs[voiceState] || configs.idle
 
   return (
     <div className="flex items-center gap-1.5" title={`Voice: ${config.label}`}>

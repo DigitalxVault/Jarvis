@@ -8,7 +8,7 @@ import { useAudioRecorder } from '@/hooks/use-audio-recorder'
 import { useJarvisBrain } from '@/hooks/use-jarvis-brain'
 import { useVoiceCues } from '@/hooks/use-voice-cues'
 
-type VoiceState = 'idle' | 'listening' | 'wake-detected' | 'recording' | 'processing' | 'speaking' | 'error'
+type VoiceState = 'idle' | 'listening' | 'wake-detected' | 'recording' | 'processing' | 'speaking' | 'error' | 'limit'
 
 interface JarvisVoiceContextValue {
   voiceState: VoiceState
@@ -96,6 +96,7 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
 
   // Derive composite voice state
   const voiceState: VoiceState =
+    wakeWordState === 'limit' ? 'limit' :
     wakeWordState === 'error' ? 'error' :
     isSpeaking.current ? 'speaking' :
     recorderState === 'processing' ? 'processing' :

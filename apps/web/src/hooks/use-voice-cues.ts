@@ -5,8 +5,14 @@ import type { ConnectionState } from '@/hooks/use-telemetry'
 import type { ActiveAlert } from '@jarvis-dcs/shared'
 import type { SpeechPriority } from '@/hooks/use-jarvis-tts'
 
+/** Minimum seconds between repeated connection state voice cues */
+const CONNECTION_CUE_COOLDOWN_S = 15
+/** Minimum seconds between repeated alert voice cues for the same rule */
+const ALERT_CUE_COOLDOWN_S = 30
+
 /**
  * Triggers Jarvis voice cues on connection state changes and telemetry alerts.
+ * Has cooldowns to prevent flip-flop spam when DCS pauses/resumes.
  */
 export function useVoiceCues(
   connectionState: ConnectionState,
@@ -15,66 +21,79 @@ export function useVoiceCues(
   enabled: boolean = true,
 ) {
   const prevConnectionRef = useRef<ConnectionState>(connectionState)
-  const spokenAlertIds = useRef<Set<string>>(new Set())
   const hasGreeted = useRef(false)
+  // Cooldown tracking: last time we spoke each cue type
+  const lastConnectionCueAt = useRef<Record<string, number>>({})
+  const lastAlertCueAt = useRef<Record<string, number>>({})
 
-  // Connection state voice cues
+  // Connection state voice cues (with cooldown)
   useEffect(() => {
     if (!enabled) return
     const prev = prevConnectionRef.current
     prevConnectionRef.current = connectionState
+    const now = Date.now() / 1000
 
     // Initial greeting on first connect
-    if (!hasGreeted.current && connectionState === 'dcs_offline') {
+    if (!hasGreeted.current && (connectionState === 'dcs_offline' || connectionState === 'connected')) {
       hasGreeted.current = true
-      speak('JARVIS online. System initiated. Awaiting DCS launch.', 'P2')
+      if (connectionState === 'connected') {
+        speak(
+          'Good day sir. I\'m JARVIS, your AI co-pilot. I\'ll be monitoring your systems and providing guidance throughout your flight. Ready when you are.',
+          'P2',
+        )
+      } else {
+        speak(
+          'Good day sir. I\'m JARVIS, your AI co-pilot. Systems are online and I\'m standing by. I\'ll be right here when you launch your mission.',
+          'P2',
+        )
+      }
+      lastConnectionCueAt.current['greeting'] = now
       return
     }
 
-    // State transitions
+    // State transitions — skip if same or within cooldown
     if (prev === connectionState) return
 
     if (connectionState === 'connected' && prev !== 'connected') {
-      speak('DCS connected. Telemetry stream active. Ready for your next flight.', 'P2')
+      const lastSpoke = lastConnectionCueAt.current['connected'] || 0
+      if (now - lastSpoke < CONNECTION_CUE_COOLDOWN_S) return
+      lastConnectionCueAt.current['connected'] = now
+      speak('DCS connected sir. Telemetry stream is active. Have a good flight.', 'P2')
     } else if (connectionState === 'dcs_offline' && prev === 'connected') {
-      speak('DCS connection lost. Standing by for reconnect.', 'P2')
-    } else if (connectionState === 'reconnecting') {
-      speak('Reconnecting.', 'P3')
+      const lastSpoke = lastConnectionCueAt.current['dcs_offline'] || 0
+      if (now - lastSpoke < CONNECTION_CUE_COOLDOWN_S) return
+      lastConnectionCueAt.current['dcs_offline'] = now
+      speak('DCS telemetry paused. Standing by sir.', 'P3')
     }
+    // Don't announce 'reconnecting' — too noisy
   }, [connectionState, speak, enabled])
 
-  // Alert voice cues
+  // Alert voice cues (with per-rule cooldown, friendly trainer style)
   useEffect(() => {
     if (!enabled) return
+    const now = Date.now() / 1000
 
     for (const alert of alerts) {
-      if (spokenAlertIds.current.has(alert.ruleId)) continue
-      spokenAlertIds.current.add(alert.ruleId)
+      const lastSpoke = lastAlertCueAt.current[alert.ruleId] || 0
+      if (now - lastSpoke < ALERT_CUE_COOLDOWN_S) continue
+      lastAlertCueAt.current[alert.ruleId] = now
 
       const priority: SpeechPriority = alert.severity === 'critical' ? 'P1' : 'P2'
 
-      // Map alert IDs to voice lines
+      // Friendly trainer-style voice lines
       const lines: Record<string, string> = {
-        pull_up: 'Warning. Low altitude. Pull up.',
-        over_g: 'Caution. Excessive G-load.',
-        stall: 'Warning. High angle of attack. Reduce pitch.',
-        bingo_fuel: 'Caution. Bingo fuel. Consider return to base.',
-        over_speed: 'Caution. Speed exceeding safe limits.',
-        high_descent: 'Warning. High descent rate.',
-        low_speed: 'Caution. Speed below safe margin.',
-        bank_angle: 'Caution. Excessive bank angle.',
+        pull_up: 'Sir, your altitude is critically low. Pull up immediately.',
+        over_g: 'Sir, you\'re pulling excessive G. Ease off the stick to stay within limits.',
+        stall: 'Sir, your angle of attack is getting high. Reduce pitch or add power to avoid a stall.',
+        bingo_fuel: 'Sir, you\'re at bingo fuel. I\'d recommend heading back to base soon.',
+        over_speed: 'Sir, you\'re exceeding safe speed limits. Reduce throttle or pull back gently.',
+        high_descent: 'Sir, high descent rate. Level off when you can.',
+        low_speed: 'Caution sir, your airspeed is getting low. Consider adding power.',
+        bank_angle: 'Sir, your bank angle is quite steep. Level the wings slightly.',
       }
 
-      const line = lines[alert.ruleId] || `Alert. ${alert.ruleId.replace(/_/g, ' ')}.`
+      const line = lines[alert.ruleId] || `Heads up sir, ${alert.ruleId.replace(/_/g, ' ')} alert.`
       speak(line, priority)
-    }
-
-    // Clean up spoken alerts that are no longer active
-    const activeIds = new Set(alerts.map(a => a.ruleId))
-    for (const id of spokenAlertIds.current) {
-      if (!activeIds.has(id)) {
-        spokenAlertIds.current.delete(id)
-      }
     }
   }, [alerts, speak, enabled])
 }

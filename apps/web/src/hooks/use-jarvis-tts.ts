@@ -15,12 +15,16 @@ interface QueuedSpeech {
  *
  * - P1 (critical): Interrupts current speech immediately
  * - P2 (warning):  Queues behind active speech, plays next
- * - P3 (info):     Waits for silence before speaking
+ * - P3 (info):     Queues at end, dropped if queue is too long
+ *
+ * Deduplicates: won't queue the same text that's already queued.
+ * Max queue size of 3 to prevent buildup during flip-flop.
  */
 export function useJarvisTTS() {
   const queueRef = useRef<QueuedSpeech[]>([])
   const isSpeakingRef = useRef(false)
   const abortRef = useRef<(() => void) | null>(null)
+  const currentTextRef = useRef<string>('')
 
   const processQueue = useCallback(async () => {
     if (isSpeakingRef.current || queueRef.current.length === 0) return
@@ -33,6 +37,7 @@ export function useJarvisTTS() {
 
     const next = queueRef.current.shift()!
     isSpeakingRef.current = true
+    currentTextRef.current = next.text
 
     try {
       const { promise, abort } = speakWithElevenLabs({ text: next.text })
@@ -43,6 +48,7 @@ export function useJarvisTTS() {
     } finally {
       isSpeakingRef.current = false
       abortRef.current = null
+      currentTextRef.current = ''
       // Process next item
       processQueue()
     }
@@ -51,18 +57,28 @@ export function useJarvisTTS() {
   const speak = useCallback((text: string, priority: SpeechPriority = 'P3') => {
     if (!text.trim()) return
 
+    // Deduplicate: skip if this exact text is already queued or currently playing
+    if (currentTextRef.current === text) return
+    if (queueRef.current.some(s => s.text === text)) return
+
     if (priority === 'P1') {
       // P1: Interrupt current speech
       if (abortRef.current) {
         abortRef.current()
         isSpeakingRef.current = false
         abortRef.current = null
+        currentTextRef.current = ''
       }
-      // Clear any P3 items from queue (they can wait)
-      queueRef.current = queueRef.current.filter(s => s.priority !== 'P3')
+      // Clear lower-priority items
+      queueRef.current = queueRef.current.filter(s => s.priority === 'P1')
       // Add at front
       queueRef.current.unshift({ text, priority })
     } else {
+      // Cap queue at 3 to prevent buildup
+      if (queueRef.current.length >= 3) {
+        // Drop lowest priority item from end
+        queueRef.current.pop()
+      }
       queueRef.current.push({ text, priority })
     }
 
@@ -77,6 +93,7 @@ export function useJarvisTTS() {
       abortRef.current()
       isSpeakingRef.current = false
       abortRef.current = null
+      currentTextRef.current = ''
     }
     queueRef.current = []
   }, [])
