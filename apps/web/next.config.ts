@@ -16,6 +16,20 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      {
+        // Required for Porcupine wake word (SharedArrayBuffer)
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'credentialless',
+          },
+        ],
+      },
     ]
   },
 };
