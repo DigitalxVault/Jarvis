@@ -116,9 +116,11 @@ export function VVITape({ vviMps, isOffline = false }: VVITapeProps) {
       ctx.fill()
       ctx.shadowBlur = 0
 
-      // Center value display
+      // Center value display — size adapts to digit count
       ctx.fillStyle = indicatorColor
-      ctx.font = 'bold 48px "Courier New"'
+      const absVal = Math.abs(Math.round(vviFpm))
+      const fontSize = absVal >= 1000 ? 28 : 36
+      ctx.font = `bold ${fontSize}px "Courier New"`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
 
@@ -126,9 +128,9 @@ export function VVITape({ vviMps, isOffline = false }: VVITapeProps) {
       const displayValue = `${sign}${Math.round(vviFpm)}`
       ctx.fillText(displayValue, cx, cy + 30)
 
-      ctx.font = '14px "Courier New"'
+      ctx.font = '12px "Courier New"'
       ctx.fillStyle = 'rgba(0, 212, 255, 0.5)'
-      ctx.fillText('FPM', cx, cy + 52)
+      ctx.fillText('FPM', cx, cy + 48)
     } else {
       // Offline: draw NO DATA text at center
       ctx.fillStyle = 'rgba(0, 212, 255, 0.15)'

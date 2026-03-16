@@ -148,6 +148,23 @@ class SupabasePublisher:
             self._backoff_s = min(self._backoff_s * 2, self._MAX_BACKOFF_S)
 
     # ------------------------------------------------------------------
+    # Raw event publish (tactical, etc.)
+    # ------------------------------------------------------------------
+
+    async def publish_raw(self, event: str, payload: dict[str, Any]) -> None:
+        """Publish an arbitrary event payload, ignoring backoff.
+
+        Used for low-frequency events like tactical data (~1 Hz) that
+        should be forwarded as-is from the Lua exporter.
+        """
+        try:
+            await self.broadcast(event, payload)
+            self._total_published += 1
+            self._backoff_s = self._BASE_BACKOFF_S
+        except Exception:
+            self._total_errors += 1
+
+    # ------------------------------------------------------------------
     # Health check
     # ------------------------------------------------------------------
 

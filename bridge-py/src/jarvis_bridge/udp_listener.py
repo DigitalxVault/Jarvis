@@ -95,6 +95,7 @@ class UdpListener:
         self.state: CockpitState = CockpitState()
         self.position_state: UdpPositionState = UdpPositionState()
         self.packet_count: int = 0
+        self.latest_tactical: dict | None = None
         self._transport: asyncio.BaseTransport | None = None
         self._first_packet_logged: bool = False
 
@@ -136,8 +137,10 @@ class UdpListener:
             self._handle_cockpit(packet)
         elif pkt_type == "telemetry":
             self._handle_telemetry(packet)
+        elif pkt_type == "tactical":
+            self.latest_tactical = packet
         else:
-            return  # ignore unknown types (e.g. "tactical")
+            return  # ignore unknown types
 
     def _handle_cockpit(self, packet: dict) -> None:
         """Parse a v3.0 flat cockpit packet."""

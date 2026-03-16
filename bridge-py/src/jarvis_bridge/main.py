@@ -128,10 +128,18 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
     # --- 4 Hz publish loop ---
     async def _publish_loop() -> None:
         interval = 1.0 / 4
+        last_tactical = None
         while True:
             packet = normalizer.get_packet()
             if packet is not None:
                 await publisher.publish_telemetry(packet)
+
+            # Forward tactical packets from Lua (~1 Hz)
+            tac = udp_listener.latest_tactical
+            if tac is not None and tac is not last_tactical:
+                last_tactical = tac
+                await publisher.publish_raw("tactical", tac)
+
             await asyncio.sleep(interval)
 
     # --- Gather all tasks ---
