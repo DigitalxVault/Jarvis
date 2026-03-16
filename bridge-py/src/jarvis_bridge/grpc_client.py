@@ -57,11 +57,17 @@ class GrpcClient:
         self._target = target
         self.state: GrpcState = GrpcState()
         self._connected: bool = False
+        self._ever_connected: bool = False
 
     @property
     def connected(self) -> bool:
         """True while the gRPC stream is active and receiving data."""
         return self._connected
+
+    @property
+    def ever_connected(self) -> bool:
+        """True if gRPC has connected at least once this session."""
+        return self._ever_connected
 
     async def run(self) -> None:
         """Connect and stream units; logs error on failure then returns."""
@@ -71,6 +77,7 @@ class GrpcClient:
                 stub = mission_pb2_grpc.MissionServiceStub(channel)
                 request = mission_pb2.StreamUnitsRequest(poll_rate=1)
                 self._connected = True
+                self._ever_connected = True
                 log.info("gRPC: stream started (StreamUnits, poll_rate=1)")
                 async for response in stub.StreamUnits(request):
                     self._process_response(response)

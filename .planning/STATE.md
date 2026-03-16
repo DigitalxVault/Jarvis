@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 15 of 24 (Python Bridge + DCS-gRPC) — In progress
-Plan: 3 of 4 complete (15-01, 15-02, 15-03 done; 15-04 pending)
-Status: In progress
-Last activity: 2026-03-15 — Completed 15-02-PLAN.md (gRPC client + UDP listener + Normalizer stream merger)
+Phase: 15 of 24 (Python Bridge + DCS-gRPC) — Phase complete (checkpoint pending)
+Plan: 4 of 4 complete (15-01, 15-02, 15-03, 15-04 done)
+Status: Checkpoint — awaiting human verification
+Last activity: 2026-03-15 — Completed 15-04-PLAN.md (main.py integration + Rich TUI + pnpm wiring)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [###.......] 30% Phase 15 plans 01+02+03 done (plan 04 pending)
+Progress: v3.0 [####......] 38% Phase 15 all 4 plans done (checkpoint pending before Phase 16)
 
 ## Performance Metrics
 
@@ -157,14 +157,18 @@ Amendment decisions (2026-03-13):
 | D-1505 | broadcast() raises; publish_telemetry() catches | Clean separation — raw broadcast usable by heartbeat; telemetry path handles all errors |
 | D-1506 | flush_buffer() oldest-first, stop on first error | Preserves order; cleanly re-enters backoff on flush failure |
 | D-1507 | Heartbeat swallows errors except CancelledError | Non-critical path; CancelledError must propagate for stop() to work correctly |
+| D-1541 | _sync_normalizer 50ms poll copies state by assignment | Simple; no observer pattern needed at 4Hz |
+| D-1542 | retry_count nonlocal int + getter closure for TUI | Clean encapsulation without coupling |
+| D-1543 | JARVIS_LOCAL_DEV env var → localhost:3000 | Developer toggle without extra CLI flag |
+| D-1544 | dotenv loads from bridge-py/.env and cwd both | Works from repo root (pnpm) and bridge-py/ dir |
 
 ### Pending Todos
 
 **v2.0:** COMPLETE — all 49 requirements shipped (REQ-200 to REQ-248)
 
 **v3.0 (in progress):**
-- Plan 15-02: COMPLETE — gRPC client + UDP listener + Normalizer
-- Plan 15-04: Integration + full TelemetryPacket assembly + Supabase publish
+- Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
+- Plan 15-04: main.py integration + Rich TUI + pnpm wiring — DONE (checkpoint pending)
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
 
@@ -185,5 +189,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-15
-Stopped at: Completed 15-02-PLAN.md (gRPC client + UDP listener + Normalizer)
-Resume file: .planning/phases/15-python-bridge-dcs-grpc/15-04-PLAN.md
+Stopped at: Checkpoint — 15-04-PLAN.md complete, awaiting human verify before Phase 16
+Resume file: None (checkpoint — human must approve before Phase 16 begins)

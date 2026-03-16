@@ -36,9 +36,8 @@ _DEFAULT_SUPABASE_KEY = (
     "G3rQI-x6cxAWEN9No8AWWyC_hBTj_vFRzm6QKyMX3sU"
 )
 
-# Web dashboard URL — local dev if env flag set, else production
-_WEB_URL_PROD = "https://jarvis-dcs.vercel.app"
-_WEB_URL_LOCAL = "http://localhost:3000"
+# Web dashboard URL — defaults to localhost; set JARVIS_WEB_URL to override
+_WEB_URL_DEFAULT = "http://localhost:3000"
 
 log = logging.getLogger(__name__)
 
@@ -79,11 +78,6 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         channel_topic=channel_topic,
     )
 
-    retry_count = 0  # mutable via closure
-
-    def _get_retry_count() -> int:
-        return retry_count
-
     heartbeat = Heartbeat(
         publisher=publisher,
         get_dcs_active=lambda: normalizer.dcs_active,
@@ -95,7 +89,6 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         grpc_client=grpc_client,
         udp_listener=udp_listener,
         publisher=publisher,
-        get_retry_count=_get_retry_count,
     )
 
     # --- Supabase health check ---
@@ -120,7 +113,6 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
 
     # --- gRPC reconnect loop (forever, exponential backoff) ---
     async def _grpc_loop() -> None:
-        nonlocal retry_count
         backoff = 1.0
         max_backoff = 30.0
         while True:
@@ -128,13 +120,10 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
                 await grpc_client.run()
                 # run() returned normally (stream ended) — reset backoff
                 backoff = 1.0
-                retry_count = 0
             except asyncio.CancelledError:
                 raise
             except Exception as exc:  # noqa: BLE001
                 log.debug("gRPC loop error: %s", exc)
-            retry_count += 1
-            log.debug("gRPC: reconnecting in %.1fs (attempt %d)", backoff, retry_count)
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
 
@@ -230,7 +219,7 @@ def main() -> None:
         print("[BRIDGE] No --channel or --code provided, using dev channel: session:dev")
 
     # --- Auto-open browser ---
-    web_url = _WEB_URL_LOCAL if os.environ.get("JARVIS_LOCAL_DEV") else _WEB_URL_PROD
+    web_url = os.environ.get("JARVIS_WEB_URL", _WEB_URL_DEFAULT)
     print(f"[BRIDGE] Opening browser: {web_url}")
     webbrowser.open(web_url)
 

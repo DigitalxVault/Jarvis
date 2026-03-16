@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import asyncio
 import time
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 from rich.console import Console
 from rich.layout import Layout
@@ -25,12 +25,18 @@ if TYPE_CHECKING:
 _REFRESH_HZ = 4
 
 
-def _status_text(connected: bool, backoff: bool = False) -> Text:
+def _grpc_status_text(connected: bool, ever_connected: bool) -> Text:
     if connected:
         return Text("Connected", style="bold green")
-    if backoff:
-        return Text("Disconnected (backing off)", style="bold yellow")
-    return Text("Disconnected (retrying...)", style="bold red")
+    if ever_connected:
+        return Text("Reconnecting...", style="bold yellow")
+    return Text("Waiting for DCS...", style="dim")
+
+
+def _supabase_status_text(is_backing_off: bool) -> Text:
+    if is_backing_off:
+        return Text("Backing off", style="bold yellow")
+    return Text("Connected", style="bold green")
 
 
 def _build_table(
@@ -38,12 +44,12 @@ def _build_table(
     channel: str,
     uptime_s: float,
     grpc_connected: bool,
+    grpc_ever_connected: bool,
     udp_packets: int,
     published: int,
     errors: int,
     buffer_size: int,
     is_backing_off: bool,
-    grpc_retry_count: int,
 ) -> Table:
     """Build the stats table displayed inside the TUI panel."""
     t = Table.grid(padding=(0, 2))
@@ -54,15 +60,13 @@ def _build_table(
     hrs, mins = divmod(mins, 60)
     uptime_str = f"{hrs:02d}:{mins:02d}:{secs:02d}"
 
-    grpc_text = _status_text(grpc_connected)
-    supabase_text = _status_text(not is_backing_off, backoff=is_backing_off)
+    grpc_text = _grpc_status_text(grpc_connected, grpc_ever_connected)
+    supabase_text = _supabase_status_text(is_backing_off)
 
     t.add_row("Channel", Text(channel, style="bold white"))
     t.add_row("Uptime", uptime_str)
     t.add_row("", "")
     t.add_row("DCS-gRPC", grpc_text)
-    if grpc_retry_count > 0:
-        t.add_row("  retries", str(grpc_retry_count))
     t.add_row("UDP Export", Text(f"{udp_packets} packets received", style="green" if udp_packets > 0 else "dim"))
     t.add_row("", "")
     t.add_row("Supabase", supabase_text)
@@ -91,13 +95,11 @@ class BridgeTUI:
         grpc_client: "GrpcClient",
         udp_listener: "UdpListener",
         publisher: "SupabasePublisher",
-        get_retry_count: Callable[[], int],
     ) -> None:
         self._channel = channel
         self._grpc = grpc_client
         self._udp = udp_listener
         self._publisher = publisher
-        self._get_retry_count = get_retry_count
         self._start_time = time.monotonic()
         self._console = Console()
 
@@ -107,12 +109,12 @@ class BridgeTUI:
             channel=self._channel,
             uptime_s=uptime,
             grpc_connected=self._grpc.connected,
+            grpc_ever_connected=self._grpc.ever_connected,
             udp_packets=self._udp.packet_count,
             published=self._publisher.total_published,
             errors=self._publisher.total_errors,
             buffer_size=self._publisher.buffer_size,
             is_backing_off=self._publisher.is_backing_off,
-            grpc_retry_count=self._get_retry_count(),
         )
         return Panel(
             table,
