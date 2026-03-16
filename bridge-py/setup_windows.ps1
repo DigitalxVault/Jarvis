@@ -25,7 +25,7 @@ if ($LASTEXITCODE -ne 0) {
     exit 1
 }
 
-# 3. Create __init__.py files so Python can import the generated packages
+# 3. Delete any corrupted __init__.py files from previous attempts, then recreate
 Write-Host "Creating __init__.py files..." -ForegroundColor Yellow
 $dirs = @(
     "generated",
@@ -42,9 +42,10 @@ $dirs = @(
 
 foreach ($dir in $dirs) {
     $file = Join-Path $dir "__init__.py"
-    if (-not (Test-Path $file)) {
-        $null > $file
+    if (Test-Path $file) {
+        Remove-Item $file -Force
     }
+    [System.IO.File]::WriteAllText($file, "", [System.Text.Encoding]::UTF8)
 }
 
 # 4. Verify imports work
