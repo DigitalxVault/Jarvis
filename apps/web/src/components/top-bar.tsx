@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectionStatus } from './connection-status'
+import { VoiceIndicator } from './voice-indicator'
 import { JarvisLogo } from './jarvis-logo'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
@@ -102,6 +103,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
             LAYOUT
           </button>
         )}
+        <VoiceIndicator />
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
           <div className="text-lg font-bold glow-text tabular-nums">{clock}</div>

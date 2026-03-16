@@ -13,6 +13,9 @@ importers:
       '@jarvis-dcs/shared':
         specifier: workspace:*
         version: link:../../packages/shared
+      '@picovoice/porcupine-web':
+        specifier: ^4.0.0
+        version: 4.0.0
       '@supabase/supabase-js':
         specifier: ^2.97.0
         version: 2.97.0
@@ -617,6 +620,15 @@ packages:
   '@panva/hkdf@1.2.1':
     resolution: {integrity: sha512-6oclG6Y3PiDFcoyk8srjLfVKyMfVCKJ27JwNPViuXziFpmdz+MZnZN/aKY0JGXgYuO/VghU0jcOAZgWXZ1Dmrw==}
 
+  '@picovoice/porcupine-web@4.0.0':
+    resolution: {integrity: sha512-YqXBp6R9od6NTgcm80UyyB71c4eBArxD3BtX1SKQC4/xAvThM2VgwtPj4J7gvjl9yqqlcr+0Mg3T4lbKIOziTw==}
+    engines: {node: '>=18'}
+
+  '@picovoice/web-utils@1.4.3':
+    resolution: {integrity: sha512-7JN3YYsSD9Gtce6YKG3XqpX49dkeu7jTdbox7rHQA/X/Q3zxopXA9zlCKSq6EIjFbiX2iuzDKUx1XrFa3d8c0w==}
+    engines: {node: '>=14'}
+    hasBin: true
+
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
 
@@ -1056,6 +1068,10 @@ packages:
 
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+
+  commander@10.0.1:
+    resolution: {integrity: sha512-y4Mg2tXshplEbSGzx7amzPwKKOCGuoSRP/CjEdwwk0FOGlUbq6lKuoyDZTNZkmxHdJtp54hdfY/JUrdL7Xfdug==}
+    engines: {node: '>=14'}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -2661,6 +2677,14 @@ snapshots:
 
   '@panva/hkdf@1.2.1': {}
 
+  '@picovoice/porcupine-web@4.0.0':
+    dependencies:
+      '@picovoice/web-utils': 1.4.3
+
+  '@picovoice/web-utils@1.4.3':
+    dependencies:
+      commander: 10.0.1
+
   '@rtsao/scc@1.1.0': {}
 
   '@supabase/auth-js@2.97.0':
@@ -3117,6 +3141,8 @@ snapshots:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
+
+  commander@10.0.1: {}
 
   concat-map@0.0.1: {}
 

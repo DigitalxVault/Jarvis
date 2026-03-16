@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 import { TelemetryProvider } from '@/providers/telemetry-provider'
+import { JarvisVoiceProvider } from '@/providers/jarvis-voice-provider'
 import { SwRegister } from '@/components/pwa/sw-register'
 import { UpdateBanner } from '@/components/pwa/update-banner'
 import { OfflineBanner } from '@/components/pwa/offline-banner'
@@ -36,7 +37,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <TelemetryProvider>
-          {children}
+          <JarvisVoiceProvider>
+            {children}
+          </JarvisVoiceProvider>
         </TelemetryProvider>
         <SwRegister />
         <UpdateBanner />
