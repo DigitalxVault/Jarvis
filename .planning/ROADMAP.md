@@ -233,13 +233,13 @@ Plans:
 
 **Dependencies:** v2.0 complete (Phases 10-14); DCS-gRPC mod installed
 
-**Plans:** ~4 plans (scaffold, gRPC client, Supabase publisher, resilience)
+**Plans:** 4 plans in 3 waves
 
 Plans:
-- [ ] 15-01-PLAN.md -- Python project scaffold (pyproject.toml, venv, structure)
-- [ ] 15-02-PLAN.md -- DCS-gRPC client (connect, extract telemetry)
-- [ ] 15-03-PLAN.md -- Supabase REST publisher (broadcast telemetry + heartbeat)
-- [ ] 15-04-PLAN.md -- Resilience (DCS disconnect retry, auto-open browser, status reporting)
+- [ ] 15-01-PLAN.md -- Scaffold: uv project, Pydantic models, JSON Schema, proto stubs, minimal Export.lua
+- [ ] 15-02-PLAN.md -- gRPC client + UDP listener + normalizer (hybrid telemetry streams)
+- [ ] 15-03-PLAN.md -- Supabase REST publisher + heartbeat system
+- [ ] 15-04-PLAN.md -- Main entry point, Rich TUI, CLI, resilience, pnpm wiring
 
 **Requirements:**
 - REQ-300 -- DCS-gRPC mod installed and verified

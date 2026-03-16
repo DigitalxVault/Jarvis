@@ -106,6 +106,7 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         while True:
             normalizer.grpc_state = grpc_client.state
             normalizer.cockpit_state = udp_listener.state
+            normalizer.udp_position_state = udp_listener.position_state
             await asyncio.sleep(0.05)
 
     # --- gRPC reconnect loop (forever, exponential backoff) ---

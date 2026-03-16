@@ -21,7 +21,7 @@ from jarvis_bridge.models import (
     Speed,
     TelemetryPacket,
 )
-from jarvis_bridge.udp_listener import CockpitState
+from jarvis_bridge.udp_listener import CockpitState, UdpPositionState
 
 # Time (seconds) after last update before a stream is considered stale.
 _STALENESS_S: float = 3.0
@@ -34,31 +34,67 @@ def _stale(last_update: float) -> bool:
     return (time.monotonic() - last_update) > _STALENESS_S
 
 
-def merge(grpc: GrpcState, cockpit: CockpitState) -> TelemetryPacket:
-    """Merge GrpcState and CockpitState into a TelemetryPacket.
+def merge(
+    grpc: GrpcState,
+    cockpit: CockpitState,
+    udp_pos: UdpPositionState | None = None,
+) -> TelemetryPacket:
+    """Merge GrpcState + CockpitState (+ optional UDP position) into a TelemetryPacket.
 
-    Uses t_model from whichever source is fresher. Falls back to 0.0
-    when no data has been received.
+    When gRPC has never connected (``grpc.last_update == 0.0``) but we have
+    UDP position data from v2.0 ``"telemetry"`` packets, the UDP position is
+    used as a fallback for lat/lon/alt, attitude, heading, and TAS.
     """
+    # Decide position/attitude source: gRPC preferred, UDP fallback.
+    grpc_available = grpc.last_update != 0.0
+    udp_pos_available = udp_pos is not None and udp_pos.last_update != 0.0
+
     # Use the most recent model time as the packet timestamp.
     t_model = max(grpc.t_model, cockpit.t_model)
+    if udp_pos_available:
+        t_model = max(t_model, udp_pos.t_model)  # type: ignore[union-attr]
 
-    pos = Position(
-        lat=grpc.lat,
-        lon=grpc.lon,
-        alt_m=grpc.alt_m,
-        alt_agl_m=cockpit.alt_agl_m if cockpit.alt_agl_m != 0.0 else None,
-    )
-
-    att = Attitude(
-        pitch_rad=grpc.pitch_rad,
-        bank_rad=grpc.bank_rad,
-        yaw_rad=grpc.yaw_rad,
-    )
+    if grpc_available:
+        # gRPC connected — use it for position/attitude
+        pos = Position(
+            lat=grpc.lat,
+            lon=grpc.lon,
+            alt_m=grpc.alt_m,
+            alt_agl_m=cockpit.alt_agl_m if cockpit.alt_agl_m != 0.0 else None,
+        )
+        att = Attitude(
+            pitch_rad=grpc.pitch_rad,
+            bank_rad=grpc.bank_rad,
+            yaw_rad=grpc.yaw_rad,
+        )
+        hdg_rad = grpc.hdg_rad
+        tas_mps = grpc.tas_mps if grpc.tas_mps != 0.0 else None
+    elif udp_pos_available:
+        assert udp_pos is not None  # for type checker
+        # gRPC never connected — fall back to UDP position data
+        pos = Position(
+            lat=udp_pos.lat,
+            lon=udp_pos.lon,
+            alt_m=udp_pos.alt_m,
+            alt_agl_m=cockpit.alt_agl_m if cockpit.alt_agl_m != 0.0 else None,
+        )
+        att = Attitude(
+            pitch_rad=udp_pos.pitch_rad,
+            bank_rad=udp_pos.bank_rad,
+            yaw_rad=udp_pos.yaw_rad,
+        )
+        hdg_rad = udp_pos.hdg_rad
+        tas_mps = udp_pos.tas_mps if udp_pos.tas_mps != 0.0 else None
+    else:
+        # No position data at all
+        pos = Position(lat=0.0, lon=0.0, alt_m=0.0, alt_agl_m=None)
+        att = Attitude(pitch_rad=0.0, bank_rad=0.0, yaw_rad=0.0)
+        hdg_rad = 0.0
+        tas_mps = None
 
     spd = Speed(
         ias_mps=cockpit.ias_mps,
-        tas_mps=grpc.tas_mps if grpc.tas_mps != 0.0 else None,
+        tas_mps=tas_mps,
         vvi_mps=cockpit.vvi_mps if cockpit.vvi_mps != 0.0 else None,
         mach=cockpit.mach,
     )
@@ -89,7 +125,7 @@ def merge(grpc: GrpcState, cockpit: CockpitState) -> TelemetryPacket:
         pos=pos,
         att=att,
         spd=spd,
-        hdg_rad=grpc.hdg_rad,
+        hdg_rad=hdg_rad,
         aero=aero,
         fuel=fuel,
         eng=eng,
@@ -119,6 +155,7 @@ class Normalizer:
     def __init__(self) -> None:
         self.grpc_state: GrpcState = GrpcState()
         self.cockpit_state: CockpitState = CockpitState()
+        self.udp_position_state: UdpPositionState = UdpPositionState()
 
     # ------------------------------------------------------------------
     # Properties
@@ -130,6 +167,7 @@ class Normalizer:
         return (
             self.grpc_state.last_update != 0.0
             or self.cockpit_state.last_update != 0.0
+            or self.udp_position_state.last_update != 0.0
         )
 
     @property
@@ -148,4 +186,4 @@ class Normalizer:
         """Return the latest merged TelemetryPacket, or None if no data yet."""
         if not self.has_data:
             return None
-        return merge(self.grpc_state, self.cockpit_state)
+        return merge(self.grpc_state, self.cockpit_state, self.udp_position_state)

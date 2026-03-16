@@ -24,10 +24,6 @@ const formatHdg = (rad: number | null) => rad !== null ? ((rad * 180 / Math.PI +
 export function Dashboard() {
   const {
     currentSession,
-    isCreating,
-    sessionError,
-    handleCreateSession,
-    clearSessionError,
     telemetry,
     connectionState,
     packetsPerSec,
@@ -108,12 +104,7 @@ export function Dashboard() {
         <div className="hidden md:flex bg-jarvis-bar md:border-r border-jarvis-border p-1.5 flex-col gap-1 overflow-hidden">
           <DraggablePanel panelId="connection" editMode={editMode} offset={getOffset('connection')} onUpdateOffset={updateOffset}>
             <ConnectionStatusPanel
-              currentSession={currentSession}
               connectionState={connectionState}
-              onCreateSession={handleCreateSession}
-              isCreating={isCreating}
-              sessionError={sessionError}
-              onClearError={clearSessionError}
             />
           </DraggablePanel>
 

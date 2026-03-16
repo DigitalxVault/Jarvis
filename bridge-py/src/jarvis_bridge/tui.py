@@ -32,11 +32,13 @@ def _clear_screen() -> None:
         os.system("clear")
 
 
-def _grpc_status(connected: bool, ever_connected: bool) -> Text:
+def _grpc_status(connected: bool, ever_connected: bool, udp_fallback: bool = False) -> Text:
     if connected:
         return Text("Connected", style="bold green")
     if ever_connected:
         return Text("Reconnecting...", style="bold yellow")
+    if udp_fallback:
+        return Text("Not installed (UDP fallback)", style="dim italic")
     return Text("Waiting for DCS...", style="dim")
 
 
@@ -57,6 +59,7 @@ def _build_panel(
     errors: int,
     buffer_size: int,
     is_backing_off: bool,
+    udp_fallback: bool = False,
 ) -> Panel:
     t = Table.grid(padding=(0, 2))
     t.add_column(style="cyan", no_wrap=True)
@@ -68,7 +71,7 @@ def _build_panel(
     t.add_row("Channel", Text(channel, style="bold white"))
     t.add_row("Uptime", f"{hrs:02d}:{mins:02d}:{secs:02d}")
     t.add_row("", "")
-    t.add_row("DCS-gRPC", _grpc_status(grpc_connected, grpc_ever_connected))
+    t.add_row("DCS-gRPC", _grpc_status(grpc_connected, grpc_ever_connected, udp_fallback))
     t.add_row("UDP Export", Text(
         f"{udp_packets} packets received" if udp_packets > 0 else "Waiting for DCS...",
         style="green" if udp_packets > 0 else "dim",
@@ -109,6 +112,12 @@ class BridgeTUI:
         self._console = Console(highlight=False)
 
     def _render(self) -> Panel:
+        # Show gRPC as optional when UDP is receiving but gRPC never connected
+        udp_fallback = (
+            self._udp.packet_count > 0
+            and not self._grpc.connected
+            and not self._grpc.ever_connected
+        )
         return _build_panel(
             channel=self._channel,
             uptime_s=time.monotonic() - self._start_time,
@@ -119,6 +128,7 @@ class BridgeTUI:
             errors=self._publisher.total_errors,
             buffer_size=self._publisher.buffer_size,
             is_backing_off=self._publisher.is_backing_off,
+            udp_fallback=udp_fallback,
         )
 
     async def run(self) -> None:
