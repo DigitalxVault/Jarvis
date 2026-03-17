@@ -8,6 +8,7 @@ import { useTrainerLog } from '@/hooks/use-trainer-log'
 import { TrainerTelemetryGrid } from './trainer-telemetry-grid'
 import { TrainerTSD } from './trainer-tsd'
 import { TrainerLogPanel } from './trainer-log-panel'
+import { TrainerCommPanel } from './trainer-comm-panel'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TrainerDashboardProps {
@@ -66,7 +67,7 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
       className="grid h-screen bg-jarvis-bg p-2 gap-2"
       style={{
         gridTemplateColumns: '280px 1fr 320px',
-        gridTemplateRows: 'auto 1fr',
+        gridTemplateRows: 'auto 1fr auto',
         fontFamily: 'Courier New, monospace',
       }}
     >
@@ -114,6 +115,15 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
       {/* Right column — mission log */}
       <div className="flex flex-col min-h-0 overflow-hidden">
         <TrainerLogPanel entries={logEntries} />
+      </div>
+
+      {/* Bottom row — comm panel spanning all 3 columns */}
+      <div className="col-span-3">
+        <TrainerCommPanel
+          sessionId={sessionId}
+          telemetry={telemetry}
+          flightPhase={flightPhase.phase}
+        />
       </div>
     </div>
   )
