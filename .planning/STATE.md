@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 21 of 24 (Trainer Session & Dashboard) — COMPLETE
-Plan: 3 of 3 complete (21-03 done)
-Status: Phase complete — ready for Phase 22
-Last activity: 2026-03-17 — Completed 21-03-PLAN.md (trainer mission log + conversation broadcast)
+Phase: 22 of 24 (Trainer Communication) — In progress
+Plan: 1 of 2 complete (22-01 done)
+Status: In progress — ready for Plan 22-02
+Last activity: 2026-03-17 — Completed 22-01-PLAN.md (trainer comm pipeline + UI)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [#######...] 58% Phase 21-03 complete (Phase 21 done)
+Progress: v3.0 [########..] 63% Phase 22-01 complete
 
 ## Performance Metrics
 
@@ -50,7 +50,7 @@ Progress: v3.0 [#######...] 58% Phase 21-03 complete (Phase 21 done)
 | 19. Command Processing | v3.0 | -- |
 | 20. Flight Phase & Proactive Alerts | v3.0 | -- |
 | 21. Trainer Session & Dashboard | v3.0 | 3 complete (DONE) |
-| 22. Trainer Communication | v3.0 | -- |
+| 22. Trainer Communication | v3.0 | 1 of 2 complete |
 | 23. Trainer DCS Controls | v3.0 | -- |
 | 24. Roles, Integration & Polish | v3.0 | -- |
 
@@ -174,6 +174,11 @@ Amendment decisions (2026-03-13):
 | D-2111 | onSpeak as optional 6th param on useVoiceCues | Non-breaking; captures every spoken cue for conversation broadcast |
 | D-2112 | Tab label COMMS not CONVERSATION | Fits 320px column; clear meaning |
 | D-2113 | Tactical events via frame-over-frame diffing of weapons/chaff/flare counts | Detects decreases in ordnance/countermeasures; no separate event bus needed |
+| D-2201 | intensity=0 bypasses GPT-4o entirely | Zero-latency passthrough; returns input directly |
+| D-2202 | Temperature = 0.3 + intensity×0.5 | Low creativity at minimal (0.3), moderate at full (0.8) |
+| D-2203 | drawWaveformRef for RAF loop | Breaks circular useEffect/useCallback dep; ref stores latest callback |
+| D-2204 | stageRef mirrors stage state | Prevents stale closures in async processVoice/sendText callbacks |
+| D-2205 | Broadcast fires concurrently with TTS | channel.send() fire-and-forget; no await before speakWithElevenLabs |
 
 ### Pending Todos
 
@@ -182,7 +187,7 @@ Amendment decisions (2026-03-13):
 **v3.0 (in progress):**
 - Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
 - Phase 21: ALL 3 PLANS COMPLETE — trainer dashboard fully built (code system, TSD, mission log)
-- Phase 22: Trainer Communication — next
+- Phase 22: Trainer Communication — 22-01 done, 22-02 next
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
 - **Add `trainer_code` column to Supabase sessions table** (required before trainer API works)
@@ -206,5 +211,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-17
-Stopped at: Completed 21-03-PLAN.md (trainer mission log + conversation broadcast) — Phase 21 COMPLETE
+Stopped at: Completed 22-01-PLAN.md (trainer comm pipeline + PTT voice + text UI)
 Resume file: None
