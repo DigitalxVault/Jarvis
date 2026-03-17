@@ -10,13 +10,13 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 ## Current Position
 
 Phase: 21 of 24 (Trainer Session & Dashboard) — In progress
-Plan: 1 of 3 complete (21-01 done)
+Plan: 2 of 3 complete (21-02 done)
 Status: In progress
-Last activity: 2026-03-17 — Completed 21-01-PLAN.md (trainer code system + telemetry grid)
+Last activity: 2026-03-17 — Completed 21-02-PLAN.md (TSD integration into trainer dashboard)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [#####.....] 45% Phase 21-01 complete
+Progress: v3.0 [######....] 50% Phase 21-02 complete
 
 ## Performance Metrics
 
@@ -166,6 +166,9 @@ Amendment decisions (2026-03-13):
 | D-2103 | /api/trainer/claim requires no auth | Trainers have no accounts; code is their credential |
 | D-2104 | Alert colors map ruleId → field label, not blanket severity | Specific fields highlight (pull_up→ALT, over_g→G-LOAD, etc.) |
 | D-2105 | useCoaching always called; null smoothnessScore when no telemetry | React rules of hooks; null shows --- in Status card |
+| D-2106 | rangeOptions defaults to DEFAULT_RANGE_OPTIONS; useState picks Math.floor(length/2) | Player gets 40nm default, trainer gets 10nm default |
+| D-2107 | TrainerTSD: flex-1 min-h-0 min-w-0; center cell: flex flex-col min-h-0 | Canvas ResizeObserver sizes correctly; never collapses to 0px |
+| D-2108 | Grid columns 280px 1fr 320px (was 1fr 260px for right) | Center gets dominant ~60% space; right slightly wider for Phase 21-03 logs |
 
 ### Pending Todos
 
@@ -174,7 +177,8 @@ Amendment decisions (2026-03-13):
 **v3.0 (in progress):**
 - Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
 - Phase 21: Plan 21-01 COMPLETE — trainer code system + telemetry grid done
-- Phase 21: Plans 21-02 (TSD) and 21-03 (Logs) pending
+- Phase 21: Plan 21-02 COMPLETE — TSD integrated into trainer dashboard (rangeOptions prop + TrainerTSD)
+- Phase 21: Plan 21-03 (Logs) pending
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
 - **Add `trainer_code` column to Supabase sessions table** (required before trainer API works)
@@ -198,5 +202,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-17
-Stopped at: Completed 21-01-PLAN.md (trainer code system + telemetry grid)
+Stopped at: Completed 21-02-PLAN.md (TSD integration into trainer dashboard)
 Resume file: None

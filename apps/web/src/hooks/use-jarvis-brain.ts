@@ -19,8 +19,8 @@ interface UseJarvisBrainOptions {
 export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrainOptions) {
   const processingRef = useRef(false)
 
-  const processTranscript = useCallback(async (transcript: string) => {
-    if (!transcript.trim() || processingRef.current) return
+  const processTranscript = useCallback(async (transcript: string): Promise<string | undefined> => {
+    if (!transcript.trim() || processingRef.current) return undefined
     processingRef.current = true
 
     console.log('[JARVIS] Processing:', transcript)
@@ -31,7 +31,7 @@ export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrain
       if (ruleResponse) {
         console.log('[JARVIS] Rule engine match:', ruleResponse)
         speak(ruleResponse, 'P2')
-        return
+        return ruleResponse
       }
 
       // Fall through to GPT-4o
@@ -46,14 +46,16 @@ export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrain
 
       if (!response.ok) {
         speak('Unable to process that request.', 'P2')
-        return
+        return undefined
       }
 
       const { reply } = await response.json()
       speak(reply, 'P2')
+      return reply
     } catch (err) {
       console.error('[JARVIS] Brain error:', err)
       speak('Processing error. Try again.', 'P2')
+      return undefined
     } finally {
       processingRef.current = false
     }

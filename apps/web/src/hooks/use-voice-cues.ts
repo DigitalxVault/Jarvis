@@ -22,6 +22,7 @@ export function useVoiceCues(
   speak: (text: string, priority: SpeechPriority) => void,
   enabled: boolean = true,
   flightPhase: FlightPhase = 'CRUISE',
+  onSpeak?: (text: string) => void,
 ) {
   const prevConnectionRef = useRef<ConnectionState>(connectionState)
   const hasGreeted = useRef(false)
@@ -40,15 +41,13 @@ export function useVoiceCues(
     if (!hasGreeted.current && (connectionState === 'dcs_offline' || connectionState === 'connected')) {
       hasGreeted.current = true
       if (connectionState === 'connected') {
-        speak(
-          'Good day sir. I\'m JARVIS, your AI co-pilot. I\'ll be monitoring your systems and providing guidance throughout your flight. Ready when you are.',
-          'P2',
-        )
+        const greetingText = 'Good day sir. I\'m JARVIS, your AI co-pilot. I\'ll be monitoring your systems and providing guidance throughout your flight. Ready when you are.'
+        speak(greetingText, 'P2')
+        onSpeak?.(greetingText)
       } else {
-        speak(
-          'Good day sir. I\'m JARVIS, your AI co-pilot. Systems are online and I\'m standing by. I\'ll be right here when you launch your mission.',
-          'P2',
-        )
+        const greetingText = 'Good day sir. I\'m JARVIS, your AI co-pilot. Systems are online and I\'m standing by. I\'ll be right here when you launch your mission.'
+        speak(greetingText, 'P2')
+        onSpeak?.(greetingText)
       }
       lastConnectionCueAt.current['greeting'] = now
       return
@@ -61,15 +60,19 @@ export function useVoiceCues(
       const lastSpoke = lastConnectionCueAt.current['connected'] || 0
       if (now - lastSpoke < CONNECTION_CUE_COOLDOWN_S) return
       lastConnectionCueAt.current['connected'] = now
-      speak('DCS connected sir. Telemetry stream is active. Have a good flight.', 'P2')
+      const connectedText = 'DCS connected sir. Telemetry stream is active. Have a good flight.'
+      speak(connectedText, 'P2')
+      onSpeak?.(connectedText)
     } else if (connectionState === 'dcs_offline' && prev === 'connected') {
       const lastSpoke = lastConnectionCueAt.current['dcs_offline'] || 0
       if (now - lastSpoke < CONNECTION_CUE_COOLDOWN_S) return
       lastConnectionCueAt.current['dcs_offline'] = now
-      speak('DCS telemetry paused. Standing by sir.', 'P3')
+      const offlineText = 'DCS telemetry paused. Standing by sir.'
+      speak(offlineText, 'P3')
+      onSpeak?.(offlineText)
     }
     // Don't announce 'reconnecting' — too noisy
-  }, [connectionState, speak, enabled])
+  }, [connectionState, speak, enabled, onSpeak])
 
   // Alert voice cues (with per-rule cooldown, friendly trainer style)
   useEffect(() => {
@@ -114,6 +117,7 @@ export function useVoiceCues(
 
       const line = lines[alert.ruleId] || `${prefix}${alert.ruleId.replace(/_/g, ' ')} alert.`
       speak(line, priority)
+      onSpeak?.(line)
     }
-  }, [alerts, speak, enabled])
+  }, [alerts, speak, enabled, onSpeak])
 }
