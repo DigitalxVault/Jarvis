@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 15 Python Bridge + DCS-gRPC
+**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 21 Trainer Session & Dashboard
 
 ## Current Position
 
-Phase: 15 of 24 (Python Bridge + DCS-gRPC) — Phase complete (checkpoint pending)
-Plan: 4 of 4 complete (15-01, 15-02, 15-03, 15-04 done)
-Status: Checkpoint — awaiting human verification
-Last activity: 2026-03-15 — Completed 15-04-PLAN.md (main.py integration + Rich TUI + pnpm wiring)
+Phase: 21 of 24 (Trainer Session & Dashboard) — In progress
+Plan: 1 of 3 complete (21-01 done)
+Status: In progress
+Last activity: 2026-03-17 — Completed 21-01-PLAN.md (trainer code system + telemetry grid)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [####......] 38% Phase 15 all 4 plans done (checkpoint pending before Phase 16)
+Progress: v3.0 [#####.....] 45% Phase 21-01 complete
 
 ## Performance Metrics
 
@@ -161,6 +161,11 @@ Amendment decisions (2026-03-13):
 | D-1542 | retry_count nonlocal int + getter closure for TUI | Clean encapsulation without coupling |
 | D-1543 | JARVIS_LOCAL_DEV env var → localhost:3000 | Developer toggle without extra CLI flag |
 | D-1544 | dotenv loads from bridge-py/.env and cwd both | Works from repo root (pnpm) and bridge-py/ dir |
+| D-2101 | Trainer uses direct useTelemetry(sessionId), not context | Root providers in tree but trainer never consumes them |
+| D-2102 | 4-digit numeric codes (1000-9999) distinct from pairing codes | Verbal-friendly; easy to read aloud |
+| D-2103 | /api/trainer/claim requires no auth | Trainers have no accounts; code is their credential |
+| D-2104 | Alert colors map ruleId → field label, not blanket severity | Specific fields highlight (pull_up→ALT, over_g→G-LOAD, etc.) |
+| D-2105 | useCoaching always called; null smoothnessScore when no telemetry | React rules of hooks; null shows --- in Status card |
 
 ### Pending Todos
 
@@ -168,9 +173,11 @@ Amendment decisions (2026-03-13):
 
 **v3.0 (in progress):**
 - Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
-- Plan 15-04: main.py integration + Rich TUI + pnpm wiring — DONE (checkpoint pending)
+- Phase 21: Plan 21-01 COMPLETE — trainer code system + telemetry grid done
+- Phase 21: Plans 21-02 (TSD) and 21-03 (Logs) pending
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
+- **Add `trainer_code` column to Supabase sessions table** (required before trainer API works)
 
 ### Blockers/Concerns
 
@@ -185,9 +192,11 @@ Amendment decisions (2026-03-13):
 - DCS-gRPC mod not yet installed — required before Phase 15 development
 - API keys not yet created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine) — required before Phases 17-18
 - Python bridge replaces Node.js bridge — need migration plan for existing sessions/channels
+- trainer_code column missing from sessions table — requires Supabase migration before Phase 21 APIs work
+- TODO: rate-limit /api/trainer/claim (9000 possible codes, brute-force risk)
 
 ## Session Continuity
 
-Last session: 2026-03-15
-Stopped at: Checkpoint — 15-04-PLAN.md complete, awaiting human verify before Phase 16
-Resume file: None (checkpoint — human must approve before Phase 16 begins)
+Last session: 2026-03-17
+Stopped at: Completed 21-01-PLAN.md (trainer code system + telemetry grid)
+Resume file: None

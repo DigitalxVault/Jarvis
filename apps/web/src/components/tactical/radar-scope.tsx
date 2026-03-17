@@ -8,6 +8,7 @@ import { metresToNM, metresToFeet, mpsToKnots, bearingDeg, distanceNM, formatHea
 interface RadarScopeProps {
   telemetry: TelemetryPacket | null
   tactical: TacticalPacket | null
+  rangeOptions?: readonly number[]
 }
 
 interface DestroyedContact {
@@ -19,8 +20,7 @@ interface DestroyedContact {
 }
 
 const KILL_FADE_MS = 5000
-const RANGE_OPTIONS = [10, 20, 40, 80] as const
-type RangeNM = typeof RANGE_OPTIONS[number]
+const DEFAULT_RANGE_OPTIONS = [10, 20, 40, 80] as const
 
 // Colors from JARVIS theme
 const COLOR = {
@@ -46,10 +46,10 @@ const COLOR = {
   diagText: 'rgba(0, 212, 255, 0.35)',
 }
 
-export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
+export function RadarScope({ telemetry, tactical, rangeOptions = DEFAULT_RANGE_OPTIONS }: RadarScopeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
-  const [rangeNM, setRangeNM] = useState<RangeNM>(40)
+  const [rangeNM, setRangeNM] = useState<number>(() => rangeOptions[Math.floor(rangeOptions.length / 2)] ?? rangeOptions[0])
   const [canvasSize, setCanvasSize] = useState(400)
 
   // Data refs to avoid re-render on each frame
@@ -488,8 +488,9 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
 
   const cycleRange = () => {
     setRangeNM((prev) => {
-      const idx = RANGE_OPTIONS.indexOf(prev)
-      return RANGE_OPTIONS[(idx + 1) % RANGE_OPTIONS.length]
+      const idx = rangeOptions.indexOf(prev)
+      const nextIdx = idx === -1 ? 0 : (idx + 1) % rangeOptions.length
+      return rangeOptions[nextIdx]!
     })
   }
 
@@ -502,7 +503,7 @@ export function RadarScope({ telemetry, tactical }: RadarScopeProps) {
       {/* Range selector */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-[12px] opacity-45" style={{ letterSpacing: '1px' }}>RANGE</span>
-        {RANGE_OPTIONS.map((r) => (
+        {rangeOptions.map((r) => (
           <button
             key={r}
             onClick={() => setRangeNM(r)}
