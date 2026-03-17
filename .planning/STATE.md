@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 21 Trainer Session & Dashboard
+**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 22 Trainer Communication
 
 ## Current Position
 
-Phase: 21 of 24 (Trainer Session & Dashboard) — In progress
-Plan: 2 of 3 complete (21-02 done)
-Status: In progress
-Last activity: 2026-03-17 — Completed 21-02-PLAN.md (TSD integration into trainer dashboard)
+Phase: 21 of 24 (Trainer Session & Dashboard) — COMPLETE
+Plan: 3 of 3 complete (21-03 done)
+Status: Phase complete — ready for Phase 22
+Last activity: 2026-03-17 — Completed 21-03-PLAN.md (trainer mission log + conversation broadcast)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [######....] 50% Phase 21-02 complete
+Progress: v3.0 [#######...] 58% Phase 21-03 complete (Phase 21 done)
 
 ## Performance Metrics
 
@@ -49,7 +49,7 @@ Progress: v3.0 [######....] 50% Phase 21-02 complete
 | 18. Wake Word + STT Pipeline | v3.0 | -- |
 | 19. Command Processing | v3.0 | -- |
 | 20. Flight Phase & Proactive Alerts | v3.0 | -- |
-| 21. Trainer Session & Dashboard | v3.0 | -- |
+| 21. Trainer Session & Dashboard | v3.0 | 3 complete (DONE) |
 | 22. Trainer Communication | v3.0 | -- |
 | 23. Trainer DCS Controls | v3.0 | -- |
 | 24. Roles, Integration & Polish | v3.0 | -- |
@@ -169,6 +169,11 @@ Amendment decisions (2026-03-13):
 | D-2106 | rangeOptions defaults to DEFAULT_RANGE_OPTIONS; useState picks Math.floor(length/2) | Player gets 40nm default, trainer gets 10nm default |
 | D-2107 | TrainerTSD: flex-1 min-h-0 min-w-0; center cell: flex flex-col min-h-0 | Canvas ResizeObserver sizes correctly; never collapses to 0px |
 | D-2108 | Grid columns 280px 1fr 320px (was 1fr 260px for right) | Center gets dominant ~60% space; right slightly wider for Phase 21-03 logs |
+| D-2109 | Trainer log uses getChannelName(sessionId) matching JarvisVoiceProvider | Supabase JS creates new channel object per call; no removeChannel conflict |
+| D-2110 | startTransition wrapping setEntries in appendEntry | Zero new lint errors in our files; resolves react-hooks/set-state-in-effect |
+| D-2111 | onSpeak as optional 6th param on useVoiceCues | Non-breaking; captures every spoken cue for conversation broadcast |
+| D-2112 | Tab label COMMS not CONVERSATION | Fits 320px column; clear meaning |
+| D-2113 | Tactical events via frame-over-frame diffing of weapons/chaff/flare counts | Detects decreases in ordnance/countermeasures; no separate event bus needed |
 
 ### Pending Todos
 
@@ -176,9 +181,8 @@ Amendment decisions (2026-03-13):
 
 **v3.0 (in progress):**
 - Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
-- Phase 21: Plan 21-01 COMPLETE — trainer code system + telemetry grid done
-- Phase 21: Plan 21-02 COMPLETE — TSD integrated into trainer dashboard (rangeOptions prop + TrainerTSD)
-- Phase 21: Plan 21-03 (Logs) pending
+- Phase 21: ALL 3 PLANS COMPLETE — trainer dashboard fully built (code system, TSD, mission log)
+- Phase 22: Trainer Communication — next
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
 - **Add `trainer_code` column to Supabase sessions table** (required before trainer API works)
@@ -202,5 +206,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-17
-Stopped at: Completed 21-02-PLAN.md (TSD integration into trainer dashboard)
+Stopped at: Completed 21-03-PLAN.md (trainer mission log + conversation broadcast) — Phase 21 COMPLETE
 Resume file: None

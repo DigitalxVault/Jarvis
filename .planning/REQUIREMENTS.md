@@ -218,10 +218,10 @@
 
 ## Trainer Visibility (TVIEW)
 
-- [ ] **REQ-331** — Trainer dashboard with live telemetry panels (altitude, airspeed, heading, fuel, engine, G-force)
-- [ ] **REQ-332** — Custom canvas Tactical Situation Display (TSD): player-centered square canvas with range rings (5/10/20nm), enemy contacts as hostile blips, waypoint markers, north-up orientation, JARVIS HUD aesthetic (dark bg, cyan/green/red, Courier New) — no real-world map library
-- [ ] **REQ-333** — Flight phase indicator and timestamped events log (weapons fired, targets destroyed, phase transitions)
-- [ ] **REQ-334** — Full Jarvis conversation log (player queries + Jarvis responses + proactive alerts)
+- [x] **REQ-331** — Trainer dashboard with live telemetry panels (altitude, airspeed, heading, fuel, engine, G-force)
+- [x] **REQ-332** — Custom canvas Tactical Situation Display (TSD): player-centered square canvas with range rings (5/10/20nm), enemy contacts as hostile blips, waypoint markers, north-up orientation, JARVIS HUD aesthetic (dark bg, cyan/green/red, Courier New) — no real-world map library
+- [x] **REQ-333** — Flight phase indicator and timestamped events log (weapons fired, targets destroyed, phase transitions)
+- [x] **REQ-334** — Full Jarvis conversation log (player queries + Jarvis responses + proactive alerts)
 
 ## Trainer Communication (TCOMM)
 
@@ -289,10 +289,10 @@
 | REQ-328 | Proactive Alerts | 20 | Pending |
 | REQ-329 | Proactive Alerts | 20 | Pending |
 | REQ-330 | Proactive Alerts | 20 | Pending |
-| REQ-331 | Trainer Visibility | 21 | Pending |
-| REQ-332 | Trainer Visibility | 21 | Pending |
-| REQ-333 | Trainer Visibility | 21 | Pending |
-| REQ-334 | Trainer Visibility | 21 | Pending |
+| REQ-331 | Trainer Visibility | 21 | Complete |
+| REQ-332 | Trainer Visibility | 21 | Complete |
+| REQ-333 | Trainer Visibility | 21 | Complete |
+| REQ-334 | Trainer Visibility | 21 | Complete |
 | REQ-335 | Trainer Communication | 22 | Pending |
 | REQ-336 | Trainer Communication | 22 | Pending |
 | REQ-337 | Trainer Communication | 22 | Pending |

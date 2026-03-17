@@ -405,9 +405,9 @@ Plans:
 **Plans:** ~3 plans
 
 Plans:
-- [ ] 21-01-PLAN.md -- Trainer entry flow + live telemetry panels
-- [ ] 21-02-PLAN.md -- Canvas Tactical Situation Display (TSD)
-- [ ] 21-03-PLAN.md -- Events log + conversation log panels
+- [x] 21-01-PLAN.md -- Trainer entry flow + live telemetry panels
+- [x] 21-02-PLAN.md -- Canvas Tactical Situation Display (TSD)
+- [x] 21-03-PLAN.md -- Events log + conversation log panels
 
 **Requirements:**
 - REQ-331 -- Trainer telemetry panels (altitude, airspeed, heading, fuel, engine, G-force)
@@ -524,11 +524,11 @@ Plans:
 | 18. Wake Word + STT Pipeline | v3.0 | 0/2 | Not Started | -- |
 | 19. Command Processing | v3.0 | 0/2 | Not Started | -- |
 | 20. Flight Phase & Proactive Alerts | v3.0 | 0/2 | Not Started | -- |
-| 21. Trainer Session & Dashboard | v3.0 | 0/3 | Not Started | -- |
+| 21. Trainer Session & Dashboard | v3.0 | 3/3 | Complete | 2026-03-17 |
 | 22. Trainer Communication | v3.0 | 0/2 | Not Started | -- |
 | 23. Trainer DCS Controls | v3.0 | 0/2 | Not Started | -- |
 | 24. Roles, Integration & Polish | v3.0 | 0/2 | Not Started | -- |
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-15 -- Phase 14 complete, v2.0 milestone complete*
+*Last updated: 2026-03-17 -- Phase 21 complete*
