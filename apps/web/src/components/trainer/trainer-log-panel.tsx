@@ -26,6 +26,8 @@ function entryColorClass(entry: LogEntry): string {
       if (entry.severity === 'critical') return 'text-jarvis-danger'
       if (entry.severity === 'warning') return 'text-jarvis-warning'
       return 'text-jarvis-primary'
+    case 'tactical':
+      return entry.severity === 'warning' ? 'text-jarvis-warning' : 'text-jarvis-accent'
     case 'connection':
       return 'text-jarvis-accent/70'
     case 'conversation-player':
@@ -52,7 +54,7 @@ function filterEntries(entries: LogEntry[], tab: LogTab): LogEntry[] {
   switch (tab) {
     case 'events':
       return entries.filter(e =>
-        e.type === 'phase' || e.type === 'alert' || e.type === 'connection'
+        e.type === 'phase' || e.type === 'alert' || e.type === 'connection' || e.type === 'tactical'
       )
     case 'conversation':
       return entries.filter(e =>

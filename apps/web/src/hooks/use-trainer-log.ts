@@ -2,15 +2,16 @@
 
 import { useEffect, useRef, useState, useCallback, startTransition } from 'react'
 import { supabase } from '@/lib/supabase'
+import { getChannelName } from '@jarvis-dcs/shared'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 import type { FlightPhaseState } from '@/lib/flight-phases'
-import type { ActiveAlert } from '@jarvis-dcs/shared'
+import type { ActiveAlert, TacticalPacket } from '@jarvis-dcs/shared'
 import type { ConversationEntry } from '@jarvis-dcs/shared'
 
 export interface LogEntry {
   id: string
   ts: number
-  type: 'phase' | 'alert' | 'connection' | 'conversation-player' | 'conversation-jarvis'
+  type: 'phase' | 'alert' | 'connection' | 'tactical' | 'conversation-player' | 'conversation-jarvis'
   label: string
   severity?: 'info' | 'warning' | 'critical'
 }
@@ -18,22 +19,26 @@ export interface LogEntry {
 const MAX_ENTRIES = 500
 
 /**
- * Accumulates trainer log entries from flight events and conversation broadcasts.
+ * Accumulates trainer log entries from flight events, tactical changes, and conversation broadcasts.
  *
  * Listens for:
  * - Connection state changes
  * - Flight phase transitions
  * - Active alert changes
+ * - Weapons fired / countermeasures deployed (from tactical data diffing)
  * - Conversation broadcast events from the player's voice pipeline
  *
- * Uses a DISTINCT channel name (`session:${sessionId}:trainer-log`) to avoid
- * conflicts with the useTelemetry subscription on the main session channel.
+ * The conversation channel uses getChannelName(sessionId) to match the channel
+ * that JarvisVoiceProvider broadcasts on. Supabase JS creates a new channel
+ * object per supabase.channel() call, so this won't conflict with useTelemetry's
+ * subscription on the same channel name.
  */
 export function useTrainerLog(
   sessionId: string,
   connectionState: ConnectionState,
   flightPhase: FlightPhaseState,
   alerts: ActiveAlert[],
+  tactical: TacticalPacket | null,
 ): LogEntry[] {
   const [entries, setEntries] = useState<LogEntry[]>([])
 
@@ -101,12 +106,57 @@ export function useTrainerLog(
     }
   }, [alerts, appendEntry])
 
-  // Conversation watcher — subscribe to a DISTINCT channel to avoid
-  // interfering with the useTelemetry subscription on the main channel.
+  // Tactical watcher — detect weapons fired and countermeasures deployed
+  const prevWeaponsRef = useRef<{ totalWeapons: number; gunRounds: number; chaff: number; flare: number } | null>(null)
+  useEffect(() => {
+    if (!tactical) return
+
+    const totalWeapons = tactical.weapons?.stations.reduce((sum, s) => sum + s.count, 0) ?? 0
+    const gunRounds = tactical.weapons?.gun_rounds ?? 0
+    const chaff = tactical.countermeasures?.chaff ?? 0
+    const flare = tactical.countermeasures?.flare ?? 0
+
+    const prev = prevWeaponsRef.current
+    if (prev !== null) {
+      if (totalWeapons < prev.totalWeapons) {
+        appendEntry({
+          type: 'tactical',
+          label: `Weapon released (${prev.totalWeapons - totalWeapons} ordnance)`,
+          severity: 'warning',
+        })
+      }
+      if (gunRounds < prev.gunRounds) {
+        appendEntry({
+          type: 'tactical',
+          label: `Gun fired (${prev.gunRounds - gunRounds} rounds)`,
+          severity: 'info',
+        })
+      }
+      if (chaff < prev.chaff) {
+        appendEntry({
+          type: 'tactical',
+          label: `Chaff deployed (${prev.chaff - chaff})`,
+          severity: 'info',
+        })
+      }
+      if (flare < prev.flare) {
+        appendEntry({
+          type: 'tactical',
+          label: `Flare deployed (${prev.flare - flare})`,
+          severity: 'info',
+        })
+      }
+    }
+    prevWeaponsRef.current = { totalWeapons, gunRounds, chaff, flare }
+  }, [tactical, appendEntry])
+
+  // Conversation watcher — subscribe to the same channel JarvisVoiceProvider
+  // broadcasts on. Supabase JS creates a distinct channel object per call,
+  // so this won't conflict with useTelemetry's subscription.
   useEffect(() => {
     if (!sessionId) return
 
-    const channelName = `session:${sessionId}:trainer-log`
+    const channelName = getChannelName(sessionId)
     const channel = supabase.channel(channelName)
 
     channel

@@ -58,8 +58,8 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
 
   const smoothnessScore = telemetry ? smoothness.score : null
 
-  // Log accumulation — events from alerts/phases/connection + conversation from broadcast
-  const logEntries = useTrainerLog(sessionId, connectionState, flightPhase, alerts)
+  // Log accumulation — events from alerts/phases/connection/tactical + conversation from broadcast
+  const logEntries = useTrainerLog(sessionId, connectionState, flightPhase, alerts, tactical)
 
   return (
     <div
