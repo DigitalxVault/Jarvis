@@ -5,6 +5,8 @@ import { useTelemetry, type ConnectionState } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
 import { useCoaching } from '@/hooks/use-coaching'
 import { useOnlineStatus } from '@/hooks/use-online-status'
+import { useFlightPhase } from '@/hooks/use-flight-phase'
+import type { FlightPhaseState } from '@/lib/flight-phases'
 import type {
   Session,
   TelemetryPacket,
@@ -35,6 +37,8 @@ interface TelemetryContextValue {
   hasWarning: boolean
   // Coaching
   coaching: ReturnType<typeof useCoaching>
+  // Flight phase
+  flightPhase: FlightPhaseState
   // Network
   isNetworkOffline: boolean
 }
@@ -74,6 +78,8 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
   }), [])
 
   const coaching = useCoaching(telemetry, coachingOpts)
+
+  const flightPhase = useFlightPhase(telemetry)
 
   const handleCreateSession = useCallback(async () => {
     setIsCreating(true)
@@ -118,6 +124,7 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
       hasCritical,
       hasWarning,
       coaching,
+      flightPhase,
       isNetworkOffline,
     }}>
       {children}

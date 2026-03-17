@@ -7,6 +7,7 @@ import { useWakeWord } from '@/hooks/use-wake-word'
 import { useAudioRecorder } from '@/hooks/use-audio-recorder'
 import { useJarvisBrain } from '@/hooks/use-jarvis-brain'
 import { useVoiceCues } from '@/hooks/use-voice-cues'
+import { getPhaseTransitionLine } from '@/lib/phase-personality'
 
 type VoiceState = 'idle' | 'listening' | 'wake-detected' | 'recording' | 'processing' | 'speaking' | 'error' | 'limit'
 
@@ -20,13 +21,13 @@ interface JarvisVoiceContextValue {
 const JarvisVoiceContext = createContext<JarvisVoiceContextValue | null>(null)
 
 export function JarvisVoiceProvider({ children }: { children: React.ReactNode }) {
-  const { telemetry, connectionState, alerts } = useTelemetryContext()
+  const { telemetry, connectionState, alerts, flightPhase } = useTelemetryContext()
 
   // TTS with priority queue
   const { speak, stop: stopSpeaking, isSpeaking } = useJarvisTTS()
 
-  // Brain: rule engine + GPT-4o fallback
-  const { processTranscript } = useJarvisBrain({ telemetry, speak })
+  // Brain: rule engine + GPT-4o fallback (phase-aware)
+  const { processTranscript } = useJarvisBrain({ telemetry, speak, flightPhase: flightPhase.phase })
 
   // Track whether we're currently processing a command
   const isProcessingRef = useRef(false)
@@ -84,8 +85,18 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     onDetected: handleWakeDetected,
   })
 
-  // Voice cues for connection state changes and alerts
-  useVoiceCues(connectionState, alerts, speak, true)
+  // Voice cues for connection state changes and alerts (phase-aware)
+  useVoiceCues(connectionState, alerts, speak, true, flightPhase.phase)
+
+  // Flight phase transition voice cues
+  useEffect(() => {
+    if (flightPhase.justTransitioned) {
+      const line = getPhaseTransitionLine(flightPhase.phase, flightPhase.previousPhase)
+      if (line) {
+        speak(line, 'P3')
+      }
+    }
+  }, [flightPhase.justTransitioned, flightPhase.phase, flightPhase.previousPhase, speak])
 
   // Reset recorder state when processing completes
   useEffect(() => {

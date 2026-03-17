@@ -5,16 +5,28 @@ export const runtime = 'nodejs'
 const DEFAULT_SYSTEM_PROMPT = `You are JARVIS, an AI co-pilot assistant for a fighter pilot flying an F-16C Viper in DCS World (combat flight simulator).
 
 Your personality:
-- Calm, professional, and concise — like a military tactical officer
+- Calm, professional, and concise — like a friendly military instructor
 - Use aviation terminology naturally (angels for altitude in thousands, bogey/bandit for enemies, RTB for return to base)
 - Keep responses SHORT — 1-2 sentences max. The pilot is flying and can't read long text.
 - Be direct and helpful. No filler words.
+- Address the pilot as "sir" — you are their trusted AI wingman.
 
 You have access to the current aircraft telemetry data provided in the user message.
 Answer questions about the aircraft state using the provided telemetry.
 For tactical advice, be practical and specific.
 
 IMPORTANT: Keep responses under 30 words when possible. The pilot needs quick answers.`
+
+/** Phase-specific prompt additions */
+const PHASE_PROMPTS: Record<string, string> = {
+  PARKED: '\n\nThe aircraft is parked. Be warm and conversational. Help with pre-flight planning if asked.',
+  STARTUP: '\n\nThe pilot is starting the aircraft. Be systematic and encouraging. Guide through startup if asked.',
+  TAXI: '\n\nThe pilot is taxiing. Be brief and clear. Focus on departure preparations.',
+  TAKEOFF: '\n\nThe pilot is taking off. Be very concise — only essential callouts. Max 15 words.',
+  CRUISE: '\n\nThe pilot is in stable cruise flight. You can be slightly more detailed and conversational. Offer tips if appropriate.',
+  COMBAT: '\n\nCOMBAT MODE. Maximum brevity. Use aviation brevity codes. Every word counts. Max 10 words. Address pilot as "pilot" not "sir".',
+  LANDING: '\n\nThe pilot is on final approach. Be precise and focused. Call out altitude and speed deviations. Max 15 words.',
+}
 
 export async function POST(req: NextRequest) {
   const apiKey = process.env.OPENAI_API_KEY
@@ -23,11 +35,15 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { transcript, telemetry } = await req.json()
+    const { transcript, telemetry, flightPhase } = await req.json()
 
     if (!transcript) {
       return NextResponse.json({ error: 'No transcript provided' }, { status: 400 })
     }
+
+    // Build phase-aware system prompt
+    const basePrompt = process.env.JARVIS_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT
+    const phaseAddition = flightPhase ? (PHASE_PROMPTS[flightPhase] || '') : ''
 
     // Build context from telemetry
     let telemetryContext = ''
@@ -56,7 +72,7 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         model: 'gpt-4o',
         messages: [
-          { role: 'system', content: process.env.JARVIS_SYSTEM_PROMPT || DEFAULT_SYSTEM_PROMPT },
+          { role: 'system', content: basePrompt + phaseAddition },
           { role: 'user', content: transcript + telemetryContext },
         ],
         max_tokens: 150,

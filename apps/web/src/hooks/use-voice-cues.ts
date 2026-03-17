@@ -4,6 +4,8 @@ import { useEffect, useRef } from 'react'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 import type { ActiveAlert } from '@jarvis-dcs/shared'
 import type { SpeechPriority } from '@/hooks/use-jarvis-tts'
+import type { FlightPhase } from '@/lib/flight-phases'
+import { getPhaseAlertPrefix } from '@/lib/phase-personality'
 
 /** Minimum seconds between repeated connection state voice cues */
 const CONNECTION_CUE_COOLDOWN_S = 15
@@ -19,6 +21,7 @@ export function useVoiceCues(
   alerts: ActiveAlert[],
   speak: (text: string, priority: SpeechPriority) => void,
   enabled: boolean = true,
+  flightPhase: FlightPhase = 'CRUISE',
 ) {
   const prevConnectionRef = useRef<ConnectionState>(connectionState)
   const hasGreeted = useRef(false)
@@ -80,19 +83,36 @@ export function useVoiceCues(
 
       const priority: SpeechPriority = alert.severity === 'critical' ? 'P1' : 'P2'
 
-      // Friendly trainer-style voice lines
-      const lines: Record<string, string> = {
-        pull_up: 'Sir, your altitude is critically low. Pull up immediately.',
-        over_g: 'Sir, you\'re pulling excessive G. Ease off the stick to stay within limits.',
-        stall: 'Sir, your angle of attack is getting high. Reduce pitch or add power to avoid a stall.',
-        bingo_fuel: 'Sir, you\'re at bingo fuel. I\'d recommend heading back to base soon.',
-        over_speed: 'Sir, you\'re exceeding safe speed limits. Reduce throttle or pull back gently.',
-        high_descent: 'Sir, high descent rate. Level off when you can.',
-        low_speed: 'Caution sir, your airspeed is getting low. Consider adding power.',
-        bank_angle: 'Sir, your bank angle is quite steep. Level the wings slightly.',
+      const prefix = getPhaseAlertPrefix(flightPhase)
+
+      // Phase-aware voice lines — terse in combat/landing, friendlier in cruise
+      const combatLines: Record<string, string> = {
+        pull_up: 'Pull up! Pull up!',
+        over_g: 'Over-G! Ease off!',
+        stall: 'Stall warning! Nose down!',
+        bingo_fuel: 'Bingo fuel. RTB.',
+        over_speed: 'Overspeed! Throttle back!',
+        high_descent: 'High sink rate!',
+        low_speed: 'Low speed! Add power!',
+        bank_angle: 'Excessive bank!',
       }
 
-      const line = lines[alert.ruleId] || `Heads up sir, ${alert.ruleId.replace(/_/g, ' ')} alert.`
+      const normalLines: Record<string, string> = {
+        pull_up: `${prefix}your altitude is critically low. Pull up immediately.`,
+        over_g: `${prefix}you're pulling excessive G. Ease off the stick to stay within limits.`,
+        stall: `${prefix}your angle of attack is getting high. Reduce pitch or add power to avoid a stall.`,
+        bingo_fuel: `${prefix}you're at bingo fuel. I'd recommend heading back to base soon.`,
+        over_speed: `${prefix}you're exceeding safe speed limits. Reduce throttle or pull back gently.`,
+        high_descent: `${prefix}high descent rate. Level off when you can.`,
+        low_speed: `Caution ${prefix.toLowerCase()}your airspeed is getting low. Consider adding power.`,
+        bank_angle: `${prefix}your bank angle is quite steep. Level the wings slightly.`,
+      }
+
+      const lines = (flightPhase === 'COMBAT' || flightPhase === 'LANDING' || flightPhase === 'TAKEOFF')
+        ? combatLines
+        : normalLines
+
+      const line = lines[alert.ruleId] || `${prefix}${alert.ruleId.replace(/_/g, ' ')} alert.`
       speak(line, priority)
     }
   }, [alerts, speak, enabled])

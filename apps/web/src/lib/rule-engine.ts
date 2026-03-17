@@ -113,11 +113,31 @@ const rules: RuleFn[] = [
 /**
  * Try to match a voice transcript against known command patterns.
  * Returns a response string if matched, or null if no rule matched (falls through to GPT-4o).
+ *
+ * @param flightPhase - Optional current flight phase for phase-aware responses
  */
 export function processWithRuleEngine(
   transcript: string,
-  telemetry: TelemetryPacket | null
+  telemetry: TelemetryPacket | null,
+  flightPhase?: string
 ): string | null {
+  // Flight phase query
+  if (/(phase|what phase|flight phase|mode)/i.test(transcript)) {
+    if (flightPhase) {
+      const phaseDescriptions: Record<string, string> = {
+        PARKED: 'We are currently parked sir. Engines are idle.',
+        STARTUP: 'Startup phase sir. Systems are coming online.',
+        TAXI: 'Taxi phase sir. Moving to the runway.',
+        TAKEOFF: 'Takeoff phase sir. Climbing out.',
+        CRUISE: 'Cruise phase sir. Stable flight.',
+        COMBAT: 'Combat phase. Tactical mode active.',
+        LANDING: 'On approach sir. Landing phase.',
+      }
+      return phaseDescriptions[flightPhase] || `Current phase: ${flightPhase}.`
+    }
+    return 'Flight phase detection requires telemetry data.'
+  }
+
   for (const rule of rules) {
     const result = rule(transcript, telemetry)
     if (result?.matched) return result.response

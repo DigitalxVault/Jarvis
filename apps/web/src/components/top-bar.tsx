@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectionStatus } from './connection-status'
 import { VoiceIndicator } from './voice-indicator'
+import { FlightPhaseIndicator } from './flight-phase-indicator'
 import { JarvisLogo } from './jarvis-logo'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
@@ -103,6 +104,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
             LAYOUT
           </button>
         )}
+        <FlightPhaseIndicator />
         <VoiceIndicator />
         <ConnectionStatus state={connectionState} />
         <div className="text-right">
