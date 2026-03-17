@@ -207,8 +207,18 @@ export interface HeartbeatPacket {
   queueSize: number
 }
 
+/** Conversation entry for trainer/player voice exchanges */
+export interface ConversationEntry {
+  type: 'conversation'
+  role: 'player' | 'jarvis'
+  text: string
+  ts: number
+  /** Mission elapsed seconds from LoGetModelTime() when the utterance was captured */
+  t_model?: number
+}
+
 /** Union of all broadcast message types */
-export type BroadcastPayload = TelemetryPacket | HeartbeatPacket | TacticalPacket
+export type BroadcastPayload = TelemetryPacket | HeartbeatPacket | TacticalPacket | ConversationEntry
 
 /** Session status in the sessions table */
 export type SessionStatus = 'active' | 'ended'
@@ -223,4 +233,6 @@ export interface Session {
   bridge_claimed: boolean
   created_at: string
   ended_at: string | null
+  /** 4-digit trainer code (1000-9999), cleared when trainer claims it */
+  trainer_code: string | null
 }

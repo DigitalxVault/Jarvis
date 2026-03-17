@@ -30,3 +30,12 @@ export const PAIRING_CODE_TTL_MINUTES = 5
 
 /** Max raw packets to display in the debug viewer */
 export const MAX_RAW_PACKETS = 20
+
+/** Trainer code length (4 digits) */
+export const TRAINER_CODE_LENGTH = 4
+
+/** Trainer code minimum value (inclusive) */
+export const TRAINER_CODE_MIN = 1000
+
+/** Trainer code maximum value (inclusive) */
+export const TRAINER_CODE_MAX = 9999
