@@ -4,8 +4,10 @@ import { useTelemetry } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
 import { useFlightPhase } from '@/hooks/use-flight-phase'
 import { useCoaching } from '@/hooks/use-coaching'
+import { useTrainerLog } from '@/hooks/use-trainer-log'
 import { TrainerTelemetryGrid } from './trainer-telemetry-grid'
 import { TrainerTSD } from './trainer-tsd'
+import { TrainerLogPanel } from './trainer-log-panel'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TrainerDashboardProps {
@@ -55,6 +57,9 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
   const { smoothness } = useCoaching(telemetry)
 
   const smoothnessScore = telemetry ? smoothness.score : null
+
+  // Log accumulation — events from alerts/phases/connection + conversation from broadcast
+  const logEntries = useTrainerLog(sessionId, connectionState, flightPhase, alerts)
 
   return (
     <div
@@ -106,22 +111,9 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
         <TrainerTSD telemetry={telemetry} tactical={tactical} />
       </div>
 
-      {/* Right column — logs placeholder (Phase 21-03) */}
-      <div className="jarvis-panel flex items-center justify-center">
-        <div className="text-center">
-          <div
-            className="text-jarvis-primary/30"
-            style={{ fontSize: '11px', letterSpacing: '3px' }}
-          >
-            LOGS
-          </div>
-          <div
-            className="text-jarvis-primary/20 mt-2"
-            style={{ fontSize: '9px', letterSpacing: '2px' }}
-          >
-            PHASE 21-03
-          </div>
-        </div>
+      {/* Right column — mission log */}
+      <div className="flex flex-col min-h-0 overflow-hidden">
+        <TrainerLogPanel entries={logEntries} />
       </div>
     </div>
   )
