@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useTrainerComm } from '@/hooks/use-trainer-comm'
 import { TrainerVoiceTab } from './trainer-voice-tab'
 import { TrainerTextTab } from './trainer-text-tab'
+import { TrainerTemplatesTab } from './trainer-templates-tab'
 import type { TelemetryPacket } from '@jarvis-dcs/shared'
 
 const INTENSITY_KEY = 'jarvis-trainer-rephrase-intensity'
@@ -202,12 +203,11 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase }: TrainerC
           />
         )}
         {activeTab === 'templates' && (
-          <div
-            className="flex items-center justify-center h-full text-jarvis-primary/30"
-            style={{ fontSize: '9px', letterSpacing: '2px' }}
-          >
-            TEMPLATES — COMING SOON
-          </div>
+          <TrainerTemplatesTab
+            stage={stage}
+            telemetry={telemetry}
+            onSendText={sendText}
+          />
         )}
       </div>
     </div>
