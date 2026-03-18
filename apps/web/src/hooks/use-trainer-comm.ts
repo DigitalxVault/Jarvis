@@ -51,7 +51,11 @@ export function useTrainerComm({
   useEffect(() => {
     if (!sessionId) return
     const channelName = getChannelName(sessionId)
-    const ch = supabase.channel(`${channelName}:trainer-broadcast`, {
+    // Use the base channel name so broadcast events reach useTelemetry
+    // on the player side and useTrainerLog on the trainer side.
+    // Multiple RealtimeChannel objects on the same topic are fine —
+    // they are separate JS objects but share the underlying Supabase subscription.
+    const ch = supabase.channel(channelName, {
       config: { broadcast: { ack: false } },
     })
     ch.subscribe()

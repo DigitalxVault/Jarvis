@@ -43,7 +43,9 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     const sessionId = currentSession?.id
     if (!sessionId) return
     const channelName = getChannelName(sessionId)
-    const ch = supabase.channel(`${channelName}:player-broadcast`, {
+    // Use base channel name so conversation events reach useTrainerLog
+    // on the trainer side. Multiple objects on same topic is fine.
+    const ch = supabase.channel(channelName, {
       config: { broadcast: { ack: false } },
     })
     ch.subscribe()
