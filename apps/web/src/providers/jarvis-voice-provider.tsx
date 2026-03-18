@@ -11,6 +11,7 @@ import { getPhaseTransitionLine } from '@/lib/phase-personality'
 import { supabase } from '@/lib/supabase'
 import { getChannelName } from '@jarvis-dcs/shared'
 import type { ConversationEntry } from '@jarvis-dcs/shared'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 
 type VoiceState = 'idle' | 'listening' | 'wake-detected' | 'recording' | 'processing' | 'speaking' | 'error' | 'limit'
 
@@ -35,18 +36,35 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   // Track whether we're currently processing a command
   const isProcessingRef = useRef(false)
 
+  // Persistent broadcast channel — created once per sessionId, reused by broadcastConversation
+  const broadcastChannelRef = useRef<RealtimeChannel | null>(null)
+
+  useEffect(() => {
+    const sessionId = currentSession?.id
+    if (!sessionId) return
+    const channelName = getChannelName(sessionId)
+    const ch = supabase.channel(`${channelName}:player-broadcast`, {
+      config: { broadcast: { ack: false } },
+    })
+    ch.subscribe()
+    broadcastChannelRef.current = ch
+    return () => {
+      supabase.removeChannel(ch)
+      broadcastChannelRef.current = null
+    }
+  }, [currentSession?.id])
+
   // Broadcast a conversation entry to the session channel for the trainer
   const broadcastConversation = useCallback((role: 'player' | 'jarvis', text: string) => {
-    if (!currentSession?.id) return
-    const channelName = getChannelName(currentSession.id)
-    const channel = supabase.channel(channelName)
+    const ch = broadcastChannelRef.current
+    if (!ch) return
     const payload: ConversationEntry = { type: 'conversation', role, text, ts: Date.now() }
-    channel.send({
+    ch.send({
       type: 'broadcast',
       event: 'conversation',
       payload,
     })
-  }, [currentSession?.id])
+  }, [])
 
   // Callback for voice cues — broadcasts proactive Jarvis alerts to trainer
   const handleVoiceCueSpeak = useCallback((text: string) => {

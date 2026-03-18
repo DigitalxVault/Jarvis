@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 23 of 24 (Trainer DCS Controls) — COMPLETE
-Plan: 2 of 2 complete (23-01 and 23-02 done)
-Status: Phase 23 complete — all 4 tabs functional (COMMS, CONTROLS, ALERTS, MISSION)
-Last activity: 2026-03-18 — Completed 23-02-PLAN.md (ALERTS tab + MISSION tab + TSD click-to-place)
+Phase: 24 of 24 (Roles, Integration & Polish) — IN PROGRESS
+Plan: 1 of ? complete (24-01 done)
+Status: Phase 24 started — session lifecycle (end session flow) complete
+Last activity: 2026-03-18 — Completed 24-01-PLAN.md (PATCH endpoint + sessionEnded + End Session button + SESSION ENDED overlay)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [##########] 83% Phase 23 complete (2/2 plans done), Phase 24 remaining
+Progress: v3.0 [##########] 88% Phase 24 in progress (1 plan done)
 
 ## Performance Metrics
 
@@ -192,6 +192,11 @@ Amendment decisions (2026-03-13):
 | D-2304 | 10s command timeout in useDcsCommands | Accounts for Supabase RTT + DCS eval execution latency |
 | D-2305 | AlertThresholdMeta in alerts.ts not types.ts | Alert configuration co-located with DEFAULT_ALERT_RULES |
 | D-2306 | 4-tab comm panel (COMMS retains sub-tabs) | Non-breaking restructure; panel height 180→220px |
+| D-2401 | Broadcast session_ended before PATCH DB call | Trainers get instant notification; DB persistence happens after |
+| D-2402 | ended_at column fallback: retry without it if DB returns column-not-found error | Graceful degradation — works with or without ended_at column in schema |
+| D-2403 | END SESSION button hidden on mobile | Session management is a deliberate desktop action; avoids accidental taps |
+| D-2404 | onExit is optional prop on TrainerDashboard | Non-breaking; works without it; page.tsx passes handleExit for full flow |
+| D-2405 | SESSION ENDED overlay uses fixed positioning z-[10000] | Appears above all trainer dashboard content including ToastProvider |
 
 ### Pending Todos
 
@@ -224,5 +229,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Phase 23 Plan 02 COMPLETE — ALERTS tab + MISSION tab + TSD click-to-place
+Stopped at: Phase 24 Plan 01 COMPLETE — session lifecycle end flow
 Resume file: None

@@ -4,6 +4,7 @@ import { useRef, useState, useCallback, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
 import { speakWithElevenLabs } from '@/lib/elevenlabs'
 import { getChannelName } from '@jarvis-dcs/shared'
+import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { TelemetryPacket, ConversationEntry } from '@jarvis-dcs/shared'
 
 export type CommStage = 'idle' | 'recording' | 'transcribing' | 'rephrasing' | 'speaking' | 'error'
@@ -43,6 +44,23 @@ export function useTrainerComm({
   rephraseIntensityRef.current = rephraseIntensity
   const sessionIdRef = useRef(sessionId)
   sessionIdRef.current = sessionId
+
+  // Persistent broadcast channel — created once per sessionId, reused by sendText
+  const broadcastChannelRef = useRef<RealtimeChannel | null>(null)
+
+  useEffect(() => {
+    if (!sessionId) return
+    const channelName = getChannelName(sessionId)
+    const ch = supabase.channel(`${channelName}:trainer-broadcast`, {
+      config: { broadcast: { ack: false } },
+    })
+    ch.subscribe()
+    broadcastChannelRef.current = ch
+    return () => {
+      supabase.removeChannel(ch)
+      broadcastChannelRef.current = null
+    }
+  }, [sessionId])
 
   // Audio recording refs
   const analyserRef = useRef<AnalyserNode | null>(null)
@@ -123,20 +141,23 @@ export function useTrainerComm({
       setStage('speaking')
       stageRef.current = 'speaking'
 
-      // Broadcast to player channel and speak concurrently
-      const channelName = getChannelName(sessionIdRef.current)
-      const channel = supabase.channel(channelName)
-      const payload: ConversationEntry = {
-        type: 'conversation',
-        role: 'jarvis',
-        text: textToSpeak,
-        ts: Date.now(),
+      // Broadcast to player channel using persistent channel ref
+      const broadcastCh = broadcastChannelRef.current
+      if (!broadcastCh) {
+        console.warn('[TrainerComm] Broadcast channel not ready — skipping conversation broadcast')
+      } else {
+        const payload: ConversationEntry = {
+          type: 'conversation',
+          role: 'jarvis',
+          text: textToSpeak,
+          ts: Date.now(),
+        }
+        broadcastCh.send({
+          type: 'broadcast',
+          event: 'conversation',
+          payload,
+        })
       }
-      channel.send({
-        type: 'broadcast',
-        event: 'conversation',
-        payload,
-      })
 
       // Await TTS playback
       const { promise } = speakWithElevenLabs({ text: textToSpeak })
