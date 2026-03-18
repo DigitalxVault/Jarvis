@@ -267,7 +267,7 @@ Plans:
 
 **Dependencies:** Phase 15 (Python bridge operational)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
 - [ ] 16-01-PLAN.md -- Session overhaul (4-digit codes, player-initiated, Supabase metadata)
@@ -322,7 +322,7 @@ Plans:
 
 **Dependencies:** Phase 17 (TTS must work for response playback)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
 - [ ] 18-01-PLAN.md -- Porcupine wake word + Web Audio API buffering
@@ -349,7 +349,7 @@ Plans:
 
 **Dependencies:** Phase 18 (STT provides transcribed text)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
 - [ ] 19-01-PLAN.md -- Rule engine (known commands → telemetry lookup → instant response)
@@ -374,7 +374,7 @@ Plans:
 
 **Dependencies:** Phase 19 (command processing provides response generation infrastructure)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
 - [ ] 20-01-PLAN.md -- Flight phase detection + personality adapter
@@ -429,11 +429,11 @@ Plans:
 
 **Dependencies:** Phase 21 (trainer dashboard provides the UI context)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] 22-01-PLAN.md -- PTT voice + text input → GPT-4o rephrase → ElevenLabs TTS
-- [ ] 22-02-PLAN.md -- Template button system (categorized library)
+- [x] 22-01-PLAN.md -- PTT voice + text input → GPT-4o rephrase → ElevenLabs TTS
+- [x] 22-02-PLAN.md -- Template button system (categorized library)
 
 **Requirements:**
 - REQ-335 -- PTT voice → Whisper → GPT-4o rephrase → ElevenLabs as Jarvis
@@ -455,11 +455,11 @@ Plans:
 
 **Dependencies:** Phase 22 (trainer communication operational; controls complement voice interaction)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
-- [ ] 23-01-PLAN.md -- Spawn units + set AI objectives (UI → bridge → gRPC)
-- [ ] 23-02-PLAN.md -- Alert threshold config + mission injection (waypoints, objectives)
+- [x] 23-01-PLAN.md -- Spawn units + set AI objectives (UI → bridge → gRPC)
+- [x] 23-02-PLAN.md -- Alert threshold config + mission injection (waypoints, objectives)
 
 **Requirements:**
 - REQ-305 -- Python bridge receives commands from Supabase Realtime → DCS-gRPC
@@ -482,7 +482,7 @@ Plans:
 
 **Dependencies:** Phase 23 (all features built; this phase integrates and polishes)
 
-**Plans:** ~2 plans
+**Plans:** 2 plans
 
 Plans:
 - [ ] 24-01-PLAN.md -- Observer role (read-only dashboard, no controls)
@@ -525,10 +525,10 @@ Plans:
 | 19. Command Processing | v3.0 | 0/2 | Not Started | -- |
 | 20. Flight Phase & Proactive Alerts | v3.0 | 0/2 | Not Started | -- |
 | 21. Trainer Session & Dashboard | v3.0 | 3/3 | Complete | 2026-03-17 |
-| 22. Trainer Communication | v3.0 | 0/2 | Not Started | -- |
-| 23. Trainer DCS Controls | v3.0 | 0/2 | Not Started | -- |
+| 22. Trainer Communication | v3.0 | 2/2 | Complete | 2026-03-18 |
+| 23. Trainer DCS Controls | v3.0 | 2/2 | Complete | 2026-03-18 |
 | 24. Roles, Integration & Polish | v3.0 | 0/2 | Not Started | -- |
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-17 -- Phase 21 complete*
+*Last updated: 2026-03-18 -- Phase 23 complete*

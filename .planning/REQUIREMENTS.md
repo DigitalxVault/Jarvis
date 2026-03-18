@@ -171,7 +171,7 @@
 
 - [ ] **REQ-303** — Python bridge connects to DCS via DCS-gRPC and receives telemetry (position, attitude, speed, fuel, engine, weapons)
 - [ ] **REQ-304** — Python bridge publishes telemetry to Supabase REST broadcast (same channel format as v1.0: `session:{id}`)
-- [ ] **REQ-305** — Python bridge receives commands from Supabase Realtime (trainer actions) and executes via DCS-gRPC
+- [x] **REQ-305** — Python bridge receives commands from Supabase Realtime (trainer actions) and executes via DCS-gRPC
 - [ ] **REQ-306** — Python bridge handles DCS disconnect with auto-retry and status reporting
 - [ ] **REQ-307** — Python bridge auto-opens browser to Jarvis web URL on startup
 - [ ] **REQ-308** — Heartbeat system (1 Hz) with DCS active/inactive status, packet count, queue depth
@@ -225,17 +225,17 @@
 
 ## Trainer Communication (TCOMM)
 
-- [ ] **REQ-335** — PTT voice input: trainer speaks → Whisper → GPT-4o rephrases to aviation terminology + Jarvis tone → ElevenLabs speaks as Jarvis
-- [ ] **REQ-336** — Template button system with configurable library (situational awareness, approach, combat, mission, encouragement categories)
-- [ ] **REQ-337** — Custom text box: trainer types → GPT-4o rephrases → ElevenLabs speaks as Jarvis
-- [ ] **REQ-338** — Player cannot distinguish trainer-relayed speech from AI-generated Jarvis speech
+- [x] **REQ-335** — PTT voice input: trainer speaks → Whisper → GPT-4o rephrases to aviation terminology + Jarvis tone → ElevenLabs speaks as Jarvis
+- [x] **REQ-336** — Template button system with configurable library (situational awareness, approach, combat, mission, encouragement categories)
+- [x] **REQ-337** — Custom text box: trainer types → GPT-4o rephrases → ElevenLabs speaks as Jarvis
+- [x] **REQ-338** — Player cannot distinguish trainer-relayed speech from AI-generated Jarvis speech
 
 ## Trainer DCS Controls (TCTRL)
 
-- [ ] **REQ-339** — Spawn enemy units: type, count, distance, bearing, altitude → Python bridge → DCS-gRPC
-- [ ] **REQ-340** — Set AI objectives: target group, objective type (CAP, fighter sweep, idle) → DCS-gRPC
-- [ ] **REQ-341** — Alert threshold configuration: parameter, operator, value → updates threshold monitor
-- [ ] **REQ-342** — Mission injection: waypoint coordinates, objective description → DCS-gRPC
+- [x] **REQ-339** — Spawn enemy units: type, count, distance, bearing, altitude → Python bridge → DCS-gRPC
+- [x] **REQ-340** — Set AI objectives: target group, objective type (CAP, fighter sweep, idle) → DCS-gRPC
+- [x] **REQ-341** — Alert threshold configuration: parameter, operator, value → updates threshold monitor
+- [x] **REQ-342** — Mission injection: waypoint coordinates, objective description → DCS-gRPC
 
 ## Trainer Roles (TROLE)
 
@@ -263,7 +263,7 @@
 | REQ-302 | Prerequisites | 15 | Pending |
 | REQ-303 | Python Bridge | 15 | Pending |
 | REQ-304 | Python Bridge | 15 | Pending |
-| REQ-305 | Python Bridge | 23 | Pending |
+| REQ-305 | Python Bridge | 23 | Complete |
 | REQ-306 | Python Bridge | 15 | Pending |
 | REQ-307 | Python Bridge | 15 | Pending |
 | REQ-308 | Python Bridge | 15 | Pending |
@@ -293,13 +293,13 @@
 | REQ-332 | Trainer Visibility | 21 | Complete |
 | REQ-333 | Trainer Visibility | 21 | Complete |
 | REQ-334 | Trainer Visibility | 21 | Complete |
-| REQ-335 | Trainer Communication | 22 | Pending |
-| REQ-336 | Trainer Communication | 22 | Pending |
-| REQ-337 | Trainer Communication | 22 | Pending |
-| REQ-338 | Trainer Communication | 22 | Pending |
-| REQ-339 | Trainer DCS Controls | 23 | Pending |
-| REQ-340 | Trainer DCS Controls | 23 | Pending |
-| REQ-341 | Trainer DCS Controls | 23 | Pending |
-| REQ-342 | Trainer DCS Controls | 23 | Pending |
+| REQ-335 | Trainer Communication | 22 | Complete |
+| REQ-336 | Trainer Communication | 22 | Complete |
+| REQ-337 | Trainer Communication | 22 | Complete |
+| REQ-338 | Trainer Communication | 22 | Complete |
+| REQ-339 | Trainer DCS Controls | 23 | Complete |
+| REQ-340 | Trainer DCS Controls | 23 | Complete |
+| REQ-341 | Trainer DCS Controls | 23 | Complete |
+| REQ-342 | Trainer DCS Controls | 23 | Complete |
 | REQ-343 | Trainer Roles | 24 | Pending |
 | REQ-344 | Trainer Roles | 24 | Pending |

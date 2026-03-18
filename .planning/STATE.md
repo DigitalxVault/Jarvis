@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 23 Trainer DCS Controls
+**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 24 Roles, Integration & Polish
 
 ## Current Position
 
-Phase: 23 of 24 (Trainer DCS Controls) — In Progress
-Plan: 1 of 2 complete (23-01 done)
-Status: In progress — 23-01 complete, ready for 23-02
-Last activity: 2026-03-18 — Completed 23-01-PLAN.md (DCS command pipeline + CONTROLS tab + 4-tab comm panel)
+Phase: 23 of 24 (Trainer DCS Controls) — COMPLETE
+Plan: 2 of 2 complete (23-01 and 23-02 done)
+Status: Phase 23 complete — all 4 tabs functional (COMMS, CONTROLS, ALERTS, MISSION)
+Last activity: 2026-03-18 — Completed 23-02-PLAN.md (ALERTS tab + MISSION tab + TSD click-to-place)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [#########.] 75% Phase 23 plan 1 of 2 complete
+Progress: v3.0 [##########] 83% Phase 23 complete (2/2 plans done), Phase 24 remaining
 
 ## Performance Metrics
 
@@ -51,7 +51,7 @@ Progress: v3.0 [#########.] 75% Phase 23 plan 1 of 2 complete
 | 20. Flight Phase & Proactive Alerts | v3.0 | -- |
 | 21. Trainer Session & Dashboard | v3.0 | 3 complete (DONE) |
 | 22. Trainer Communication | v3.0 | 2 of 2 complete (DONE) |
-| 23. Trainer DCS Controls | v3.0 | 1 of 2 (23-01 done) |
+| 23. Trainer DCS Controls | v3.0 | 2 of 2 COMPLETE |
 | 24. Roles, Integration & Polish | v3.0 | -- |
 
 *Updated after each plan completion*
@@ -182,6 +182,10 @@ Amendment decisions (2026-03-13):
 | D-2206 | fillTemplate uses inline math not conversions.ts | Self-contained; no import chain needed for 7 arithmetic operations |
 | D-2207 | Custom tab always shown in tab row | Keeps discoverability; shows + ADD TEMPLATE when empty |
 | D-2208 | lastClickedId reset after await onSendText | Accurately reflects active button during async pipeline |
+| D-2307 | Alert config bypasses bridge; trainer broadcasts config_alert on session channel | Web-only config; no Python bridge round-trip needed |
+| D-2308 | tsdClickHandler stored as useState(() => handler) not useState(handler) | React treats bare function as initializer; wrap to store function as state value |
+| D-2309 | Pixel-to-latlon uses radius=(canvasSize/2)-30 matching renderFrame padding | Accurate coordinate mapping; consistent with drawing origin |
+| D-2310 | useAlertConfig resets to DEFAULT_ALERT_RULES when sessionId is null | Guards against stale overrides on session change |
 | D-2301 | Client-side BRA→absolute conversion using player telemetry | Bridge receives absolute coords only; no telemetry coupling in Python |
 | D-2302 | CommandExecutor opens gRPC channel in __init__, close() in finally | Same lifecycle as SupabasePublisher; clean shutdown guaranteed |
 | D-2303 | CommandListener async start() + polling loop | start() connects/subscribes then polls while running; stop() sets flag |
@@ -220,5 +224,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Phase 23 Plan 01 COMPLETE — DCS command pipeline + CONTROLS tab + 4-tab comm panel
+Stopped at: Phase 23 Plan 02 COMPLETE — ALERTS tab + MISSION tab + TSD click-to-place
 Resume file: None
