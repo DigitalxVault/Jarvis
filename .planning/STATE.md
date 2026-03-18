@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 25 of 27 (Supabase Schema & RLS) — IN PROGRESS
-Plan: 1 of 2
-Status: Plan 01 complete — trainer_code column migration created
-Last activity: 2026-03-18 — Completed 25-01-PLAN.md
+Phase: 25 of 27 (Supabase Schema & RLS) — COMPLETE
+Plan: 2 of 2 complete
+Status: Phase 25 complete — RLS enabled on sessions table
+Last activity: 2026-03-18 — Completed 25-02-PLAN.md
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [########--] 82% Phases 15-24 complete; Phase 25 in progress (1/2 done); Phases 26-27 pending
+Progress: v3.0 [#########-] 89% Phases 15-25 complete; Phases 26-27 pending
 
 ## Performance Metrics
 
@@ -53,6 +53,7 @@ Progress: v3.0 [########--] 82% Phases 15-24 complete; Phase 25 in progress (1/2
 | 22. Trainer Communication | v3.0 | 2 of 2 complete (DONE) |
 | 23. Trainer DCS Controls | v3.0 | 2 of 2 COMPLETE |
 | 24. Roles, Integration & Polish | v3.0 | 2 of 2 COMPLETE |
+| 25. Supabase Schema & RLS | v3.0 | 2 of 2 COMPLETE |
 
 *Updated after each plan completion*
 
@@ -202,6 +203,9 @@ Amendment decisions (2026-03-13):
 | D-2413 | startTransition(setMicDenied) in useEffect | Matches existing project pattern (D-2110) to suppress react-hooks/set-state-in-effect lint rule |
 | D-2501 | trainer_code column is nullable with no default | Trainer code is opt-in; not all sessions need one |
 | D-2502 | Two partial indexes (lookup + unique) not a UNIQUE column constraint | Partial uniqueness (WHERE NOT NULL) cannot be expressed as column constraint; requires index |
+| D-2511 | anon SELECT restricted to sessions with active codes only | Guards against direct PostgREST anon key access; Realtime Broadcast unaffected by table RLS |
+| D-2512 | authenticated role: permissive USING (true) — NextAuth project | auth.uid() meaningless; real auth happens in API routes; policies are defense-in-depth only |
+| D-2513 | No DELETE policy for any role | Sessions ended by status=ended, never deleted; RLS enforces this invariant at DB level |
 
 ### Pending Todos
 
@@ -211,12 +215,13 @@ Amendment decisions (2026-03-13):
 - Phases 15-24 all complete and shipping
 - Integration fixes applied 2026-03-18: trainer code UI, session_ended broadcast, rate limiting
 - ~~**Add `trainer_code` column to Supabase sessions table**~~ DONE — 002_trainer_code.sql created (apply via Supabase dashboard)
+- ~~**Enable RLS on sessions table**~~ DONE — 003_enable_rls.sql created (apply via Supabase dashboard)
 
 ### Blockers/Concerns
 
 - NextAuth v5 session JWT structure may change between betas -- verify before next milestone
 - Supabase free tier pauses projects after 1 week of inactivity; unpause manually or add keepalive
-- Supabase RLS disabled -- must re-enable when addressing auth integration in future milestone
+- ~~Supabase RLS disabled~~ RESOLVED — RLS enabled in Phase 25 via 003_enable_rls.sql (apply to Supabase dashboard)
 - iOS PWA limitations: no beforeinstallprompt (HANDLED via guidance UI in 08-04), 7-day storage eviction, limited background execution
 - RSC payloads excluded from SW caching (RESOLVED in 08-02 via two-path detection)
 - iOS WebSocket dies on background -- existing visibilitychange reconnection mitigates
@@ -231,5 +236,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Completed 25-01-PLAN.md — trainer_code column migration created
+Stopped at: Completed 25-02-PLAN.md — RLS enabled on sessions table (Phase 25 COMPLETE)
 Resume file: None
