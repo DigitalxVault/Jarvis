@@ -21,6 +21,7 @@ interface TelemetryState {
   lastPacketAt: number | null
   rawPackets: TelemetryPacket[]
   subscriptionStatus: string
+  sessionEnded: boolean
 }
 
 export function useTelemetry(sessionId: string | null): TelemetryState {
@@ -30,6 +31,8 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
   const [connectionState, setConnectionState] = useState<ConnectionState>('offline')
   const [subscriptionStatus, setSubscriptionStatus] = useState<string>('idle')
   const [rawPackets, setRawPackets] = useState<TelemetryPacket[]>([])
+
+  const [sessionEnded, setSessionEnded] = useState(false)
 
   const channelRef = useRef<RealtimeChannel | null>(null)
   const packetCountRef = useRef(0)
@@ -100,6 +103,10 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
     setTactical(packet)
   }, [])
 
+  const handleSessionEnded = useCallback(() => {
+    setSessionEnded(true)
+  }, [])
+
   const handleStatus = useCallback((status: string) => {
     setSubscriptionStatus(status)
     if (status === 'SUBSCRIBED') {
@@ -124,11 +131,12 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
       .on('broadcast', { event: 'telemetry' }, handleTelemetry)
       .on('broadcast', { event: 'heartbeat' }, handleHeartbeat)
       .on('broadcast', { event: 'tactical' }, handleTactical)
+      .on('broadcast', { event: 'session_ended' }, handleSessionEnded)
       .subscribe(handleStatus)
 
     channelRef.current = channel
     return channel
-  }, [handleTelemetry, handleHeartbeat, handleTactical, handleStatus])
+  }, [handleTelemetry, handleHeartbeat, handleTactical, handleSessionEnded, handleStatus])
 
   // Subscribe to channel
   useEffect(() => {
@@ -139,6 +147,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
 
     setConnectionState('connecting')
     setSubscriptionStatus('subscribing')
+    setSessionEnded(false)
 
     const channelName = `session:${sessionId}`
     setupChannel(channelName)
@@ -168,5 +177,6 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
     lastPacketAt,
     rawPackets,
     subscriptionStatus,
+    sessionEnded,
   }
 }
