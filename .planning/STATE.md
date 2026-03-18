@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 24 Roles, Integration & Polish
+**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Tech Debt Closure (Phases 25-27)
 
 ## Current Position
 
-Phase: 24 of 24 (Roles, Integration & Polish) — COMPLETE
-Plan: 2 of 2 complete (24-01 + 24-02 done)
-Status: Phase 24 COMPLETE — v3.0 Voice Co-Pilot & Trainer Platform feature-complete
-Last activity: 2026-03-18 — Completed 24-02-PLAN.md (memory leaks + error hardening + integration audit)
+Phase: 25 of 27 (Supabase Schema & RLS) — IN PROGRESS
+Plan: 1 of 2
+Status: Plan 01 complete — trainer_code column migration created
+Last activity: 2026-03-18 — Completed 25-01-PLAN.md
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [##########] 100% Phase 24 COMPLETE — v3.0 SHIPPED
+Progress: v3.0 [########--] 82% Phases 15-24 complete; Phase 25 in progress (1/2 done); Phases 26-27 pending
 
 ## Performance Metrics
 
@@ -43,12 +43,12 @@ Progress: v3.0 [##########] 100% Phase 24 COMPLETE — v3.0 SHIPPED
 | 12. Draggable Layout | v2.0 | 1 complete (DONE) |
 | 13. Responsive Layout | v2.0 | 4 complete (DONE) |
 | 14. Offline Shell & Polish | v2.0 | 3 complete (DONE) |
-| 15. Python Bridge + DCS-gRPC | v3.0 | -- |
-| 16. Session & Connection Overhaul | v3.0 | -- |
-| 17. TTS Foundation + Voice Cues | v3.0 | -- |
-| 18. Wake Word + STT Pipeline | v3.0 | -- |
-| 19. Command Processing | v3.0 | -- |
-| 20. Flight Phase & Proactive Alerts | v3.0 | -- |
+| 15. Python Bridge + DCS-gRPC | v3.0 | 4 complete (DONE) |
+| 16. Session & Connection Overhaul | v3.0 | 2 complete (DONE) |
+| 17. TTS Foundation + Voice Cues | v3.0 | 3 complete (DONE) |
+| 18. Wake Word + STT Pipeline | v3.0 | 2 complete (DONE) |
+| 19. Command Processing | v3.0 | 2 complete (DONE) |
+| 20. Flight Phase & Proactive Alerts | v3.0 | 2 complete (DONE) |
 | 21. Trainer Session & Dashboard | v3.0 | 3 complete (DONE) |
 | 22. Trainer Communication | v3.0 | 2 of 2 complete (DONE) |
 | 23. Trainer DCS Controls | v3.0 | 2 of 2 COMPLETE |
@@ -200,18 +200,17 @@ Amendment decisions (2026-03-13):
 | D-2411 | Broadcast refs use base getChannelName (no suffix) | Supabase broadcast only reaches same-topic subscribers; suffix broke player/log reception |
 | D-2412 | ElevenLabs throws on TTS failure (not silent return) | Enables service-named error propagation to trainer's stage display |
 | D-2413 | startTransition(setMicDenied) in useEffect | Matches existing project pattern (D-2110) to suppress react-hooks/set-state-in-effect lint rule |
+| D-2501 | trainer_code column is nullable with no default | Trainer code is opt-in; not all sessions need one |
+| D-2502 | Two partial indexes (lookup + unique) not a UNIQUE column constraint | Partial uniqueness (WHERE NOT NULL) cannot be expressed as column constraint; requires index |
 
 ### Pending Todos
 
 **v2.0:** COMPLETE — all 49 requirements shipped (REQ-200 to REQ-248)
 
-**v3.0 (in progress):**
-- Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
-- Phase 21: ALL 3 PLANS COMPLETE — trainer dashboard fully built (code system, TSD, mission log)
-- Phase 22: Trainer Communication — ALL 2 PLANS COMPLETE
-- Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
-- Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
-- **Add `trainer_code` column to Supabase sessions table** (required before trainer API works)
+**v3.0 — ALL PHASES COMPLETE:**
+- Phases 15-24 all complete and shipping
+- Integration fixes applied 2026-03-18: trainer code UI, session_ended broadcast, rate limiting
+- ~~**Add `trainer_code` column to Supabase sessions table**~~ DONE — 002_trainer_code.sql created (apply via Supabase dashboard)
 
 ### Blockers/Concerns
 
@@ -226,11 +225,11 @@ Amendment decisions (2026-03-13):
 - DCS-gRPC mod not yet installed — required before Phase 15 development
 - API keys not yet created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine) — required before Phases 17-18
 - Python bridge replaces Node.js bridge — need migration plan for existing sessions/channels
-- trainer_code column missing from sessions table — requires Supabase migration before Phase 21 APIs work
+- trainer_code column migration created (002_trainer_code.sql) — must be applied to Supabase via dashboard SQL editor before Phase 21 APIs work
 - TODO: rate-limit /api/trainer/claim (9000 possible codes, brute-force risk)
 
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Phase 24 Plan 02 COMPLETE — v3.0 COMPLETE (memory leaks + error hardening + integration audit)
+Stopped at: Completed 25-01-PLAN.md — trainer_code column migration created
 Resume file: None
