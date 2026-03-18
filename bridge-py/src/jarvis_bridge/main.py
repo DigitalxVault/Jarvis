@@ -19,6 +19,8 @@ import webbrowser
 
 from dotenv import load_dotenv
 
+from jarvis_bridge.command_executor import CommandExecutor
+from jarvis_bridge.command_listener import CommandListener
 from jarvis_bridge.grpc_client import GrpcClient
 from jarvis_bridge.heartbeat import Heartbeat
 from jarvis_bridge.normalizer import Normalizer
@@ -66,6 +68,14 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
     """Run all bridge components concurrently."""
 
     # --- Component construction ---
+    command_executor = CommandExecutor(target="localhost:50051")
+    command_listener = CommandListener(
+        supabase_url=supabase_url,
+        api_key=api_key,
+        channel_topic=channel_topic,
+        executor=command_executor,
+    )
+
     grpc_client = GrpcClient()
     udp_listener = UdpListener()
     normalizer = Normalizer()
@@ -142,12 +152,30 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
 
             await asyncio.sleep(interval)
 
+    # --- Command listener reconnect loop ---
+    async def _command_loop() -> None:
+        """Command listener with exponential backoff reconnect."""
+        backoff = 1.0
+        max_backoff = 30.0
+        while True:
+            try:
+                await command_listener.start()
+                # start() returned normally (e.g. after stop()) — done
+                break
+            except asyncio.CancelledError:
+                raise
+            except Exception as exc:  # noqa: BLE001
+                log.debug("Command listener error: %s", exc)
+            await asyncio.sleep(backoff)
+            backoff = min(backoff * 2, max_backoff)
+
     # --- Gather all tasks ---
     tasks = [
         asyncio.create_task(_grpc_loop(), name="grpc_loop"),
         asyncio.create_task(_publish_loop(), name="publish_loop"),
         asyncio.create_task(_sync_normalizer(), name="sync_normalizer"),
         asyncio.create_task(tui.run(), name="tui"),
+        asyncio.create_task(_command_loop(), name="command_loop"),
     ]
 
     try:
@@ -163,6 +191,8 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         heartbeat.stop()
         udp_listener.stop()
         await publisher.close()
+        await command_listener.stop()
+        await command_executor.close()
         log.info("Bridge shutdown complete.")
 
 
