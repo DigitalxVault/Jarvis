@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { useDcsCommands } from '@/hooks/use-dcs-commands'
 import { useToast } from '@/components/toast-notification'
 import { ConfirmModal } from '@/components/confirm-modal'
+import { ObserverGuard } from './observer-guard'
 import type { TelemetryPacket, MissionWaypoint } from '@jarvis-dcs/shared'
 
 type MissionMode = 'quick' | 'route'
@@ -279,6 +280,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
   const noTelemetry = !telemetry
 
   return (
+    <ObserverGuard>
     <div
       style={{
         height: '100%',
@@ -583,5 +585,6 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
         }}
       />
     </div>
+    </ObserverGuard>
   )
 }

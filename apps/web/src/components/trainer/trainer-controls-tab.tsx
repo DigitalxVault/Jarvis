@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useDcsCommands } from '@/hooks/use-dcs-commands'
 import { useToast } from '@/components/toast-notification'
 import { ConfirmModal } from '@/components/confirm-modal'
+import { ObserverGuard } from './observer-guard'
 import type {
   TelemetryPacket,
   DcsSkillLevel,
@@ -359,6 +360,7 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
   // ---------------------------------------------------------------------------
 
   return (
+    <ObserverGuard>
     <div
       style={{
         height: '100%',
@@ -734,5 +736,6 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
         onCancel={() => setConfirmOpen(false)}
       />
     </div>
+    </ObserverGuard>
   )
 }

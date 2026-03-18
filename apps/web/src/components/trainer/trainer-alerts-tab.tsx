@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react'
 import { supabase } from '@/lib/supabase'
 import { getChannelName, ALERT_THRESHOLD_META, DEFAULT_ALERT_RULES } from '@jarvis-dcs/shared'
 import type { AlertSeverity, AlertThresholdMeta } from '@jarvis-dcs/shared'
+import { ObserverGuard } from './observer-guard'
 
 interface AlertRowState {
   enabled: boolean
@@ -105,6 +106,7 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
   }
 
   return (
+    <ObserverGuard>
     <div
       style={{
         height: '100%',
@@ -245,5 +247,6 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
         )
       })}
     </div>
+    </ObserverGuard>
   )
 }

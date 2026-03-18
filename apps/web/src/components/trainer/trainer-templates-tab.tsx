@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { ObserverGuard } from './observer-guard'
 import {
   CURATED_TEMPLATES,
   TEMPLATE_CATEGORIES,
@@ -75,6 +76,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
   const isPipelineRunning = stage !== 'idle' && stage !== 'error'
 
   return (
+    <ObserverGuard>
     <div
       style={{
         height: '100%',
@@ -410,5 +412,6 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
         </div>
       )}
     </div>
+    </ObserverGuard>
   )
 }

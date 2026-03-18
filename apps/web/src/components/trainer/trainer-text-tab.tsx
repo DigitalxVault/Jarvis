@@ -2,6 +2,8 @@
 
 import { useState, useCallback, useRef } from 'react'
 import type { CommStage } from '@/hooks/use-trainer-comm'
+import { ObserverGuard } from './observer-guard'
+import { useTrainerRole } from './trainer-role-context'
 
 interface TrainerTextTabProps {
   stage: CommStage
@@ -37,6 +39,7 @@ function StageProgress({ stage, errorMessage }: { stage: CommStage; errorMessage
 }
 
 export function TrainerTextTab({ stage, onSendText }: TrainerTextTabProps) {
+  const { isObserver } = useTrainerRole()
   const [text, setText] = useState('')
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
@@ -54,11 +57,12 @@ export function TrainerTextTab({ stage, onSendText }: TrainerTextTabProps) {
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault()
-      handleSend()
+      if (!isObserver) handleSend()
     }
-  }, [handleSend])
+  }, [handleSend, isObserver])
 
   return (
+    <ObserverGuard>
     <div className="flex flex-col gap-2 p-2 h-full">
       {/* Text input area */}
       <textarea
@@ -114,5 +118,6 @@ export function TrainerTextTab({ stage, onSendText }: TrainerTextTabProps) {
         </div>
       </div>
     </div>
+    </ObserverGuard>
   )
 }

@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useCallback, useState, startTransition } from 'react'
 import type { CommStage } from '@/hooks/use-trainer-comm'
+import { ObserverGuard } from './observer-guard'
+import { useTrainerRole } from './trainer-role-context'
 
 interface TrainerVoiceTabProps {
   stage: CommStage
@@ -66,6 +68,7 @@ export function TrainerVoiceTab({
   analyserRef,
   onToggleRecording,
 }: TrainerVoiceTabProps) {
+  const { isObserver } = useTrainerRole()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rafRef = useRef<number>(0)
   const isRecordingRef = useRef(false)
@@ -161,24 +164,26 @@ export function TrainerVoiceTab({
   }, [stage, drawWaveform])
 
   // Keyboard shortcut — Space to toggle recording when voice tab is visible
+  // Blocked for observers (isObserver check prevents PTT via keyboard)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'Space' && e.target === document.body) {
         e.preventDefault()
-        if (stage === 'idle' || stage === 'recording') {
+        if (!isObserver && (stage === 'idle' || stage === 'recording')) {
           onToggleRecording()
         }
       }
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [stage, onToggleRecording])
+  }, [stage, onToggleRecording, isObserver])
 
   const isRecording = stage === 'recording'
   const isPipelineActive = stage === 'transcribing' || stage === 'rephrasing' || stage === 'speaking'
   const isButtonDisabled = isPipelineActive || micDenied
 
   return (
+    <ObserverGuard>
     <div className="flex flex-col gap-2 p-2 h-full">
       {/* Waveform canvas */}
       <div className="relative" style={{ height: '60px' }}>
@@ -237,5 +242,6 @@ export function TrainerVoiceTab({
       {/* Stage progress (non-mic errors only) */}
       {!micDenied && <StageProgress stage={stage} errorMessage={errorMessage} />}
     </div>
+    </ObserverGuard>
   )
 }

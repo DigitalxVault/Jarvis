@@ -8,6 +8,7 @@ import { TrainerTemplatesTab } from './trainer-templates-tab'
 import { TrainerControlsTab } from './trainer-controls-tab'
 import { TrainerAlertsTab } from './trainer-alerts-tab'
 import { TrainerMissionTab } from './trainer-mission-tab'
+import { ObserverGuard } from './observer-guard'
 import type { TelemetryPacket } from '@jarvis-dcs/shared'
 
 const INTENSITY_KEY = 'jarvis-trainer-rephrase-intensity'
@@ -163,6 +164,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
 
         {/* Settings gear — only visible on COMMS tab */}
         {activeTop === 'comms' && (
+          <ObserverGuard>
           <div ref={settingsRef} style={{ position: 'relative' }}>
             <button
               onClick={() => setShowSettings(prev => !prev)}
@@ -207,6 +209,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
               </div>
             )}
           </div>
+          </ObserverGuard>
         )}
       </div>
 
