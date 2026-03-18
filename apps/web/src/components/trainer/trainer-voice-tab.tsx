@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState, startTransition } from 'react'
 import type { CommStage } from '@/hooks/use-trainer-comm'
 
 interface TrainerVoiceTabProps {
@@ -69,6 +69,20 @@ export function TrainerVoiceTab({
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const rafRef = useRef<number>(0)
   const isRecordingRef = useRef(false)
+
+  // Persistent mic denied state — set when mic permission is denied, stays until unmount
+  const [micDenied, setMicDenied] = useState(false)
+
+  useEffect(() => {
+    if (
+      errorMessage &&
+      (errorMessage.toLowerCase().includes('denied') ||
+        errorMessage.toLowerCase().includes('notallowederror') ||
+        errorMessage.toLowerCase().includes('permission'))
+    ) {
+      startTransition(() => setMicDenied(true))
+    }
+  }, [errorMessage])
 
   // Draw function stored in ref to avoid circular dependency
   const drawWaveformRef = useRef<() => void>(() => {})
@@ -162,7 +176,7 @@ export function TrainerVoiceTab({
 
   const isRecording = stage === 'recording'
   const isPipelineActive = stage === 'transcribing' || stage === 'rephrasing' || stage === 'speaking'
-  const isButtonDisabled = isPipelineActive
+  const isButtonDisabled = isPipelineActive || micDenied
 
   return (
     <div className="flex flex-col gap-2 p-2 h-full">
@@ -186,6 +200,16 @@ export function TrainerVoiceTab({
         )}
       </div>
 
+      {/* Persistent mic denied tooltip */}
+      {micDenied && (
+        <div
+          className="text-jarvis-warning text-center border border-jarvis-warning/30 px-2 py-1"
+          style={{ fontSize: '8px', letterSpacing: '1px', borderRadius: '2px' }}
+        >
+          MICROPHONE ACCESS DENIED — Check browser permissions
+        </div>
+      )}
+
       {/* PTT toggle button */}
       <button
         onClick={onToggleRecording}
@@ -204,13 +228,14 @@ export function TrainerVoiceTab({
           fontSize: '9px',
           letterSpacing: '3px',
           borderRadius: '2px',
+          opacity: micDenied ? 0.4 : 1,
         }}
       >
         {isRecording ? 'RECORDING — PRESS TO STOP' : 'PRESS TO TALK'}
       </button>
 
-      {/* Stage progress */}
-      <StageProgress stage={stage} errorMessage={errorMessage} />
+      {/* Stage progress (non-mic errors only) */}
+      {!micDenied && <StageProgress stage={stage} errorMessage={errorMessage} />}
     </div>
   )
 }

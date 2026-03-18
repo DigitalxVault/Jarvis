@@ -72,8 +72,9 @@ export function speakWithElevenLabs(
     })
 
     if (!response.ok || !response.body) {
-      console.error('TTS proxy error:', response.status, await response.text())
-      return
+      const errText = await response.text()
+      console.error('TTS proxy error:', response.status, errText)
+      throw new Error(`TTS unavailable (ElevenLabs): ${response.status}`)
     }
 
     // Collect the streaming response into a single buffer

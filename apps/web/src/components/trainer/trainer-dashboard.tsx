@@ -142,6 +142,16 @@ export function TrainerDashboard({ sessionId, onExit }: TrainerDashboardProps) {
         </div>
       </div>
 
+      {/* Awaiting telemetry banner — shown while connecting before first packet */}
+      {(connectionState === 'connecting' || connectionState === 'offline') && !sessionEnded && (
+        <div
+          className="col-span-3 text-center text-jarvis-accent/40 animate-pulse"
+          style={{ fontSize: '8px', letterSpacing: '3px', padding: '4px 0' }}
+        >
+          AWAITING TELEMETRY...
+        </div>
+      )}
+
       {/* Left column — telemetry grid */}
       <div className="overflow-auto">
         <TrainerTelemetryGrid

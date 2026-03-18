@@ -14,13 +14,27 @@ interface TrainerTSDProps {
 
 export function TrainerTSD({ telemetry, tactical, onCanvasClick }: TrainerTSDProps) {
   return (
-    <div className="flex-1 min-h-0 min-w-0">
+    <div className="flex-1 min-h-0 min-w-0 relative">
       <RadarScope
         telemetry={telemetry}
         tactical={tactical}
         rangeOptions={TRAINER_RANGE_OPTIONS}
         onCanvasClick={onCanvasClick}
       />
+      {/* Overlay when no player telemetry available */}
+      {!telemetry && (
+        <div
+          className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          style={{ zIndex: 1 }}
+        >
+          <span
+            className="text-jarvis-accent"
+            style={{ fontSize: '9px', letterSpacing: '3px', opacity: 0.3 }}
+          >
+            AWAITING PLAYER POSITION
+          </span>
+        </div>
+      )}
     </div>
   )
 }

@@ -134,10 +134,10 @@ export function TrainerLogPanel({ entries }: TrainerLogPanelProps) {
       >
         {filtered.length === 0 ? (
           <div
-            className="text-jarvis-primary/30 flex items-center justify-center h-full"
-            style={{ fontSize: '9px', letterSpacing: '2px' }}
+            className="text-jarvis-accent flex items-center justify-center h-full"
+            style={{ fontSize: '9px', letterSpacing: '2px', opacity: 0.3 }}
           >
-            AWAITING EVENTS...
+            NO EVENTS YET
           </div>
         ) : (
           <div className="flex flex-col gap-0.5">

@@ -131,7 +131,7 @@ export function useTrainerComm({
       if (!rephraseRes.ok) {
         const errorData = await rephraseRes.text()
         console.error('[TrainerComm] Rephrase error:', rephraseRes.status, errorData)
-        throw new Error('Rephrase failed')
+        throw new Error('Rephrase unavailable (GPT-4o)')
       }
 
       const { rephrasedText } = await rephraseRes.json() as { rephrasedText: string }
@@ -185,7 +185,7 @@ export function useTrainerComm({
       })
 
       if (!transcribeRes.ok) {
-        throw new Error('Transcription failed')
+        throw new Error('Transcription failed (Whisper)')
       }
 
       const { text } = await transcribeRes.json() as { text: string }
