@@ -9,6 +9,7 @@ import { TrainerTelemetryGrid } from './trainer-telemetry-grid'
 import { TrainerTSD } from './trainer-tsd'
 import { TrainerLogPanel } from './trainer-log-panel'
 import { TrainerCommPanel } from './trainer-comm-panel'
+import { ToastProvider } from '@/components/toast-notification'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TrainerDashboardProps {
@@ -63,6 +64,7 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
   const logEntries = useTrainerLog(sessionId, connectionState, flightPhase, alerts, tactical)
 
   return (
+    <ToastProvider>
     <div
       className="grid h-screen bg-jarvis-bg p-2 gap-2"
       style={{
@@ -126,5 +128,6 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
         />
       </div>
     </div>
+    </ToastProvider>
   )
 }
