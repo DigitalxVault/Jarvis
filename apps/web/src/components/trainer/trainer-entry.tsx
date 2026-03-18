@@ -3,12 +3,14 @@
 import { useState, useRef } from 'react'
 
 interface TrainerEntryProps {
-  onResolved: (sessionId: string) => void
+  onResolved: (sessionId: string, role?: 'controller' | 'observer') => void
+  /** Error message to display when an observer deep-link fails validation */
+  observerJoinError?: string
 }
 
 type EntryState = 'idle' | 'submitting' | 'error'
 
-export function TrainerEntry({ onResolved }: TrainerEntryProps) {
+export function TrainerEntry({ onResolved, observerJoinError }: TrainerEntryProps) {
   const [code, setCode] = useState('')
   const [entryState, setEntryState] = useState<EntryState>('idle')
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
@@ -37,7 +39,7 @@ export function TrainerEntry({ onResolved }: TrainerEntryProps) {
       const data = await res.json()
 
       if (res.status === 200) {
-        onResolved(data.sessionId as string)
+        onResolved(data.sessionId as string, (data.role as 'controller' | 'observer') || 'controller')
         return
       }
 
@@ -45,6 +47,8 @@ export function TrainerEntry({ onResolved }: TrainerEntryProps) {
         setErrorMessage('Session not found')
       } else if (res.status === 400) {
         setErrorMessage('Invalid code format')
+      } else if (res.status === 429) {
+        setErrorMessage('Too many attempts — wait a minute')
       } else {
         setErrorMessage('Connection error — try again')
       }
@@ -143,6 +147,15 @@ export function TrainerEntry({ onResolved }: TrainerEntryProps) {
             {isSubmitting ? 'CONNECTING...' : 'CONNECT'}
           </button>
         </form>
+
+        {observerJoinError && (
+          <div
+            className="mt-4 text-center text-jarvis-danger border border-jarvis-danger/30 px-2 py-2"
+            style={{ fontSize: '9px', letterSpacing: '2px' }}
+          >
+            {observerJoinError}
+          </div>
+        )}
 
         <div
           className="mt-6 text-center text-jarvis-primary/40"

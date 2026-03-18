@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 25 of 27 (Supabase Schema & RLS) — COMPLETE
-Plan: 2 of 2 complete
-Status: Phase 25 complete — RLS enabled on sessions table
-Last activity: 2026-03-18 — Completed 25-02-PLAN.md
+Phase: 26 of 27 (Observer Role) — IN PROGRESS
+Plan: 1 of 2
+Status: 26-01 complete; 26-02 next
+Last activity: 2026-03-18 — Completed 26-01-PLAN.md (observer role foundation)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [#########-] 89% Phases 15-25 complete; Phases 26-27 pending
+Progress: v3.0 [#########-] 91% Phases 15-25 complete + 26-01; Phases 26-02 + 27 pending
 
 ## Performance Metrics
 
@@ -206,6 +206,10 @@ Amendment decisions (2026-03-13):
 | D-2511 | anon SELECT restricted to sessions with active codes only | Guards against direct PostgREST anon key access; Realtime Broadcast unaffected by table RLS |
 | D-2512 | authenticated role: permissive USING (true) — NextAuth project | auth.uid() meaningless; real auth happens in API routes; policies are defense-in-depth only |
 | D-2513 | No DELETE policy for any role | Sessions ended by status=ended, never deleted; RLS enforces this invariant at DB level |
+| D-2601 | Conditional UPDATE for role assignment | `.is('trainer_role', null)` — atomic first-writer-wins without transactions |
+| D-2602 | trainer_role stores only 'controller' | Observer status derived at join time; no extra DB write for observers |
+| D-2603 | ObserverGuard uses overlay not unmount | Observers see controls but cannot click — transparency over hiding |
+| D-2604 | Idempotent observer-link | Reuses existing token; repeated calls don't invalidate existing links |
 
 ### Pending Todos
 
@@ -230,11 +234,11 @@ Amendment decisions (2026-03-13):
 - DCS-gRPC mod not yet installed — required before Phase 15 development
 - API keys not yet created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine) — required before Phases 17-18
 - Python bridge replaces Node.js bridge — need migration plan for existing sessions/channels
-- trainer_code column migration created (002_trainer_code.sql) — must be applied to Supabase via dashboard SQL editor before Phase 21 APIs work
+- trainer_code migration + RLS migration ready (002/003) — must be applied to Supabase via dashboard SQL editor before trainer flow works in production
 - TODO: rate-limit /api/trainer/claim (9000 possible codes, brute-force risk)
 
 ## Session Continuity
 
-Last session: 2026-03-18
-Stopped at: Completed 25-02-PLAN.md — RLS enabled on sessions table (Phase 25 COMPLETE)
+Last session: 2026-03-18T08:46:54Z
+Stopped at: Completed 26-01-PLAN.md (observer role foundation). 26-02 (wire ObserverGuard into trainer components) next.
 Resume file: None

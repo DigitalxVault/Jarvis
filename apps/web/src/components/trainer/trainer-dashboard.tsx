@@ -7,15 +7,18 @@ import { useAlertConfig } from '@/hooks/use-alert-config'
 import { useFlightPhase } from '@/hooks/use-flight-phase'
 import { useCoaching } from '@/hooks/use-coaching'
 import { useTrainerLog } from '@/hooks/use-trainer-log'
+import { useObserverPresence } from '@/hooks/use-observer-presence'
 import { TrainerTelemetryGrid } from './trainer-telemetry-grid'
 import { TrainerTSD } from './trainer-tsd'
 import { TrainerLogPanel } from './trainer-log-panel'
 import { TrainerCommPanel } from './trainer-comm-panel'
 import { ToastProvider } from '@/components/toast-notification'
+import { TrainerRoleProvider } from './trainer-role-context'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TrainerDashboardProps {
   sessionId: string
+  role?: 'controller' | 'observer'
   onExit?: () => void
 }
 
@@ -51,7 +54,7 @@ function connectionLabel(state: ConnectionState): string {
   }
 }
 
-export function TrainerDashboard({ sessionId, onExit }: TrainerDashboardProps) {
+export function TrainerDashboard({ sessionId, role = 'controller', onExit }: TrainerDashboardProps) {
   // Call useTelemetry directly — NOT useTelemetryContext() — so the trainer
   // gets its own independent subscription to the player's session channel.
   const { telemetry, tactical, connectionState, sessionEnded } = useTelemetry(sessionId)
@@ -75,8 +78,10 @@ export function TrainerDashboard({ sessionId, onExit }: TrainerDashboardProps) {
 
   // Log accumulation — events from alerts/phases/connection/tactical + conversation from broadcast
   const logEntries = useTrainerLog(sessionId, connectionState, flightPhase, alerts, tactical)
+  const observerCount = useObserverPresence(sessionId, role)
 
   return (
+    <TrainerRoleProvider role={role}>
     <ToastProvider>
     <div className="relative">
     {/* SESSION ENDED overlay */}
@@ -137,8 +142,23 @@ export function TrainerDashboard({ sessionId, onExit }: TrainerDashboardProps) {
           </span>
         </div>
 
-        <div className="text-jarvis-primary/40" style={{ fontSize: '9px', letterSpacing: '2px' }}>
-          SESSION {sessionId.slice(0, 8).toUpperCase()}
+        <div className="flex items-center gap-3">
+          <div className="text-jarvis-primary/40" style={{ fontSize: '9px', letterSpacing: '2px' }}>
+            SESSION {sessionId.slice(0, 8).toUpperCase()}
+          </div>
+          {role === 'observer' && (
+            <span
+              className="text-jarvis-warning font-bold"
+              style={{ fontSize: '9px', letterSpacing: '2px' }}
+            >
+              OBSERVER
+            </span>
+          )}
+          {observerCount > 0 && (
+            <span style={{ fontSize: '8px', letterSpacing: '1px', color: 'rgba(0,212,255,0.4)' }}>
+              {observerCount} OBSERVER{observerCount !== 1 ? 'S' : ''}
+            </span>
+          )}
         </div>
       </div>
 
@@ -190,5 +210,6 @@ export function TrainerDashboard({ sessionId, onExit }: TrainerDashboardProps) {
     </div>
     </div>
     </ToastProvider>
+    </TrainerRoleProvider>
   )
 }
