@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { Suspense, useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import dynamic from 'next/dynamic'
 
@@ -17,6 +17,14 @@ const TrainerDashboard = dynamic(
 type PageState = 'entry' | 'joining' | 'dashboard'
 
 export default function TrainerPage() {
+  return (
+    <Suspense fallback={null}>
+      <TrainerPageInner />
+    </Suspense>
+  )
+}
+
+function TrainerPageInner() {
   const searchParams = useSearchParams()
   const [state, setState] = useState<PageState>('entry')
   const [sessionId, setSessionId] = useState<string | null>(null)
