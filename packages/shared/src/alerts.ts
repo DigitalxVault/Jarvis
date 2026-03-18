@@ -20,6 +20,29 @@ export interface ActiveAlert {
   triggeredAt: number
 }
 
+/** Metadata for alert threshold configuration UI */
+export interface AlertThresholdMeta {
+  ruleId: string
+  label: string
+  unit: string
+  min: number
+  max: number
+  step: number
+  defaultValue: number
+  /** Field path in telemetry used by the test function */
+  telemetryField: string
+}
+
+export const ALERT_THRESHOLD_META: AlertThresholdMeta[] = [
+  { ruleId: 'pull_up', label: 'PULL UP (AGL)', unit: 'ft', min: 50, max: 2000, step: 50, defaultValue: 500, telemetryField: 'pos.alt_agl_m' },
+  { ruleId: 'over_g', label: 'OVER-G LIMIT', unit: 'G', min: 4, max: 12, step: 0.5, defaultValue: 9, telemetryField: 'aero.g.y' },
+  { ruleId: 'stall', label: 'STALL AoA', unit: 'deg', min: 8, max: 25, step: 1, defaultValue: 15, telemetryField: 'aero.aoa_rad' },
+  { ruleId: 'bingo_fuel', label: 'BINGO FUEL', unit: '%', min: 5, max: 50, step: 5, defaultValue: 30, telemetryField: 'fuel.internal' },
+  { ruleId: 'low_speed', label: 'LOW SPEED', unit: 'kts', min: 80, max: 200, step: 10, defaultValue: 150, telemetryField: 'spd.ias_mps' },
+  { ruleId: 'high_aoa', label: 'HIGH AoA', unit: 'deg', min: 5, max: 20, step: 1, defaultValue: 12.5, telemetryField: 'aero.aoa_rad' },
+  { ruleId: 'negative_g', label: 'NEGATIVE G', unit: 'G', min: -3, max: 0, step: 0.5, defaultValue: -1, telemetryField: 'aero.g.y' },
+]
+
 /** F-16 default alert thresholds — configurable per aircraft type */
 export const DEFAULT_ALERT_RULES: AlertRule[] = [
   {

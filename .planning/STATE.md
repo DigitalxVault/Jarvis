@@ -5,18 +5,18 @@
 See: .planning/PROJECT.md (updated 2026-03-14)
 
 **Core value:** Live telemetry from DCS appears on a web dashboard in under 500ms -- the pipeline works end-to-end and stays stable for a 20-minute flight session.
-**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 22 Trainer Communication
+**Current focus:** v3.0 Voice Co-Pilot & Trainer Platform — Phase 22 Trainer Communication COMPLETE
 
 ## Current Position
 
-Phase: 22 of 24 (Trainer Communication) — In progress
-Plan: 1 of 2 complete (22-01 done)
-Status: In progress — ready for Plan 22-02
-Last activity: 2026-03-17 — Completed 22-01-PLAN.md (trainer comm pipeline + UI)
+Phase: 22 of 24 (Trainer Communication) — COMPLETE
+Plan: 2 of 2 complete (22-02 done)
+Status: Phase 22 complete — ready for Phase 23
+Last activity: 2026-03-17 — Completed 22-02-PLAN.md (template button grid + custom templates + comm panel wiring)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [########..] 63% Phase 22-01 complete
+Progress: v3.0 [########..] 67% Phase 22 complete (2 plans)
 
 ## Performance Metrics
 
@@ -50,7 +50,7 @@ Progress: v3.0 [########..] 63% Phase 22-01 complete
 | 19. Command Processing | v3.0 | -- |
 | 20. Flight Phase & Proactive Alerts | v3.0 | -- |
 | 21. Trainer Session & Dashboard | v3.0 | 3 complete (DONE) |
-| 22. Trainer Communication | v3.0 | 1 of 2 complete |
+| 22. Trainer Communication | v3.0 | 2 of 2 complete (DONE) |
 | 23. Trainer DCS Controls | v3.0 | -- |
 | 24. Roles, Integration & Polish | v3.0 | -- |
 
@@ -179,6 +179,9 @@ Amendment decisions (2026-03-13):
 | D-2203 | drawWaveformRef for RAF loop | Breaks circular useEffect/useCallback dep; ref stores latest callback |
 | D-2204 | stageRef mirrors stage state | Prevents stale closures in async processVoice/sendText callbacks |
 | D-2205 | Broadcast fires concurrently with TTS | channel.send() fire-and-forget; no await before speakWithElevenLabs |
+| D-2206 | fillTemplate uses inline math not conversions.ts | Self-contained; no import chain needed for 7 arithmetic operations |
+| D-2207 | Custom tab always shown in tab row | Keeps discoverability; shows + ADD TEMPLATE when empty |
+| D-2208 | lastClickedId reset after await onSendText | Accurately reflects active button during async pipeline |
 
 ### Pending Todos
 
@@ -187,7 +190,7 @@ Amendment decisions (2026-03-13):
 **v3.0 (in progress):**
 - Phase 15: ALL 4 PLANS COMPLETE — awaiting human checkpoint verification
 - Phase 21: ALL 3 PLANS COMPLETE — trainer dashboard fully built (code system, TSD, mission log)
-- Phase 22: Trainer Communication — 22-01 done, 22-02 next
+- Phase 22: Trainer Communication — ALL 2 PLANS COMPLETE
 - Install DCS-gRPC mod in DCS World (required before Phase 15 testing)
 - Set up API accounts: OpenAI, ElevenLabs, Picovoice (required before Phases 17-18)
 - **Add `trainer_code` column to Supabase sessions table** (required before trainer API works)
@@ -211,5 +214,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-17
-Stopped at: Completed 22-01-PLAN.md (trainer comm pipeline + PTT voice + text UI)
+Stopped at: Completed 22-02-PLAN.md (template library, templates tab UI, comm panel wiring)
 Resume file: None

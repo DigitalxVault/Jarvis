@@ -217,8 +217,106 @@ export interface ConversationEntry {
   t_model?: number
 }
 
+/** Spawn unit positioning modes */
+export type PositionMode = 'simple' | 'bra' | 'absolute'
+
+/** Cardinal/intercardinal directions for simple positioning */
+export type CardinalDirection = 'N' | 'NE' | 'E' | 'SE' | 'S' | 'SW' | 'W' | 'NW'
+
+/** DCS AI skill levels */
+export type DcsSkillLevel = 'Average' | 'Good' | 'High' | 'Excellent'
+
+/** DCS AI task types */
+export type DcsAiTask = 'CAP' | 'Fighter Sweep' | 'CAS' | 'Orbit' | 'Nothing'
+
+/** Unit category for spawning */
+export type UnitCategory = 'fighter' | 'bomber' | 'sam' | 'ground'
+
+/** Spawn unit payload */
+export interface SpawnUnitPayload {
+  unitType: string
+  category: UnitCategory
+  count: number
+  skill: DcsSkillLevel
+  task: DcsAiTask
+  position: SimplePosition | BraPosition | AbsolutePosition
+}
+
+export interface SimplePosition {
+  mode: 'simple'
+  direction: CardinalDirection
+  distance_nm: number
+  altitude_ft: number
+}
+
+export interface BraPosition {
+  mode: 'bra'
+  bearing_deg: number
+  range_nm: number
+  altitude_ft: number
+}
+
+export interface AbsolutePosition {
+  mode: 'absolute'
+  lat: number
+  lon: number
+  altitude_ft: number
+}
+
+/** Set AI task payload */
+export interface SetAiTaskPayload {
+  groupName: string
+  task: DcsAiTask
+}
+
+/** Alert config payload — web-only, NOT routed through bridge */
+export interface ConfigAlertPayload {
+  ruleId: string
+  enabled: boolean
+  threshold?: number
+  severity?: AlertSeverity
+}
+
+/** Waypoint for mission injection */
+export interface MissionWaypoint {
+  idx: number
+  lat: number
+  lon: number
+  altitude_ft: number
+  name: string
+  objectiveType?: 'Strike' | 'Defend' | 'Recon'
+}
+
+/** Inject waypoint/mission payload */
+export interface InjectWaypointPayload {
+  waypoints: MissionWaypoint[]
+  briefing?: string
+}
+
+/** DCS command actions */
+export type DcsCommandAction = 'spawn_unit' | 'set_ai_task' | 'config_alert' | 'inject_waypoint'
+
+/** Trainer -> bridge DCS command */
+export interface DcsCommand {
+  type: 'dcs_command'
+  id: string
+  action: DcsCommandAction
+  payload: SpawnUnitPayload | SetAiTaskPayload | ConfigAlertPayload | InjectWaypointPayload
+}
+
+/** Bridge -> trainer command result */
+export interface DcsCommandResult {
+  type: 'dcs_command_result'
+  id: string
+  success: boolean
+  message: string
+}
+
+/** Alert severity (re-exported for use in ConfigAlertPayload) */
+type AlertSeverity = 'info' | 'warning' | 'critical'
+
 /** Union of all broadcast message types */
-export type BroadcastPayload = TelemetryPacket | HeartbeatPacket | TacticalPacket | ConversationEntry
+export type BroadcastPayload = TelemetryPacket | HeartbeatPacket | TacticalPacket | ConversationEntry | DcsCommandResult
 
 /** Session status in the sessions table */
 export type SessionStatus = 'active' | 'ended'

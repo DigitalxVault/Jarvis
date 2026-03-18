@@ -24,12 +24,18 @@ COMMON_PROTO="dcs/common/v0/common.proto"
 MISSION_PROTO="dcs/mission/v0/mission.proto"
 UNIT_PROTO="dcs/unit/v0/unit.proto"
 HOOK_PROTO="dcs/hook/v0/hook.proto"
+COALITION_PROTO="dcs/coalition/v0/coalition.proto"
+CUSTOM_PROTO="dcs/custom/v0/custom.proto"
+TRIGGER_PROTO="dcs/trigger/v0/trigger.proto"
 
 echo "Generating stubs for:"
 echo "  $COMMON_PROTO"
 echo "  $MISSION_PROTO"
 echo "  $UNIT_PROTO"
 echo "  $HOOK_PROTO"
+echo "  $COALITION_PROTO"
+echo "  $CUSTOM_PROTO"
+echo "  $TRIGGER_PROTO"
 
 uv run python -m grpc_tools.protoc \
   --proto_path="$PROTO_DIR" \
@@ -39,7 +45,10 @@ uv run python -m grpc_tools.protoc \
   "$COMMON_PROTO" \
   "$MISSION_PROTO" \
   "$UNIT_PROTO" \
-  "$HOOK_PROTO"
+  "$HOOK_PROTO" \
+  "$COALITION_PROTO" \
+  "$CUSTOM_PROTO" \
+  "$TRIGGER_PROTO"
 
 # Add __init__.py files so generated packages are importable
 find "$OUT_DIR" -type d -exec touch {}/__init__.py \;
