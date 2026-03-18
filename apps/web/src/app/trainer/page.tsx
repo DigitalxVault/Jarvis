@@ -24,12 +24,17 @@ export default function TrainerPage() {
     setState('dashboard')
   }
 
+  function handleExit() {
+    setSessionId(null)
+    setState('entry')
+  }
+
   if (state === 'entry') {
     return <TrainerEntry onResolved={handleResolved} />
   }
 
   if ((state === 'connecting' || state === 'dashboard') && sessionId) {
-    return <TrainerDashboard sessionId={sessionId} />
+    return <TrainerDashboard sessionId={sessionId} onExit={handleExit} />
   }
 
   return null

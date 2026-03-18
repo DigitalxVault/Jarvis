@@ -16,6 +16,7 @@ import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TrainerDashboardProps {
   sessionId: string
+  onExit?: () => void
 }
 
 function connectionDot(state: ConnectionState): string {
@@ -50,10 +51,10 @@ function connectionLabel(state: ConnectionState): string {
   }
 }
 
-export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
+export function TrainerDashboard({ sessionId, onExit }: TrainerDashboardProps) {
   // Call useTelemetry directly — NOT useTelemetryContext() — so the trainer
   // gets its own independent subscription to the player's session channel.
-  const { telemetry, tactical, connectionState } = useTelemetry(sessionId)
+  const { telemetry, tactical, connectionState, sessionEnded } = useTelemetry(sessionId)
   const { rules: configuredRules } = useAlertConfig(sessionId)
   const { alerts, hasCritical, hasWarning } = useAlerts(telemetry, { rules: configuredRules })
 
@@ -77,6 +78,38 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
 
   return (
     <ToastProvider>
+    <div className="relative">
+    {/* SESSION ENDED overlay */}
+    {sessionEnded && (
+      <div
+        className="fixed inset-0 z-[10000] flex items-center justify-center"
+        style={{ background: 'rgba(1, 10, 26, 0.92)', fontFamily: 'Courier New, monospace' }}
+      >
+        <div
+          className="jarvis-panel flex flex-col items-center gap-4 p-8"
+          style={{ minWidth: '320px' }}
+        >
+          <div
+            className="text-jarvis-accent"
+            style={{ fontSize: '10px', letterSpacing: '4px', fontWeight: 'bold' }}
+          >
+            SESSION ENDED
+          </div>
+          <div
+            style={{ fontSize: '9px', letterSpacing: '2px', color: 'rgba(0, 212, 255, 0.5)' }}
+          >
+            PILOT HAS ENDED THE SESSION
+          </div>
+          <button
+            onClick={onExit}
+            className="mt-2 px-6 py-2 border border-jarvis-accent text-jarvis-accent hover:bg-jarvis-accent/10 transition-all font-bold"
+            style={{ fontSize: '9px', letterSpacing: '3px' }}
+          >
+            RETURN TO JOIN SCREEN
+          </button>
+        </div>
+      </div>
+    )}
     <div
       className="grid h-screen bg-jarvis-bg p-2 gap-2"
       style={{
@@ -144,6 +177,7 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
           onSetTsdClickHandler={setTsdClickHandler}
         />
       </div>
+    </div>
     </div>
     </ToastProvider>
   )

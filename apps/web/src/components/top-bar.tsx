@@ -1,12 +1,15 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ConnectionStatus } from './connection-status'
 import { VoiceIndicator } from './voice-indicator'
 import { FlightPhaseIndicator } from './flight-phase-indicator'
 import { JarvisLogo } from './jarvis-logo'
+import { supabase } from '@/lib/supabase'
+import { getChannelName } from '@jarvis-dcs/shared'
+import { useTelemetryContext } from '@/providers/telemetry-provider'
 import type { ConnectionState } from '@/hooks/use-telemetry'
 
 interface TopBarProps {
@@ -19,6 +22,39 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
   const [clock, setClock] = useState('--:--:--')
   const [date, setDate] = useState('')
   const pathname = usePathname()
+  const { currentSession } = useTelemetryContext()
+  const sessionId = currentSession?.id ?? null
+  const [isEnding, setIsEnding] = useState(false)
+
+  const handleEndSession = useCallback(async () => {
+    if (!sessionId) return
+    const confirmed = window.confirm('End this session? Connected trainers will be disconnected.')
+    if (!confirmed) return
+
+    setIsEnding(true)
+    try {
+      // Broadcast session_ended to all channel subscribers first
+      const channelName = getChannelName(sessionId)
+      const ch = supabase.channel(channelName)
+      await ch.send({
+        type: 'broadcast',
+        event: 'session_ended',
+        payload: { type: 'session_ended', ts: Date.now() },
+      })
+      supabase.removeChannel(ch)
+
+      // Then mark session as ended in DB
+      await fetch(`/api/sessions/${sessionId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'ended' }),
+      })
+    } catch (err) {
+      console.error('[TopBar] End session error:', err)
+    } finally {
+      setIsEnding(false)
+    }
+  }, [sessionId])
 
   useEffect(() => {
     const tick = () => {
@@ -102,6 +138,16 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
             style={{ letterSpacing: '2px' }}
           >
             LAYOUT
+          </button>
+        )}
+        {sessionId && (
+          <button
+            onClick={handleEndSession}
+            disabled={isEnding}
+            className="hidden md:inline-flex px-3 py-1.5 text-[8px] font-bold border border-jarvis-danger text-jarvis-danger hover:bg-jarvis-danger/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            style={{ letterSpacing: '2px' }}
+          >
+            {isEnding ? 'ENDING...' : 'END SESSION'}
           </button>
         )}
         <FlightPhaseIndicator />
