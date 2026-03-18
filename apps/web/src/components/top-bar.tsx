@@ -34,8 +34,21 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
     setIsEnding(true)
     try {
       // Broadcast session_ended to all channel subscribers first
+      // Must subscribe before send() — Supabase JS v2 requires SUBSCRIBED state
       const channelName = getChannelName(sessionId)
-      const ch = supabase.channel(channelName)
+      const ch = supabase.channel(channelName, {
+        config: { broadcast: { ack: false } },
+      })
+      await new Promise<void>((resolve, reject) => {
+        const timeout = setTimeout(() => reject(new Error('Subscribe timeout')), 3000)
+        ch.subscribe((status) => {
+          if (status === 'SUBSCRIBED') { clearTimeout(timeout); resolve() }
+          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+            clearTimeout(timeout)
+            reject(new Error(`Channel ${status}`))
+          }
+        })
+      })
       await ch.send({
         type: 'broadcast',
         event: 'session_ended',

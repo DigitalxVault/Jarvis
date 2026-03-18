@@ -105,6 +105,7 @@ export function Dashboard() {
           <DraggablePanel panelId="connection" editMode={editMode} offset={getOffset('connection')} onUpdateOffset={updateOffset}>
             <ConnectionStatusPanel
               connectionState={connectionState}
+              sessionId={sessionId}
             />
           </DraggablePanel>
 
