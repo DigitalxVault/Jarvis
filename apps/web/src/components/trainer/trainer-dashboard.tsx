@@ -2,6 +2,7 @@
 
 import { useTelemetry } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
+import { useAlertConfig } from '@/hooks/use-alert-config'
 import { useFlightPhase } from '@/hooks/use-flight-phase'
 import { useCoaching } from '@/hooks/use-coaching'
 import { useTrainerLog } from '@/hooks/use-trainer-log'
@@ -52,7 +53,8 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
   // Call useTelemetry directly — NOT useTelemetryContext() — so the trainer
   // gets its own independent subscription to the player's session channel.
   const { telemetry, tactical, connectionState } = useTelemetry(sessionId)
-  const { alerts, hasCritical, hasWarning } = useAlerts(telemetry)
+  const { rules: configuredRules } = useAlertConfig(sessionId)
+  const { alerts, hasCritical, hasWarning } = useAlerts(telemetry, { rules: configuredRules })
   const flightPhase = useFlightPhase(telemetry)
   // useCoaching must always be called unconditionally (React rules of hooks).
   // smoothness.score is passed to the Status card in TrainerTelemetryGrid.

@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, useCallback, useMemo } from 'react'
 import { useTelemetry, type ConnectionState } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
+import { useAlertConfig } from '@/hooks/use-alert-config'
 import { useCoaching } from '@/hooks/use-coaching'
 import { useOnlineStatus } from '@/hooks/use-online-status'
 import { useFlightPhase } from '@/hooks/use-flight-phase'
@@ -66,7 +67,8 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
     subscriptionStatus,
   } = useTelemetry(sessionId)
 
-  const { alerts, hasCritical, hasWarning } = useAlerts(telemetry)
+  const { rules: configuredRules } = useAlertConfig(sessionId)
+  const { alerts, hasCritical, hasWarning } = useAlerts(telemetry, { rules: configuredRules })
 
   const coachingOpts = useMemo(() => ({
     targetSpeedKnots: 350,

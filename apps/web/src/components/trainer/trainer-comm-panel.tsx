@@ -6,6 +6,7 @@ import { TrainerVoiceTab } from './trainer-voice-tab'
 import { TrainerTextTab } from './trainer-text-tab'
 import { TrainerTemplatesTab } from './trainer-templates-tab'
 import { TrainerControlsTab } from './trainer-controls-tab'
+import { TrainerAlertsTab } from './trainer-alerts-tab'
 import type { TelemetryPacket } from '@jarvis-dcs/shared'
 
 const INTENSITY_KEY = 'jarvis-trainer-rephrase-intensity'
@@ -282,19 +283,9 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase }: TrainerC
           <TrainerControlsTab sessionId={sessionId} telemetry={telemetry} />
         )}
 
-        {/* ALERTS placeholder */}
+        {/* ALERTS tab */}
         {activeTop === 'alerts' && (
-          <div
-            style={{
-              padding: '12px',
-              fontSize: '8px',
-              letterSpacing: '2px',
-              color: 'rgba(0, 212, 255, 0.3)',
-              textTransform: 'uppercase',
-            }}
-          >
-            ALERTS — COMING IN 23-02
-          </div>
+          <TrainerAlertsTab sessionId={sessionId} />
         )}
 
         {/* MISSION placeholder */}
