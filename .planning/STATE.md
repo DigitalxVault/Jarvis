@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 24 of 24 (Roles, Integration & Polish) — IN PROGRESS
-Plan: 1 of ? complete (24-01 done)
-Status: Phase 24 started — session lifecycle (end session flow) complete
-Last activity: 2026-03-18 — Completed 24-01-PLAN.md (PATCH endpoint + sessionEnded + End Session button + SESSION ENDED overlay)
+Phase: 24 of 24 (Roles, Integration & Polish) — COMPLETE
+Plan: 2 of 2 complete (24-01 + 24-02 done)
+Status: Phase 24 COMPLETE — v3.0 Voice Co-Pilot & Trainer Platform feature-complete
+Last activity: 2026-03-18 — Completed 24-02-PLAN.md (memory leaks + error hardening + integration audit)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [##########] 88% Phase 24 in progress (1 plan done)
+Progress: v3.0 [##########] 100% Phase 24 COMPLETE — v3.0 SHIPPED
 
 ## Performance Metrics
 
@@ -52,7 +52,7 @@ Progress: v3.0 [##########] 88% Phase 24 in progress (1 plan done)
 | 21. Trainer Session & Dashboard | v3.0 | 3 complete (DONE) |
 | 22. Trainer Communication | v3.0 | 2 of 2 complete (DONE) |
 | 23. Trainer DCS Controls | v3.0 | 2 of 2 COMPLETE |
-| 24. Roles, Integration & Polish | v3.0 | -- |
+| 24. Roles, Integration & Polish | v3.0 | 2 of 2 COMPLETE |
 
 *Updated after each plan completion*
 
@@ -197,6 +197,9 @@ Amendment decisions (2026-03-13):
 | D-2403 | END SESSION button hidden on mobile | Session management is a deliberate desktop action; avoids accidental taps |
 | D-2404 | onExit is optional prop on TrainerDashboard | Non-breaking; works without it; page.tsx passes handleExit for full flow |
 | D-2405 | SESSION ENDED overlay uses fixed positioning z-[10000] | Appears above all trainer dashboard content including ToastProvider |
+| D-2411 | Broadcast refs use base getChannelName (no suffix) | Supabase broadcast only reaches same-topic subscribers; suffix broke player/log reception |
+| D-2412 | ElevenLabs throws on TTS failure (not silent return) | Enables service-named error propagation to trainer's stage display |
+| D-2413 | startTransition(setMicDenied) in useEffect | Matches existing project pattern (D-2110) to suppress react-hooks/set-state-in-effect lint rule |
 
 ### Pending Todos
 
@@ -229,5 +232,5 @@ Amendment decisions (2026-03-13):
 ## Session Continuity
 
 Last session: 2026-03-18
-Stopped at: Phase 24 Plan 01 COMPLETE — session lifecycle end flow
+Stopped at: Phase 24 Plan 02 COMPLETE — v3.0 COMPLETE (memory leaks + error hardening + integration audit)
 Resume file: None
