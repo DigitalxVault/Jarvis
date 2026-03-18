@@ -23,7 +23,8 @@ export function useAlertConfig(sessionId: string | null): UseAlertConfigReturn {
 
   useEffect(() => {
     if (!sessionId) {
-      setRules(DEFAULT_ALERT_RULES)
+      // Reset to defaults when session is cleared
+      setRules(DEFAULT_ALERT_RULES)  // eslint-disable-line react-hooks/set-state-in-effect
       return
     }
 
@@ -97,6 +98,7 @@ function buildRules(overrides: Map<string, ConfigAlertPayload>): AlertRule[] {
  * Build a new test function for the given ruleId with the threshold value
  * from the trainer UI (in display units — ft, G, deg, %, kts).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function buildTestFunction(ruleId: string, threshold: number): (t: any) => boolean {
   switch (ruleId) {
     case 'pull_up': {

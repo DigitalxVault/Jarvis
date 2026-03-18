@@ -9,6 +9,8 @@ interface RadarScopeProps {
   telemetry: TelemetryPacket | null
   tactical: TacticalPacket | null
   rangeOptions?: readonly number[]
+  /** When provided, canvas clicks invoke this with lat/lon instead of cycling range */
+  onCanvasClick?: (coords: { lat: number; lon: number }) => void
 }
 
 interface DestroyedContact {
@@ -46,7 +48,7 @@ const COLOR = {
   diagText: 'rgba(0, 212, 255, 0.35)',
 }
 
-export function RadarScope({ telemetry, tactical, rangeOptions = DEFAULT_RANGE_OPTIONS }: RadarScopeProps) {
+export function RadarScope({ telemetry, tactical, rangeOptions = DEFAULT_RANGE_OPTIONS, onCanvasClick }: RadarScopeProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const [rangeNM, setRangeNM] = useState<number>(() => rangeOptions[Math.floor(rangeOptions.length / 2)] ?? rangeOptions[0])
@@ -494,6 +496,54 @@ export function RadarScope({ telemetry, tactical, rangeOptions = DEFAULT_RANGE_O
     })
   }
 
+  const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (onCanvasClick) {
+      // Pixel-to-latlon conversion — only works when we have player position
+      const tel = telemetryRef.current
+      if (!tel) return
+
+      const canvas = canvasRef.current
+      if (!canvas) return
+
+      const rect = canvas.getBoundingClientRect()
+      const clickX = event.clientX - rect.left
+      const clickY = event.clientY - rect.top
+
+      const size = canvas.width
+      const centerX = size / 2
+      const centerY = size / 2
+      const radius = (size / 2) - 30 // matches renderFrame padding
+
+      // Scale click from CSS pixels to canvas pixels
+      const scaleX = size / rect.width
+      const scaleY = size / rect.height
+      const canvasClickX = clickX * scaleX
+      const canvasClickY = clickY * scaleY
+
+      const dx = canvasClickX - centerX // pixels from center (east positive)
+      const dy = centerY - canvasClickY // pixels from center (north positive, Y inverted)
+
+      const pixelsPerNm = radius / rangeRef.current
+      const offsetNmX = dx / pixelsPerNm  // East offset in nm
+      const offsetNmY = dy / pixelsPerNm  // North offset in nm
+
+      const playerLat = tel.pos.lat
+      const playerLon = tel.pos.lon
+
+      const latOffset = offsetNmY / 60   // 1 nm = 1/60 degree lat
+      const lonOffset = offsetNmX / (60 * Math.cos(playerLat * Math.PI / 180))
+
+      onCanvasClick({
+        lat: playerLat + latOffset,
+        lon: playerLon + lonOffset,
+      })
+      return
+    }
+
+    // Default: cycle range
+    cycleRange()
+  }
+
   const isGated = tactical && (
     !(tactical.permissions?.objects) || !(tactical.permissions?.sensors)
   )
@@ -525,8 +575,8 @@ export function RadarScope({ telemetry, tactical, rangeOptions = DEFAULT_RANGE_O
           ref={canvasRef}
           width={canvasSize}
           height={canvasSize}
-          onClick={cycleRange}
-          className="cursor-crosshair"
+          onClick={handleCanvasClick}
+          className={onCanvasClick ? 'cursor-crosshair' : 'cursor-pointer'}
           style={{ maxWidth: '100%', maxHeight: 'calc(100% - 40px)' }}
         />
 

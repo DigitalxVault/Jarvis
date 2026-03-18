@@ -7,6 +7,7 @@ import { TrainerTextTab } from './trainer-text-tab'
 import { TrainerTemplatesTab } from './trainer-templates-tab'
 import { TrainerControlsTab } from './trainer-controls-tab'
 import { TrainerAlertsTab } from './trainer-alerts-tab'
+import { TrainerMissionTab } from './trainer-mission-tab'
 import type { TelemetryPacket } from '@jarvis-dcs/shared'
 
 const INTENSITY_KEY = 'jarvis-trainer-rephrase-intensity'
@@ -21,6 +22,7 @@ interface TrainerCommPanelProps {
   sessionId: string
   telemetry: TelemetryPacket | null
   flightPhase: string
+  onSetTsdClickHandler?: (handler: ((coords: { lat: number; lon: number }) => void) | null) => void
 }
 
 function intensityLabel(value: number): string {
@@ -30,7 +32,7 @@ function intensityLabel(value: number): string {
   return 'FULL JARVIS'
 }
 
-export function TrainerCommPanel({ sessionId, telemetry, flightPhase }: TrainerCommPanelProps) {
+export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdClickHandler }: TrainerCommPanelProps) {
   const [activeTop, setActiveTop] = useState<TopTabId>('comms')
   const [activeSub, setActiveSub] = useState<SubTabId>('voice')
   const [showSettings, setShowSettings] = useState(false)
@@ -288,19 +290,13 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase }: TrainerC
           <TrainerAlertsTab sessionId={sessionId} />
         )}
 
-        {/* MISSION placeholder */}
+        {/* MISSION tab */}
         {activeTop === 'mission' && (
-          <div
-            style={{
-              padding: '12px',
-              fontSize: '8px',
-              letterSpacing: '2px',
-              color: 'rgba(0, 212, 255, 0.3)',
-              textTransform: 'uppercase',
-            }}
-          >
-            MISSION — COMING IN 23-02
-          </div>
+          <TrainerMissionTab
+            sessionId={sessionId}
+            telemetry={telemetry}
+            onSetTsdClickHandler={onSetTsdClickHandler}
+          />
         )}
       </div>
     </div>

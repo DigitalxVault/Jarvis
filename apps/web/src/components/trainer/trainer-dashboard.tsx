@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useCallback } from 'react'
 import { useTelemetry } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
 import { useAlertConfig } from '@/hooks/use-alert-config'
@@ -55,6 +56,15 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
   const { telemetry, tactical, connectionState } = useTelemetry(sessionId)
   const { rules: configuredRules } = useAlertConfig(sessionId)
   const { alerts, hasCritical, hasWarning } = useAlerts(telemetry, { rules: configuredRules })
+
+  // TSD click-to-place: mission tab sets a handler; TrainerTSD uses it
+  const [tsdClickHandler, setTsdClickHandlerState] = useState<((coords: { lat: number; lon: number }) => void) | null>(null)
+  const setTsdClickHandler = useCallback(
+    (handler: ((coords: { lat: number; lon: number }) => void) | null) => {
+      setTsdClickHandlerState(() => handler)
+    },
+    []
+  )
   const flightPhase = useFlightPhase(telemetry)
   // useCoaching must always be called unconditionally (React rules of hooks).
   // smoothness.score is passed to the Status card in TrainerTelemetryGrid.
@@ -113,7 +123,11 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
 
       {/* Center column — Tactical Situation Display */}
       <div className="jarvis-panel flex flex-col min-h-0 p-1">
-        <TrainerTSD telemetry={telemetry} tactical={tactical} />
+        <TrainerTSD
+          telemetry={telemetry}
+          tactical={tactical}
+          onCanvasClick={tsdClickHandler ?? undefined}
+        />
       </div>
 
       {/* Right column — mission log */}
@@ -127,6 +141,7 @@ export function TrainerDashboard({ sessionId }: TrainerDashboardProps) {
           sessionId={sessionId}
           telemetry={telemetry}
           flightPhase={flightPhase.phase}
+          onSetTsdClickHandler={setTsdClickHandler}
         />
       </div>
     </div>
