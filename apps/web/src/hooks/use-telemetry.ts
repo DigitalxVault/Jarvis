@@ -92,9 +92,10 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
     if (hb?.type !== 'heartbeat') return
     lastHeartbeatAtRef.current = Date.now()
     setHeartbeat(hb)
-    if (!hb.dcsActive) {
-      setConnectionState('dcs_offline')
-    }
+    // Don't immediately set dcs_offline on heartbeat — let the staleness
+    // timer handle it. Heartbeat dcsActive can bounce during DCS pause/unpause
+    // causing rapid connected↔dcs_offline flicker and repeated voice cues.
+    // The 3s staleness timeout provides a natural debounce.
   }, [])
 
   const handleTactical = useCallback((msg: { payload: unknown }) => {

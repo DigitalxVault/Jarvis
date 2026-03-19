@@ -1,16 +1,18 @@
 'use client'
 
+import { useCallback, useState } from 'react'
 import { useJarvisVoice } from '@/providers/jarvis-voice-provider'
 
 /**
  * Compact voice status indicator for the top bar.
- * Shows mic icon with state-based color and pulse animation.
+ * Clickable — requests mic permission and resumes AudioContext on first click.
  */
 export function VoiceIndicator() {
   const { voiceState } = useJarvisVoice()
+  const [micGranted, setMicGranted] = useState<boolean | null>(null)
 
   const configs: Record<string, { color: string; pulse: boolean; label: string }> = {
-    idle: { color: 'text-jarvis-muted', pulse: false, label: 'CLICK TO ENABLE' },
+    idle: { color: 'text-jarvis-muted', pulse: false, label: 'CLICK MIC' },
     listening: { color: 'text-jarvis-accent', pulse: false, label: 'LISTENING' },
     'wake-detected': { color: 'text-jarvis-success', pulse: true, label: 'JARVIS' },
     recording: { color: 'text-jarvis-danger', pulse: true, label: 'RECORDING' },
@@ -18,12 +20,32 @@ export function VoiceIndicator() {
     speaking: { color: 'text-jarvis-success', pulse: true, label: 'SPEAKING' },
     error: { color: 'text-jarvis-danger', pulse: false, label: 'MIC ERR' },
     limit: { color: 'text-jarvis-warning', pulse: false, label: 'MIC IN USE' },
+    'mic-denied': { color: 'text-jarvis-danger', pulse: false, label: 'MIC DENIED' },
   }
 
-  const config = configs[voiceState] || configs.idle
+  const effectiveState = micGranted === false ? 'mic-denied' : voiceState
+  const config = configs[effectiveState] || configs.idle
+
+  const handleClick = useCallback(async () => {
+    try {
+      // Request mic permission explicitly — this is the user gesture Chrome needs
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      // Stop the stream immediately — we just needed the permission grant
+      stream.getTracks().forEach(t => t.stop())
+      setMicGranted(true)
+      console.log('[JARVIS] Mic permission granted')
+    } catch (err) {
+      console.error('[JARVIS] Mic permission denied:', err)
+      setMicGranted(false)
+    }
+  }, [])
 
   return (
-    <div className="flex items-center gap-1.5" title={`Voice: ${config.label}`}>
+    <button
+      onClick={handleClick}
+      className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+      title={`Voice: ${config.label}${voiceState === 'idle' ? ' — Click to enable mic' : ''}`}
+    >
       {/* Mic icon */}
       <div className={`relative ${config.color}`}>
         {config.pulse && (
@@ -52,6 +74,6 @@ export function VoiceIndicator() {
       >
         {config.label}
       </span>
-    </div>
+    </button>
   )
 }

@@ -7,8 +7,10 @@ import type { SpeechPriority } from '@/hooks/use-jarvis-tts'
 import type { FlightPhase } from '@/lib/flight-phases'
 import { getPhaseAlertPrefix } from '@/lib/phase-personality'
 
-/** Minimum seconds between repeated connection state voice cues */
-const CONNECTION_CUE_COOLDOWN_S = 15
+/** Minimum seconds between repeated connection state voice cues.
+ * 60s prevents spam when DCS is paused (pause stops Lua export,
+ * triggering dcs_offline after 3s staleness; unpause resumes). */
+const CONNECTION_CUE_COOLDOWN_S = 60
 /** Minimum seconds between repeated alert voice cues for the same rule */
 const ALERT_CUE_COOLDOWN_S = 30
 
