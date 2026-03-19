@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useCallback, useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import { useTelemetryContext } from '@/providers/telemetry-provider'
 import { useJarvisTTS } from '@/hooks/use-jarvis-tts'
 import { useWakeWord } from '@/hooks/use-wake-word'
@@ -25,6 +26,27 @@ interface JarvisVoiceContextValue {
 const JarvisVoiceContext = createContext<JarvisVoiceContextValue | null>(null)
 
 export function JarvisVoiceProvider({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  const isTrainerRoute = pathname?.startsWith('/trainer')
+
+  // On trainer route, skip all voice logic — trainer has its own comm system
+  if (isTrainerRoute) {
+    return (
+      <JarvisVoiceContext.Provider value={{
+        voiceState: 'idle',
+        isSpeaking: false,
+        wakeWordState: 'idle',
+        recorderState: 'idle',
+      }}>
+        {children}
+      </JarvisVoiceContext.Provider>
+    )
+  }
+
+  return <JarvisVoiceProviderInner>{children}</JarvisVoiceProviderInner>
+}
+
+function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
   const { telemetry, connectionState, alerts, flightPhase, currentSession } = useTelemetryContext()
 
   // TTS with priority queue
