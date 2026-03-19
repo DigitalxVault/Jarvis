@@ -17,38 +17,35 @@ function generatePairingCode(): string {
 
 /** POST /api/sessions — Create a new session with a pairing code */
 export async function POST() {
-  // Auth is optional — dynamic import so the route doesn't crash
-  // if NextAuth env vars (AUTH_SECRET etc.) are missing.
-  let userId = 'anonymous'
   try {
-    const { auth } = await import('@/auth')
-    const session = await auth()
-    if (session?.user?.id) userId = session.user.id
-  } catch {
-    // Auth not configured or failed — proceed anonymously
+    const supabase = createServerSupabase()
+    const pairingCode = generatePairingCode()
+    const expiresAt = new Date(Date.now() + PAIRING_CODE_TTL_MINUTES * 60 * 1000).toISOString()
+
+    const { data, error } = await supabase
+      .from('sessions')
+      .insert({
+        user_id: 'anonymous',
+        status: 'active',
+        pairing_code: pairingCode,
+        pairing_expires_at: expiresAt,
+      })
+      .select()
+      .single()
+
+    if (error) {
+      console.error('[API] Session creation failed:', error)
+      return NextResponse.json({ error: error.message || 'Failed to create session' }, { status: 500 })
+    }
+
+    return NextResponse.json(data)
+  } catch (err) {
+    console.error('[API] Session route crashed:', err)
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : 'Internal error' },
+      { status: 500 },
+    )
   }
-
-  const supabase = createServerSupabase()
-  const pairingCode = generatePairingCode()
-  const expiresAt = new Date(Date.now() + PAIRING_CODE_TTL_MINUTES * 60 * 1000).toISOString()
-
-  const { data, error } = await supabase
-    .from('sessions')
-    .insert({
-      user_id: userId,
-      status: 'active',
-      pairing_code: pairingCode,
-      pairing_expires_at: expiresAt,
-    })
-    .select()
-    .single()
-
-  if (error) {
-    console.error('[API] Session creation failed:', error)
-    return NextResponse.json({ error: error.message || 'Failed to create session' }, { status: 500 })
-  }
-
-  return NextResponse.json(data)
 }
 
 /** GET /api/sessions — List current user's sessions */
