@@ -32,7 +32,8 @@ class CommandExecutor:
     during shutdown to release the channel.
     """
 
-    def __init__(self, target: str = "localhost:50051") -> None:
+    def __init__(self, target: str | None = None) -> None:
+        target = target or _os.environ.get("DCS_GRPC_HOST", "localhost:50051")
         self._target = target
         # Open async gRPC channel — reused across calls
         self._channel = grpc.aio.insecure_channel(target)

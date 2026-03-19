@@ -76,8 +76,9 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         from jarvis_bridge.command_executor import CommandExecutor
         from jarvis_bridge.command_listener import CommandListener
 
-        grpc_client = GrpcClient()
-        command_executor = CommandExecutor(target="localhost:50051")
+        grpc_target = os.environ.get("DCS_GRPC_HOST", "localhost:50051")
+        grpc_client = GrpcClient(target=grpc_target)
+        command_executor = CommandExecutor(target=grpc_target)
         command_listener = CommandListener(
             supabase_url=supabase_url,
             api_key=api_key,

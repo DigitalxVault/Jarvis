@@ -38,7 +38,7 @@ def _grpc_status(connected: bool, ever_connected: bool, udp_fallback: bool = Fal
     if ever_connected:
         return Text("Reconnecting...", style="bold yellow")
     if udp_fallback:
-        return Text("Not installed (UDP fallback)", style="dim italic")
+        return Text("Not connected (UDP fallback)", style="dim italic")
     return Text("Waiting for DCS...", style="dim")
 
 

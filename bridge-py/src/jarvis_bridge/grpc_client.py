@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import logging
 import math
+import os
 import sys
 import time
 from dataclasses import dataclass, field
@@ -23,7 +24,7 @@ from dcs.mission.v0 import mission_pb2, mission_pb2_grpc  # noqa: E402
 
 log = logging.getLogger(__name__)
 
-_GRPC_TARGET = "localhost:50051"
+_GRPC_TARGET = os.environ.get("DCS_GRPC_HOST", "localhost:50051")
 
 
 @dataclass
