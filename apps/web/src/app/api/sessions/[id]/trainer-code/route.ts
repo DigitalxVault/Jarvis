@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { createServerSupabase } from '@/lib/supabase-server'
 import { TRAINER_CODE_MIN, TRAINER_CODE_MAX } from '@jarvis-dcs/shared'
 
@@ -14,20 +13,14 @@ export async function POST(
   _req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
-
   const { id } = await params
   const supabase = createServerSupabase()
 
-  // Verify the session belongs to the authenticated user and is active
+  // Verify the session exists and is active
   const { data: dbSession, error: findErr } = await supabase
     .from('sessions')
     .select('id, status')
     .eq('id', id)
-    .eq('user_id', session.user.id)
     .eq('status', 'active')
     .single()
 
@@ -43,7 +36,6 @@ export async function POST(
       .from('sessions')
       .update({ trainer_code: code })
       .eq('id', id)
-      .eq('user_id', session.user.id)
 
     if (!updateErr) {
       return NextResponse.json({ trainerCode: code })
