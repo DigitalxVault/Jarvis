@@ -108,15 +108,15 @@ const INPUT_STYLE: React.CSSProperties = {
   border: '1px solid rgba(0, 212, 255, 0.3)',
   color: '#00d4ff',
   fontFamily: 'Courier New, monospace',
-  fontSize: '9px',
+  fontSize: '11px',
   letterSpacing: '1px',
-  padding: '3px 6px',
+  padding: '4px 6px',
   outline: 'none',
   width: '100%',
 }
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: '8px',
+  fontSize: '10px',
   letterSpacing: '2px',
   color: 'rgba(0, 212, 255, 0.5)',
   textTransform: 'uppercase',
@@ -124,7 +124,7 @@ const LABEL_STYLE: React.CSSProperties = {
 }
 
 const RADIO_OPTION_STYLE = (active: boolean): React.CSSProperties => ({
-  fontSize: '8px',
+  fontSize: '10px',
   letterSpacing: '1px',
   color: active ? '#00ffff' : 'rgba(0, 212, 255, 0.4)',
   cursor: 'pointer',
@@ -387,7 +387,7 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
                   border: '1px solid rgba(0, 212, 255, 0.2)',
                   color: 'rgba(0, 212, 255, 0.6)',
                   fontFamily: 'Courier New, monospace',
-                  fontSize: '8px',
+                  fontSize: '10px',
                   letterSpacing: '1px',
                   textTransform: 'uppercase',
                   padding: '5px 4px',
@@ -495,7 +495,7 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
               {!hasPlayerPos && posMode !== 'absolute' && (
                 <div
                   style={{
-                    fontSize: '8px',
+                    fontSize: '10px',
                     letterSpacing: '1px',
                     color: 'rgba(255, 68, 68, 0.7)',
                     marginTop: '3px',
@@ -627,7 +627,7 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
                 border: '1px solid rgba(0, 255, 255, 0.4)',
                 color: '#00ffff',
                 fontFamily: 'Courier New, monospace',
-                fontSize: '9px',
+                fontSize: '11px',
                 letterSpacing: '2px',
                 textTransform: 'uppercase',
                 padding: '5px',
@@ -659,7 +659,7 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
           >
             <span
               style={{
-                fontSize: '8px',
+                fontSize: '10px',
                 letterSpacing: '2px',
                 color: 'rgba(0, 212, 255, 0.4)',
                 textTransform: 'uppercase',

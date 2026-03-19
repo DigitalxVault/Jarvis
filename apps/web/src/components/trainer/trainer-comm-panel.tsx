@@ -102,12 +102,12 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
     alignItems: 'center',
     justifyContent: 'center',
     height: '100%',
-    padding: '0 12px',
+    padding: '0 14px',
     background: 'none',
     border: 'none',
     cursor: 'pointer',
     position: 'relative',
-    fontSize: '9px',
+    fontSize: '11px',
     letterSpacing: '2px',
     color: active ? '#00ffff' : 'rgba(0, 212, 255, 0.4)',
     transition: 'color 0.15s',
@@ -117,7 +117,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
     <div
       className="jarvis-panel relative"
       style={{
-        height: '220px',
+        height: '100%',
         fontFamily: 'Courier New, monospace',
         display: 'flex',
         flexDirection: 'column',
@@ -126,7 +126,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
       {/* ---- Top-level tab bar ---- */}
       <div
         className="flex items-center border-b border-jarvis-primary/20 relative"
-        style={{ height: '28px', flexShrink: 0 }}
+        style={{ height: '34px', flexShrink: 0 }}
       >
         {topTabs.map(tab => (
           <button
@@ -190,7 +190,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
                 className="absolute right-0 top-full mt-1 jarvis-panel border border-jarvis-primary/40 z-50"
                 style={{ width: '220px', padding: '10px 12px' }}
               >
-                <div style={{ fontSize: '8px', letterSpacing: '2px', color: 'rgba(0,212,255,0.6)', marginBottom: '8px' }}>
+                <div style={{ fontSize: '10px', letterSpacing: '2px', color: 'rgba(0,212,255,0.6)', marginBottom: '8px' }}>
                   REPHRASE INTENSITY
                 </div>
                 <input
@@ -203,7 +203,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
                   className="w-full mb-2"
                   style={{ accentColor: '#00ffff' }}
                 />
-                <div style={{ fontSize: '9px', letterSpacing: '2px', color: '#00ffff', textAlign: 'center' }}>
+                <div style={{ fontSize: '11px', letterSpacing: '2px', color: '#00ffff', textAlign: 'center' }}>
                   {intensityLabel(rephraseIntensity)}
                 </div>
               </div>
@@ -222,7 +222,7 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
             {/* Sub-tab bar */}
             <div
               className="flex items-center border-b border-jarvis-primary/10"
-              style={{ height: '24px', flexShrink: 0 }}
+              style={{ height: '30px', flexShrink: 0 }}
             >
               {subTabs.map(tab => (
                 <button
@@ -230,9 +230,9 @@ export function TrainerCommPanel({ sessionId, telemetry, flightPhase, onSetTsdCl
                   onClick={() => setActiveSub(tab.id)}
                   style={{
                     ...TAB_BTN_STYLE(activeSub === tab.id),
-                    fontSize: '8px',
+                    fontSize: '10px',
                     height: '100%',
-                    padding: '0 10px',
+                    padding: '0 12px',
                   }}
                   onMouseEnter={e => {
                     if (activeSub !== tab.id) e.currentTarget.style.color = 'rgba(0, 212, 255, 0.7)'

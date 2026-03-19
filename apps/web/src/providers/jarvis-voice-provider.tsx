@@ -41,7 +41,7 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   const inConversationRef = useRef(false)
   const speakingPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const CONVERSATION_WINDOW_MS = 8000
+  const CONVERSATION_WINDOW_MS = 10000
 
   const clearConversationWindow = useCallback(() => {
     if (conversationWindowRef.current) {
@@ -61,6 +61,11 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   // Persistent broadcast channel — created once per sessionId, reused by broadcastConversation
   const broadcastChannelRef = useRef<RealtimeChannel | null>(null)
 
+  // Ref for speak so the broadcast listener can use it without re-subscribing
+  const speakRef = useRef(speak)
+  speakRef.current = speak
+  const broadcastConversationRef = useRef<(role: 'player' | 'jarvis', text: string) => void>(() => {})
+
   useEffect(() => {
     const sessionId = currentSession?.id
     if (!sessionId) return
@@ -70,6 +75,17 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     const ch = supabase.channel(channelName, {
       config: { broadcast: { ack: false } },
     })
+
+    // Listen for trainer messages — speak them as JARVIS on the player's side
+    ch.on('broadcast', { event: 'trainer_speak' }, (msg) => {
+      const text = msg.payload?.text
+      if (text && typeof text === 'string') {
+        console.log('[JARVIS] Trainer message received:', text)
+        speakRef.current(text, 'P1')
+        broadcastConversationRef.current('jarvis', text)
+      }
+    })
+
     ch.subscribe()
     broadcastChannelRef.current = ch
     return () => {
@@ -89,6 +105,9 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
       payload,
     })
   }, [])
+
+  // Keep ref in sync for the broadcast listener
+  broadcastConversationRef.current = broadcastConversation
 
   // Callback for voice cues — broadcasts proactive Jarvis alerts to trainer
   const handleVoiceCueSpeak = useCallback((text: string) => {
@@ -178,8 +197,8 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   }, [speak, processTranscript, broadcastConversation, openConversationWindow, clearConversationWindow])
 
   const { state: recorderState, startRecording, setState: setRecorderState } = useAudioRecorder({
-    silenceTimeout: 1500,
-    maxDuration: 10000,
+    silenceTimeout: 2500,
+    maxDuration: 15000,
     onRecorded: handleRecorded,
   })
 

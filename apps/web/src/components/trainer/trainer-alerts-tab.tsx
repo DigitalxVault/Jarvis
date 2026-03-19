@@ -77,8 +77,8 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
   }
 
   const TOGGLE_STYLE = (enabled: boolean): React.CSSProperties => ({
-    width: '24px',
-    height: '12px',
+    width: '28px',
+    height: '14px',
     background: enabled ? '#00ffff' : 'rgba(0,212,255,0.15)',
     border: `1px solid ${enabled ? '#00ffff' : 'rgba(0,212,255,0.3)'}`,
     borderRadius: '2px',
@@ -126,7 +126,7 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
               display: 'flex',
               alignItems: 'center',
               gap: '6px',
-              height: '28px',
+              height: '32px',
               opacity: dimmed ? 0.3 : 1,
               transition: 'opacity 0.15s',
             }}
@@ -143,10 +143,10 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
             {/* Label */}
             <div
               style={{
-                fontSize: '7px',
+                fontSize: '10px',
                 letterSpacing: '1.5px',
                 color: 'rgba(0,212,255,0.6)',
-                width: '80px',
+                width: '90px',
                 flexShrink: 0,
                 overflow: 'hidden',
                 whiteSpace: 'nowrap',
@@ -189,12 +189,12 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
                 }
               }}
               style={{
-                width: '38px',
+                width: '44px',
                 background: 'transparent',
                 border: '1px solid rgba(0,212,255,0.2)',
                 color: '#00d4ff',
                 fontFamily: 'Courier New, monospace',
-                fontSize: '8px',
+                fontSize: '10px',
                 letterSpacing: '1px',
                 padding: '1px 3px',
                 textAlign: 'center',
@@ -205,9 +205,9 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
             {/* Unit label */}
             <div
               style={{
-                fontSize: '7px',
+                fontSize: '9px',
                 color: 'rgba(0,212,255,0.4)',
-                width: '16px',
+                width: '20px',
                 flexShrink: 0,
               }}
             >
@@ -222,13 +222,13 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
                   disabled={!state.enabled}
                   onClick={() => updateAndBroadcast(meta.ruleId, { severity: sev })}
                   style={{
-                    width: '14px',
-                    height: '14px',
+                    width: '18px',
+                    height: '18px',
                     background: state.severity === sev ? SEV_COLORS[sev] + '22' : 'transparent',
                     border: `1px solid ${state.severity === sev ? SEV_COLORS[sev] : 'rgba(0,212,255,0.15)'}`,
                     color: state.severity === sev ? SEV_COLORS[sev] : 'rgba(0,212,255,0.3)',
                     fontFamily: 'Courier New, monospace',
-                    fontSize: '7px',
+                    fontSize: '9px',
                     letterSpacing: 0,
                     cursor: state.enabled ? 'pointer' : 'not-allowed',
                     display: 'flex',

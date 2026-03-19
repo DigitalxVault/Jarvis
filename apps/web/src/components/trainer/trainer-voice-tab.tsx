@@ -25,7 +25,7 @@ function StageProgress({ stage, errorMessage }: { stage: CommStage; errorMessage
     return (
       <div
         className="text-jarvis-danger text-center"
-        style={{ fontSize: '9px', letterSpacing: '2px' }}
+        style={{ fontSize: '11px', letterSpacing: '2px' }}
       >
         {errorMessage || 'ERROR'}
       </div>
@@ -41,7 +41,7 @@ function StageProgress({ stage, errorMessage }: { stage: CommStage; errorMessage
     return (
       <div
         className="text-jarvis-accent flex items-center justify-center gap-2"
-        style={{ fontSize: '9px', letterSpacing: '2px' }}
+        style={{ fontSize: '11px', letterSpacing: '2px' }}
       >
         <span
           className="inline-block w-1.5 h-1.5 rounded-full bg-jarvis-accent animate-pulse"
@@ -198,7 +198,7 @@ export function TrainerVoiceTab({
         {isRecording && (
           <div
             className="absolute top-1 right-2 text-jarvis-danger font-mono"
-            style={{ fontSize: '9px', letterSpacing: '1px' }}
+            style={{ fontSize: '11px', letterSpacing: '1px' }}
           >
             {formatElapsed(elapsedMs)} / 30s MAX
           </div>
@@ -209,7 +209,7 @@ export function TrainerVoiceTab({
       {micDenied && (
         <div
           className="text-jarvis-warning text-center border border-jarvis-warning/30 px-2 py-1"
-          style={{ fontSize: '8px', letterSpacing: '1px', borderRadius: '2px' }}
+          style={{ fontSize: '10px', letterSpacing: '1px', borderRadius: '2px' }}
         >
           MICROPHONE ACCESS DENIED — Check browser permissions
         </div>
@@ -230,7 +230,7 @@ export function TrainerVoiceTab({
         `}
         style={{
           height: '42px',
-          fontSize: '9px',
+          fontSize: '11px',
           letterSpacing: '3px',
           borderRadius: '2px',
           opacity: micDenied ? 0.4 : 1,

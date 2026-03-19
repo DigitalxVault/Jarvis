@@ -119,7 +119,7 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
       className="grid h-screen bg-jarvis-bg p-2 gap-2"
       style={{
         gridTemplateColumns: '280px 1fr 320px',
-        gridTemplateRows: 'auto 1fr auto',
+        gridTemplateRows: 'auto 1fr 340px',
         fontFamily: 'Courier New, monospace',
       }}
     >
@@ -172,8 +172,8 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
         </div>
       )}
 
-      {/* Left column — telemetry grid */}
-      <div className="overflow-auto">
+      {/* Left column — telemetry grid (spans middle + bottom rows) */}
+      <div className="overflow-auto" style={{ gridRow: '2 / 4' }}>
         <TrainerTelemetryGrid
           telemetry={telemetry}
           alerts={alerts}
@@ -198,8 +198,8 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
         <TrainerLogPanel entries={logEntries} />
       </div>
 
-      {/* Bottom row — comm panel spanning all 3 columns */}
-      <div className="col-span-3">
+      {/* Bottom row — comm panel spanning center + right columns */}
+      <div className="col-span-2">
         <TrainerCommPanel
           sessionId={sessionId}
           telemetry={telemetry}

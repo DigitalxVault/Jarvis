@@ -2,7 +2,6 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { speakWithElevenLabs } from '@/lib/elevenlabs'
 import { getChannelName } from '@jarvis-dcs/shared'
 import type { RealtimeChannel } from '@supabase/supabase-js'
 import type { TelemetryPacket, ConversationEntry } from '@jarvis-dcs/shared'
@@ -145,12 +144,19 @@ export function useTrainerComm({
       setStage('speaking')
       stageRef.current = 'speaking'
 
-      // Broadcast to player channel using persistent channel ref
+      // Send to player's side — JARVIS speaks on the player's browser, not the trainer's
       const broadcastCh = broadcastChannelRef.current
       if (!broadcastCh) {
-        console.warn('[TrainerComm] Broadcast channel not ready — skipping conversation broadcast')
+        console.warn('[TrainerComm] Broadcast channel not ready — skipping trainer speak')
       } else {
-        const payload: ConversationEntry = {
+        // trainer_speak event: player's voice provider listens and plays TTS
+        broadcastCh.send({
+          type: 'broadcast',
+          event: 'trainer_speak',
+          payload: { text: textToSpeak, ts: Date.now() },
+        })
+        // Also broadcast conversation entry for the trainer log
+        const convoPayload: ConversationEntry = {
           type: 'conversation',
           role: 'jarvis',
           text: textToSpeak,
@@ -159,13 +165,12 @@ export function useTrainerComm({
         broadcastCh.send({
           type: 'broadcast',
           event: 'conversation',
-          payload,
+          payload: convoPayload,
         })
       }
 
-      // Await TTS playback
-      const { promise } = speakWithElevenLabs({ text: textToSpeak })
-      await promise
+      // Brief delay so the trainer UI shows "speaking" stage while player TTS plays
+      await new Promise(resolve => setTimeout(resolve, 2000))
 
       setStage('idle')
       stageRef.current = 'idle'
