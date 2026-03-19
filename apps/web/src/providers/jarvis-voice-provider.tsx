@@ -41,7 +41,7 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   const inConversationRef = useRef(false)
   const speakingPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  const CONVERSATION_WINDOW_MS = 10000
+  const CONVERSATION_WINDOW_MS = 25000
 
   const clearConversationWindow = useCallback(() => {
     if (conversationWindowRef.current) {
@@ -76,13 +76,16 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
       config: { broadcast: { ack: false } },
     })
 
-    // Listen for trainer messages — speak them as JARVIS on the player's side
+    // Listen for trainer messages — speak them as JARVIS on the player's side,
+    // then open conversation window so the pilot can respond without wake word
     ch.on('broadcast', { event: 'trainer_speak' }, (msg) => {
       const text = msg.payload?.text
       if (text && typeof text === 'string') {
         console.log('[JARVIS] Trainer message received:', text)
         speakRef.current(text, 'P1')
         broadcastConversationRef.current('jarvis', text)
+        // Open conversation window so pilot can reply naturally
+        openConversationWindowRef.current()
       }
     })
 
@@ -114,8 +117,9 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     broadcastConversation('jarvis', text)
   }, [broadcastConversation])
 
-  // Ref to hold startRecording — breaks circular dependency with openConversationWindow
-  const startRecordingRef = useRef<() => void>(() => {})
+  // Refs to hold startRecording and openConversationWindow — breaks circular dependencies
+  const startRecordingRef = useRef<(overrides?: { silenceTimeout?: number; maxDuration?: number; noiseFloor?: number }) => void>(() => {})
+  const openConversationWindowRef = useRef<() => void>(() => {})
 
   // Open a conversation window: wait for TTS to finish, then auto-record
   const openConversationWindow = useCallback(() => {
@@ -137,8 +141,9 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
           inConversationRef.current = true
           console.log('[JARVIS] Conversation window opened (after 1s cooldown)')
 
-          // Auto-start recording (no wake word needed)
-          startRecordingRef.current()
+          // Auto-start recording with longer silence timeout (6s) and higher noise floor
+          // so the pilot has time to think and ambient noise doesn't trigger false positives
+          startRecordingRef.current({ silenceTimeout: 6000, maxDuration: 20000, noiseFloor: 25 })
 
           // Safety timeout: if the recorder's silence detection doesn't fire,
           // close the window after CONVERSATION_WINDOW_MS
@@ -149,6 +154,9 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
       }
     }, 100)
   }, [isSpeaking, clearConversationWindow])
+
+  // Keep ref in sync so trainer_speak listener can open conversation window
+  openConversationWindowRef.current = openConversationWindow
 
   // Audio recorder — sends audio to Whisper, then to brain
   const handleRecorded = useCallback(async (blob: Blob) => {

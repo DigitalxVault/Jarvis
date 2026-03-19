@@ -5,18 +5,24 @@ import { useRef, useCallback, useState } from 'react'
 type RecorderState = 'idle' | 'recording' | 'processing'
 
 interface UseAudioRecorderOptions {
-  silenceTimeout?: number   // ms of silence before auto-stop (default: 1500)
-  maxDuration?: number      // max recording duration in ms (default: 10000)
+  silenceTimeout?: number   // ms of silence before auto-stop (default: 2500)
+  maxDuration?: number      // max recording duration in ms (default: 15000)
+  noiseFloor?: number       // avg frequency level below this = silence (default: 20)
   onRecorded?: (blob: Blob) => void
 }
 
 /**
  * Records audio from the microphone after wake word detection.
  * Auto-stops on silence or timeout.
+ *
+ * startRecording() accepts an optional overrides object to change
+ * silenceTimeout / maxDuration / noiseFloor for that single recording
+ * (e.g. conversation-window recordings use a longer silence timeout).
  */
 export function useAudioRecorder({
-  silenceTimeout = 1500,
-  maxDuration = 10000,
+  silenceTimeout: defaultSilenceTimeout = 2500,
+  maxDuration: defaultMaxDuration = 15000,
+  noiseFloor: defaultNoiseFloor = 20,
   onRecorded,
 }: UseAudioRecorderOptions = {}) {
   const [state, setState] = useState<RecorderState>('idle')
@@ -39,8 +45,16 @@ export function useAudioRecorder({
     setState('idle')
   }, [])
 
-  const startRecording = useCallback(async () => {
+  const startRecording = useCallback(async (overrides?: {
+    silenceTimeout?: number
+    maxDuration?: number
+    noiseFloor?: number
+  }) => {
     if (state === 'recording') return
+
+    const silenceTimeout = overrides?.silenceTimeout ?? defaultSilenceTimeout
+    const maxDuration = overrides?.maxDuration ?? defaultMaxDuration
+    const noiseFloor = overrides?.noiseFloor ?? defaultNoiseFloor
 
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
@@ -68,7 +82,7 @@ export function useAudioRecorder({
         analyser.getByteFrequencyData(dataArray)
         const avgLevel = dataArray.reduce((sum, v) => sum + v, 0) / dataArray.length
 
-        if (avgLevel > 15) {
+        if (avgLevel > noiseFloor) {
           lastSoundTime = Date.now()
         } else if (Date.now() - lastSoundTime > silenceTimeout) {
           // Silence detected
@@ -110,7 +124,7 @@ export function useAudioRecorder({
       console.error('[JARVIS] Mic access error:', err)
       setState('idle')
     }
-  }, [state, silenceTimeout, maxDuration, stopRecording])
+  }, [state, defaultSilenceTimeout, defaultMaxDuration, defaultNoiseFloor, stopRecording])
 
   return { state, startRecording, stopRecording, setState }
 }
