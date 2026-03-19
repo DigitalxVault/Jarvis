@@ -6,6 +6,9 @@ import type { ConnectionState } from '@/hooks/use-telemetry'
 interface ConnectionStatusPanelProps {
   connectionState: ConnectionState
   sessionId: string | null
+  onCreateSession?: () => void
+  isCreatingSession?: boolean
+  sessionError?: string | null
 }
 
 type UIConnectionState = 'INITIALIZING' | 'SYSTEM_INITIALIZED' | 'DCS_ONLINE' | 'DCS_OFFLINE'
@@ -67,6 +70,9 @@ function deriveUIState(
 export function ConnectionStatusPanel({
   connectionState,
   sessionId,
+  onCreateSession,
+  isCreatingSession,
+  sessionError,
 }: ConnectionStatusPanelProps) {
   const hadTelemetryRef = useRef<boolean>(false)
   const [trainerCode, setTrainerCode] = useState<string | null>(null)
@@ -169,6 +175,30 @@ export function ConnectionStatusPanel({
             {STATUS_CONFIG[uiState].subText}
           </div>
         </div>
+
+        {/* Create session — shown when no session exists */}
+        {!sessionId && onCreateSession && (
+          <div className="border-t border-jarvis-border/40 pt-2">
+            <div className="text-center">
+              <button
+                onClick={onCreateSession}
+                disabled={isCreatingSession}
+                className="w-full px-3 py-2 text-[11px] font-bold border border-jarvis-accent/60 text-jarvis-accent hover:border-jarvis-accent hover:bg-jarvis-accent/10 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                style={{ letterSpacing: '2px' }}
+              >
+                {isCreatingSession ? 'CREATING...' : 'CREATE SESSION'}
+              </button>
+              <div className="text-[9px] opacity-30 mt-1" style={{ letterSpacing: '1px' }}>
+                ENABLES TRAINER MODE + CODES
+              </div>
+              {sessionError && (
+                <div className="text-[10px] text-jarvis-danger mt-1" style={{ letterSpacing: '1px' }}>
+                  {sessionError}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Trainer code generation — only when session is active */}
         {sessionId && (

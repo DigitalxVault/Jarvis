@@ -81,8 +81,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
   }, [])
 
   const isMainDash = pathname === '/'
-  const isTactical = pathname === '/tactical'
-  const isDocumentation = pathname === '/documentation'
+  const isTrainer = pathname === '/trainer'
 
   return (
     <div
@@ -96,7 +95,7 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
             J·A·R·V·I·S
           </div>
           <div className="hidden md:block text-[12px] opacity-50" style={{ letterSpacing: '2px' }}>
-            TACTICAL HUD v2.0
+            TACTICAL HUD v3.0
           </div>
         </div>
       </div>
@@ -115,26 +114,15 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
           DASHBOARD
         </Link>
         <Link
-          href="/tactical"
+          href="/trainer"
           className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
-            isTactical
+            isTrainer
               ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
               : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
           }`}
           style={{ letterSpacing: '2px' }}
         >
-          TACTICAL
-        </Link>
-        <Link
-          href="/documentation"
-          className={`px-4 py-1.5 text-[13px] font-bold border transition-all ${
-            isDocumentation
-              ? 'border-jarvis-accent text-jarvis-accent glow-accent bg-jarvis-accent/10'
-              : 'border-jarvis-border text-jarvis-muted hover:border-jarvis-primary hover:text-jarvis-primary'
-          }`}
-          style={{ letterSpacing: '2px' }}
-        >
-          DOCUMENTATION
+          TRAINER
         </Link>
       </div>
 

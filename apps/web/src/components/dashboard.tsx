@@ -36,6 +36,9 @@ export function Dashboard() {
     coaching,
     tactical,
     isNetworkOffline,
+    handleCreateSession,
+    isCreating,
+    sessionError,
   } = useTelemetryContext()
 
   const isOffline = isNetworkOffline || telemetry === null
@@ -106,6 +109,9 @@ export function Dashboard() {
             <ConnectionStatusPanel
               connectionState={connectionState}
               sessionId={sessionId}
+              onCreateSession={handleCreateSession}
+              isCreatingSession={isCreating}
+              sessionError={sessionError}
             />
           </DraggablePanel>
 
