@@ -1,18 +1,31 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useState, useEffect } from 'react'
 import { useJarvisVoice } from '@/providers/jarvis-voice-provider'
 
 /**
  * Compact voice status indicator for the top bar.
- * Clickable — requests mic permission and resumes AudioContext on first click.
+ * Shows mic/voice state. No longer requests mic permission on click —
+ * Porcupine handles its own getUserMedia internally.
  */
 export function VoiceIndicator() {
   const { voiceState } = useJarvisVoice()
   const [micGranted, setMicGranted] = useState<boolean | null>(null)
 
+  // Check mic permission status without creating a stream
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.permissions) return
+    navigator.permissions.query({ name: 'microphone' as PermissionName }).then((status) => {
+      setMicGranted(status.state === 'granted')
+      status.onchange = () => setMicGranted(status.state === 'granted')
+    }).catch(() => {
+      // Permissions API not supported — assume granted (Porcupine will handle it)
+      setMicGranted(true)
+    })
+  }, [])
+
   const configs: Record<string, { color: string; pulse: boolean; label: string }> = {
-    idle: { color: 'text-jarvis-muted', pulse: false, label: 'CLICK MIC' },
+    idle: { color: 'text-jarvis-muted', pulse: false, label: 'VOICE OFF' },
     listening: { color: 'text-jarvis-accent', pulse: false, label: 'LISTENING' },
     'wake-detected': { color: 'text-jarvis-success', pulse: true, label: 'JARVIS' },
     recording: { color: 'text-jarvis-danger', pulse: true, label: 'RECORDING' },
@@ -26,33 +39,20 @@ export function VoiceIndicator() {
   const effectiveState = micGranted === false ? 'mic-denied' : voiceState
   const config = configs[effectiveState] || configs.idle
 
-  const handleClick = useCallback(async () => {
-    // Warm up AudioContext synchronously during the user gesture
-    // so Porcupine and the audio recorder can create contexts later.
+  // Click is now just a user gesture to unlock AudioContext — no stream creation
+  const handleClick = useCallback(() => {
     try {
       const ctx = new AudioContext()
       if (ctx.state === 'suspended') ctx.resume()
       setTimeout(() => ctx.close(), 100)
     } catch { /* non-fatal */ }
-
-    try {
-      // Request mic permission explicitly — this is the user gesture Chrome needs
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      // Stop the stream immediately — we just needed the permission grant
-      stream.getTracks().forEach(t => t.stop())
-      setMicGranted(true)
-      console.log('[JARVIS] Mic permission granted')
-    } catch (err) {
-      console.error('[JARVIS] Mic permission denied:', err)
-      setMicGranted(false)
-    }
   }, [])
 
   return (
     <button
       onClick={handleClick}
       className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
-      title={`Voice: ${config.label}${voiceState === 'idle' ? ' — Click to enable mic' : ''}`}
+      title={`Voice: ${config.label}`}
     >
       {/* Mic icon */}
       <div className={`relative ${config.color}`}>
