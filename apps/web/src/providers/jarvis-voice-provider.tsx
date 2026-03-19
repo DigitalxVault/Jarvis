@@ -36,6 +36,28 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   // Track whether we're currently processing a command
   const isProcessingRef = useRef(false)
 
+  // Conversation window: after JARVIS speaks, auto-listen for follow-ups
+  const conversationWindowRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inConversationRef = useRef(false)
+  const speakingPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const CONVERSATION_WINDOW_MS = 8000
+
+  const clearConversationWindow = useCallback(() => {
+    if (conversationWindowRef.current) {
+      clearTimeout(conversationWindowRef.current)
+      conversationWindowRef.current = null
+    }
+    if (speakingPollRef.current) {
+      clearInterval(speakingPollRef.current)
+      speakingPollRef.current = null
+    }
+    if (inConversationRef.current) {
+      inConversationRef.current = false
+      console.log('[JARVIS] Conversation window closed')
+    }
+  }, [])
+
   // Persistent broadcast channel — created once per sessionId, reused by broadcastConversation
   const broadcastChannelRef = useRef<RealtimeChannel | null>(null)
 
@@ -73,9 +95,44 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     broadcastConversation('jarvis', text)
   }, [broadcastConversation])
 
+  // Ref to hold startRecording — breaks circular dependency with openConversationWindow
+  const startRecordingRef = useRef<() => void>(() => {})
+
+  // Open a conversation window: wait for TTS to finish, then auto-record
+  const openConversationWindow = useCallback(() => {
+    // Clear any existing window
+    if (speakingPollRef.current) clearInterval(speakingPollRef.current)
+    if (conversationWindowRef.current) clearTimeout(conversationWindowRef.current)
+
+    // Poll until TTS finishes, then start recording
+    speakingPollRef.current = setInterval(() => {
+      if (!isSpeaking.current) {
+        clearInterval(speakingPollRef.current!)
+        speakingPollRef.current = null
+
+        inConversationRef.current = true
+        console.log('[JARVIS] Conversation window opened')
+
+        // Auto-start recording (no wake word needed)
+        startRecordingRef.current()
+
+        // Safety timeout: if the recorder's silence detection doesn't fire,
+        // close the window after CONVERSATION_WINDOW_MS
+        conversationWindowRef.current = setTimeout(() => {
+          clearConversationWindow()
+        }, CONVERSATION_WINDOW_MS)
+      }
+    }, 100)
+  }, [isSpeaking, clearConversationWindow])
+
   // Audio recorder — sends audio to Whisper, then to brain
   const handleRecorded = useCallback(async (blob: Blob) => {
+    const wasInConversation = inConversationRef.current
+    // Clear conversation window while processing
+    clearConversationWindow()
+
     isProcessingRef.current = true
+    let gotReply = false
     try {
       const formData = new FormData()
       formData.append('audio', blob, 'audio.webm')
@@ -92,6 +149,11 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
 
       const { text } = await res.json()
       if (!text?.trim()) {
+        // During conversation window, silence with no speech = close window
+        if (wasInConversation) {
+          console.log('[JARVIS] No speech during conversation window, closing')
+          return
+        }
         speak('I didn\'t catch that.', 'P3')
         return
       }
@@ -99,14 +161,21 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
       console.log('[JARVIS] Transcribed:', text)
       broadcastConversation('player', text)
       const reply = await processTranscript(text)
-      if (reply) broadcastConversation('jarvis', reply)
+      if (reply) {
+        broadcastConversation('jarvis', reply)
+        gotReply = true
+      }
     } catch (err) {
       console.error('[JARVIS] Recording pipeline error:', err)
       speak('Processing error.', 'P2')
     } finally {
       isProcessingRef.current = false
+      // Open conversation window after a successful exchange
+      if (gotReply) {
+        openConversationWindow()
+      }
     }
-  }, [speak, processTranscript, broadcastConversation])
+  }, [speak, processTranscript, broadcastConversation, openConversationWindow, clearConversationWindow])
 
   const { state: recorderState, startRecording, setState: setRecorderState } = useAudioRecorder({
     silenceTimeout: 1500,
@@ -114,19 +183,30 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     onRecorded: handleRecorded,
   })
 
+  // Keep ref in sync with actual startRecording
+  startRecordingRef.current = startRecording
+
   // Wake word detection — triggers recording
   const handleWakeDetected = useCallback(() => {
-    // Don't start recording if already processing
+    // Don't start recording if already processing or already recording (conversation window)
     if (isProcessingRef.current) return
+    if (recorderState === 'recording') return
+    // Clear any active conversation window — user is explicitly re-engaging
+    clearConversationWindow()
     // Brief audible cue: stop any current speech
     stopSpeaking()
     startRecording()
-  }, [startRecording, stopSpeaking])
+  }, [startRecording, stopSpeaking, recorderState, clearConversationWindow])
 
   const { state: wakeWordState } = useWakeWord({
     enabled: true,
     onDetected: handleWakeDetected,
   })
+
+  // Cleanup conversation window timers on unmount
+  useEffect(() => {
+    return () => clearConversationWindow()
+  }, [clearConversationWindow])
 
   // Voice cues for connection state changes and alerts (phase-aware)
   // onSpeak callback broadcasts each spoken cue to the trainer session channel
