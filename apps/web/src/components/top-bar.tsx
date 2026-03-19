@@ -33,30 +33,33 @@ export function TopBar({ connectionState, editMode, onToggleEditMode }: TopBarPr
 
     setIsEnding(true)
     try {
-      // Broadcast session_ended to all channel subscribers first
-      // Must subscribe before send() — Supabase JS v2 requires SUBSCRIBED state
-      const channelName = getChannelName(sessionId)
-      const ch = supabase.channel(channelName, {
-        config: { broadcast: { ack: false } },
-      })
-      await new Promise<void>((resolve, reject) => {
-        const timeout = setTimeout(() => reject(new Error('Subscribe timeout')), 3000)
-        ch.subscribe((status) => {
-          if (status === 'SUBSCRIBED') { clearTimeout(timeout); resolve() }
-          if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
-            clearTimeout(timeout)
-            reject(new Error(`Channel ${status}`))
-          }
+      // Best-effort broadcast to notify trainers — don't block on it
+      try {
+        const channelName = getChannelName(sessionId)
+        const ch = supabase.channel(channelName, {
+          config: { broadcast: { ack: false } },
         })
-      })
-      await ch.send({
-        type: 'broadcast',
-        event: 'session_ended',
-        payload: { type: 'session_ended', ts: Date.now() },
-      })
-      supabase.removeChannel(ch)
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => resolve(), 3000) // resolve on timeout, don't block
+          ch.subscribe((status) => {
+            if (status === 'SUBSCRIBED') { clearTimeout(timeout); resolve() }
+            if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
+              clearTimeout(timeout)
+              resolve() // still proceed
+            }
+          })
+        })
+        await ch.send({
+          type: 'broadcast',
+          event: 'session_ended',
+          payload: { type: 'session_ended', ts: Date.now() },
+        }).catch(() => {})
+        supabase.removeChannel(ch)
+      } catch {
+        // Broadcast failed — trainers will detect via heartbeat timeout
+      }
 
-      // Then mark session as ended in DB
+      // Mark session as ended in DB
       await fetch(`/api/sessions/${sessionId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
