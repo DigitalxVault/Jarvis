@@ -59,6 +59,31 @@ export function useWakeWord({ enabled = true, onDetected }: UseWakeWordOptions =
       porcupineRef.current = porcupine
       setState('listening')
       console.log('[JARVIS] Wake word engine started — say "Jarvis"')
+
+      // Debug: monitor mic audio levels to verify audio is flowing
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        const dbgCtx = new AudioContext()
+        const source = dbgCtx.createMediaStreamSource(stream)
+        const analyser = dbgCtx.createAnalyser()
+        analyser.fftSize = 256
+        source.connect(analyser)
+        const data = new Uint8Array(analyser.frequencyBinCount)
+        const logLevel = () => {
+          if (!porcupineRef.current) {
+            stream.getTracks().forEach(t => t.stop())
+            dbgCtx.close()
+            return
+          }
+          analyser.getByteFrequencyData(data)
+          const avg = data.reduce((s, v) => s + v, 0) / data.length
+          console.log(`[JARVIS] Mic level: ${avg.toFixed(1)} ${avg > 5 ? '🎤' : '🔇'}`)
+          setTimeout(logLevel, 2000)
+        }
+        logLevel()
+      } catch {
+        console.warn('[JARVIS] Could not start mic level monitor')
+      }
     } catch (err: any) {
       const msg = err?.message || String(err)
       // Handle Picovoice activation limit (free tier = limited active devices)
