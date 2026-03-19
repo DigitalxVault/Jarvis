@@ -19,9 +19,6 @@ import webbrowser
 
 from dotenv import load_dotenv
 
-from jarvis_bridge.command_executor import CommandExecutor
-from jarvis_bridge.command_listener import CommandListener
-from jarvis_bridge.grpc_client import GrpcClient
 from jarvis_bridge.heartbeat import Heartbeat
 from jarvis_bridge.normalizer import Normalizer
 from jarvis_bridge.publisher import SupabasePublisher
@@ -68,15 +65,27 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
     """Run all bridge components concurrently."""
 
     # --- Component construction ---
-    command_executor = CommandExecutor(target="localhost:50051")
-    command_listener = CommandListener(
-        supabase_url=supabase_url,
-        api_key=api_key,
-        channel_topic=channel_topic,
-        executor=command_executor,
-    )
+    # Lazy imports: gRPC modules depend on generated proto stubs
+    # (bridge-py/generated/) which may not exist on fresh clones.
+    # The bridge still runs for telemetry (UDP only) without them.
+    grpc_client = None
+    command_executor = None
+    command_listener = None
+    try:
+        from jarvis_bridge.grpc_client import GrpcClient
+        from jarvis_bridge.command_executor import CommandExecutor
+        from jarvis_bridge.command_listener import CommandListener
 
-    grpc_client = GrpcClient()
+        grpc_client = GrpcClient()
+        command_executor = CommandExecutor(target="localhost:50051")
+        command_listener = CommandListener(
+            supabase_url=supabase_url,
+            api_key=api_key,
+            channel_topic=channel_topic,
+            executor=command_executor,
+        )
+    except ImportError:
+        log.warning("gRPC stubs not found — DCS-gRPC + command execution disabled. Run scripts/gen_stubs.sh to enable.")
     udp_listener = UdpListener()
     normalizer = Normalizer()
     publisher = SupabasePublisher(
@@ -114,13 +123,16 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
     async def _sync_normalizer() -> None:
         """Copy live state objects into the normalizer every 50 ms."""
         while True:
-            normalizer.grpc_state = grpc_client.state
+            if grpc_client is not None:
+                normalizer.grpc_state = grpc_client.state
             normalizer.cockpit_state = udp_listener.state
             normalizer.udp_position_state = udp_listener.position_state
             await asyncio.sleep(0.05)
 
     # --- gRPC reconnect loop (forever, exponential backoff) ---
     async def _grpc_loop() -> None:
+        if grpc_client is None:
+            return  # gRPC stubs not available
         backoff = 1.0
         max_backoff = 30.0
         while True:
@@ -155,6 +167,8 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
     # --- Command listener reconnect loop ---
     async def _command_loop() -> None:
         """Command listener with exponential backoff reconnect."""
+        if command_listener is None:
+            return  # gRPC stubs not available
         backoff = 1.0
         max_backoff = 30.0
         while True:
@@ -191,8 +205,10 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         heartbeat.stop()
         udp_listener.stop()
         await publisher.close()
-        await command_listener.stop()
-        await command_executor.close()
+        if command_listener is not None:
+            await command_listener.stop()
+        if command_executor is not None:
+            await command_executor.close()
         log.info("Bridge shutdown complete.")
 
 

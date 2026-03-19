@@ -100,7 +100,7 @@ class BridgeTUI:
         self,
         *,
         channel: str,
-        grpc_client: "GrpcClient",
+        grpc_client: "GrpcClient | None",
         udp_listener: "UdpListener",
         publisher: "SupabasePublisher",
     ) -> None:
@@ -112,17 +112,19 @@ class BridgeTUI:
         self._console = Console(highlight=False)
 
     def _render(self) -> Panel:
+        grpc_connected = self._grpc.connected if self._grpc else False
+        grpc_ever_connected = self._grpc.ever_connected if self._grpc else False
         # Show gRPC as optional when UDP is receiving but gRPC never connected
         udp_fallback = (
             self._udp.packet_count > 0
-            and not self._grpc.connected
-            and not self._grpc.ever_connected
+            and not grpc_connected
+            and not grpc_ever_connected
         )
         return _build_panel(
             channel=self._channel,
             uptime_s=time.monotonic() - self._start_time,
-            grpc_connected=self._grpc.connected,
-            grpc_ever_connected=self._grpc.ever_connected,
+            grpc_connected=grpc_connected,
+            grpc_ever_connected=grpc_ever_connected,
             udp_packets=self._udp.packet_count,
             published=self._publisher.total_published,
             errors=self._publisher.total_errors,
