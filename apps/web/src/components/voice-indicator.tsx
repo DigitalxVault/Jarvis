@@ -27,6 +27,14 @@ export function VoiceIndicator() {
   const config = configs[effectiveState] || configs.idle
 
   const handleClick = useCallback(async () => {
+    // Warm up AudioContext synchronously during the user gesture
+    // so Porcupine and the audio recorder can create contexts later.
+    try {
+      const ctx = new AudioContext()
+      if (ctx.state === 'suspended') ctx.resume()
+      setTimeout(() => ctx.close(), 100)
+    } catch { /* non-fatal */ }
+
     try {
       // Request mic permission explicitly — this is the user gesture Chrome needs
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true })

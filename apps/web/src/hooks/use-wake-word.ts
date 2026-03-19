@@ -86,6 +86,18 @@ export function useWakeWord({ enabled = true, onDetected }: UseWakeWordOptions =
 
     const handleGesture = () => {
       hasUserGesture.current = true
+
+      // Unlock browser audio policy synchronously during the gesture.
+      // Porcupine creates its own AudioContext internally — browsers
+      // require at least one AudioContext to be created/resumed within
+      // a user gesture before allowing any further AudioContext usage.
+      try {
+        const ctx = new AudioContext()
+        if (ctx.state === 'suspended') ctx.resume()
+        // Close after a tick — we only needed to unlock the policy
+        setTimeout(() => ctx.close(), 100)
+      } catch { /* non-fatal — Porcupine will try anyway */ }
+
       start()
       document.removeEventListener('click', handleGesture)
       document.removeEventListener('keydown', handleGesture)

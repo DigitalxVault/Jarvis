@@ -18,10 +18,9 @@ function generatePairingCode(): string {
 
 /** POST /api/sessions — Create a new session with a pairing code */
 export async function POST() {
+  // Auth is optional — anonymous sessions use placeholder user_id
   const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const userId = session?.user?.id ?? 'anonymous'
 
   const supabase = createServerSupabase()
   const pairingCode = generatePairingCode()
@@ -30,7 +29,7 @@ export async function POST() {
   const { data, error } = await supabase
     .from('sessions')
     .insert({
-      user_id: session.user.id,
+      user_id: userId,
       status: 'active',
       pairing_code: pairingCode,
       pairing_expires_at: expiresAt,

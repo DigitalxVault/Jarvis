@@ -90,9 +90,6 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
       const res = await fetch('/api/sessions', { method: 'POST' })
       if (!res.ok) {
         const data = await res.json().catch(() => ({}))
-        if (res.status === 401) {
-          throw new Error('Sign in with Google to create a session')
-        }
         throw new Error(data.error || `Failed (${res.status})`)
       }
       const session = await res.json()
