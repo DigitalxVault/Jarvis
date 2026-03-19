@@ -39,6 +39,7 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   // Conversation window: after JARVIS speaks, auto-listen for follow-ups
   const conversationWindowRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inConversationRef = useRef(false)
+  const pendingCooldownRef = useRef(false)  // true while waiting for post-TTS cooldown
   const speakingPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const CONVERSATION_WINDOW_MS = 25000
@@ -52,6 +53,7 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
       clearInterval(speakingPollRef.current)
       speakingPollRef.current = null
     }
+    pendingCooldownRef.current = false
     if (inConversationRef.current) {
       inConversationRef.current = false
       console.log('[JARVIS] Conversation window closed')
@@ -133,10 +135,14 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
         clearInterval(speakingPollRef.current!)
         speakingPollRef.current = null
 
+        // Mark that we're in the cooldown phase
+        pendingCooldownRef.current = true
+
         // Wait 1s after TTS stops so the mic doesn't pick up speaker echo
         setTimeout(() => {
-          // Bail if conversation was closed during the delay
-          if (conversationWindowRef.current === null && !inConversationRef.current) return
+          // Bail if conversation was cancelled during the cooldown
+          if (!pendingCooldownRef.current) return
+          pendingCooldownRef.current = false
 
           inConversationRef.current = true
           console.log('[JARVIS] Conversation window opened (after 1s cooldown)')
@@ -219,6 +225,7 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
   const { state: recorderState, startRecording, setState: setRecorderState } = useAudioRecorder({
     silenceTimeout: 2500,
     maxDuration: 15000,
+    noiseFloor: 25,
     onRecorded: handleRecorded,
   })
 
