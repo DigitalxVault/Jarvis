@@ -123,23 +123,29 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
     if (speakingPollRef.current) clearInterval(speakingPollRef.current)
     if (conversationWindowRef.current) clearTimeout(conversationWindowRef.current)
 
-    // Poll until TTS finishes, then start recording
+    // Poll until TTS finishes, then wait for speaker audio to dissipate before recording
     speakingPollRef.current = setInterval(() => {
       if (!isSpeaking.current) {
         clearInterval(speakingPollRef.current!)
         speakingPollRef.current = null
 
-        inConversationRef.current = true
-        console.log('[JARVIS] Conversation window opened')
+        // Wait 1s after TTS stops so the mic doesn't pick up speaker echo
+        setTimeout(() => {
+          // Bail if conversation was closed during the delay
+          if (conversationWindowRef.current === null && !inConversationRef.current) return
 
-        // Auto-start recording (no wake word needed)
-        startRecordingRef.current()
+          inConversationRef.current = true
+          console.log('[JARVIS] Conversation window opened (after 1s cooldown)')
 
-        // Safety timeout: if the recorder's silence detection doesn't fire,
-        // close the window after CONVERSATION_WINDOW_MS
-        conversationWindowRef.current = setTimeout(() => {
-          clearConversationWindow()
-        }, CONVERSATION_WINDOW_MS)
+          // Auto-start recording (no wake word needed)
+          startRecordingRef.current()
+
+          // Safety timeout: if the recorder's silence detection doesn't fire,
+          // close the window after CONVERSATION_WINDOW_MS
+          conversationWindowRef.current = setTimeout(() => {
+            clearConversationWindow()
+          }, CONVERSATION_WINDOW_MS)
+        }, 1000)
       }
     }, 100)
   }, [isSpeaking, clearConversationWindow])
@@ -174,6 +180,12 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
           return
         }
         speak('I didn\'t catch that.', 'P3')
+        return
+      }
+
+      // During conversation window, discard very short transcriptions (likely speaker echo)
+      if (wasInConversation && text.trim().split(/\s+/).length <= 2) {
+        console.log('[JARVIS] Discarding short echo in conversation window:', text)
         return
       }
 
