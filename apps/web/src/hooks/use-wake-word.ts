@@ -45,7 +45,7 @@ export function useWakeWord({ enabled = true, onDetected }: UseWakeWordOptions =
 
       const porcupine = await PorcupineWorker.create(
         accessKey,
-        [{ builtin: 'Jarvis' as any, sensitivity: 0.6 }],
+        [{ builtin: 'Jarvis' as any, sensitivity: 0.9 }],
         (detection: { label: string; index: number }) => {
           console.log('[JARVIS] Wake word detected:', detection.label)
           setState('detected')
