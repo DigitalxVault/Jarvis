@@ -29,7 +29,7 @@ export function TrainerTSD({ telemetry, tactical, onCanvasClick }: TrainerTSDPro
         >
           <span
             className="text-jarvis-accent"
-            style={{ fontSize: '9px', letterSpacing: '3px', opacity: 0.3 }}
+            style={{ fontSize: '14px', letterSpacing: '3px', opacity: 0.3 }}
           >
             AWAITING PLAYER POSITION
           </span>

@@ -89,7 +89,7 @@ export function TrainerLogPanel({ entries }: TrainerLogPanelProps) {
   }, [filtered])
 
   const tabStyle = (tab: LogTab) => ({
-    fontSize: '9px' as const,
+    fontSize: '14px' as const,
     letterSpacing: '2px' as const,
     padding: '3px 8px' as const,
     cursor: 'pointer' as const,
@@ -107,7 +107,7 @@ export function TrainerLogPanel({ entries }: TrainerLogPanelProps) {
       {/* Panel title */}
       <div
         className="text-jarvis-accent/70 shrink-0 mb-2"
-        style={{ fontSize: '9px', letterSpacing: '4px' }}
+        style={{ fontSize: '14px', letterSpacing: '4px' }}
       >
         MISSION LOG
       </div>
@@ -135,7 +135,7 @@ export function TrainerLogPanel({ entries }: TrainerLogPanelProps) {
         {filtered.length === 0 ? (
           <div
             className="text-jarvis-accent flex items-center justify-center h-full"
-            style={{ fontSize: '9px', letterSpacing: '2px', opacity: 0.3 }}
+            style={{ fontSize: '14px', letterSpacing: '2px', opacity: 0.3 }}
           >
             NO EVENTS YET
           </div>
@@ -146,7 +146,7 @@ export function TrainerLogPanel({ entries }: TrainerLogPanelProps) {
                 key={entry.id}
                 className={`leading-relaxed ${entryColorClass(entry)}`}
                 style={{
-                  fontSize: '11px',
+                  fontSize: '14px',
                   fontFamily: 'Courier New, monospace',
                   wordBreak: 'break-word',
                 }}

@@ -143,7 +143,7 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
             {/* Label */}
             <div
               style={{
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '1.5px',
                 color: 'rgba(0,212,255,0.6)',
                 width: '90px',
@@ -194,7 +194,7 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
                 border: '1px solid rgba(0,212,255,0.2)',
                 color: '#00d4ff',
                 fontFamily: 'Courier New, monospace',
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '1px',
                 padding: '1px 3px',
                 textAlign: 'center',
@@ -205,7 +205,7 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
             {/* Unit label */}
             <div
               style={{
-                fontSize: '9px',
+                fontSize: '14px',
                 color: 'rgba(0,212,255,0.4)',
                 width: '20px',
                 flexShrink: 0,
@@ -228,7 +228,7 @@ export function TrainerAlertsTab({ sessionId }: TrainerAlertsTabProps) {
                     border: `1px solid ${state.severity === sev ? SEV_COLORS[sev] : 'rgba(0,212,255,0.15)'}`,
                     color: state.severity === sev ? SEV_COLORS[sev] : 'rgba(0,212,255,0.3)',
                     fontFamily: 'Courier New, monospace',
-                    fontSize: '9px',
+                    fontSize: '14px',
                     letterSpacing: 0,
                     cursor: state.enabled ? 'pointer' : 'not-allowed',
                     display: 'flex',

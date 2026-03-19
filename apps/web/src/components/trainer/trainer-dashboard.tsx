@@ -96,19 +96,19 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
         >
           <div
             className="text-jarvis-accent"
-            style={{ fontSize: '10px', letterSpacing: '4px', fontWeight: 'bold' }}
+            style={{ fontSize: '16px', letterSpacing: '4px', fontWeight: 'bold' }}
           >
             SESSION ENDED
           </div>
           <div
-            style={{ fontSize: '9px', letterSpacing: '2px', color: 'rgba(0, 212, 255, 0.5)' }}
+            style={{ fontSize: '14px', letterSpacing: '2px', color: 'rgba(0, 212, 255, 0.5)' }}
           >
             PILOT HAS ENDED THE SESSION
           </div>
           <button
             onClick={onExit}
             className="mt-2 px-6 py-2 border border-jarvis-accent text-jarvis-accent hover:bg-jarvis-accent/10 transition-all font-bold"
-            style={{ fontSize: '9px', letterSpacing: '3px' }}
+            style={{ fontSize: '14px', letterSpacing: '3px' }}
           >
             RETURN TO JOIN SCREEN
           </button>
@@ -118,8 +118,8 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
     <div
       className="grid h-screen bg-jarvis-bg p-2 gap-2"
       style={{
-        gridTemplateColumns: '280px 1fr 320px',
-        gridTemplateRows: 'auto 1fr 340px',
+        gridTemplateColumns: '320px 1fr 360px',
+        gridTemplateRows: 'auto 1fr',
         fontFamily: 'Courier New, monospace',
       }}
     >
@@ -128,7 +128,7 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
         className="col-span-3 jarvis-panel flex items-center justify-between"
         style={{ padding: '6px 12px' }}
       >
-        <div className="text-jarvis-accent" style={{ fontSize: '10px', letterSpacing: '4px' }}>
+        <div className="text-jarvis-accent" style={{ fontSize: '14px', letterSpacing: '4px' }}>
           J·A·R·V·I·S // TRAINER VIEW
         </div>
 
@@ -136,26 +136,26 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
           <div className={`w-2 h-2 rounded-full ${connectionDot(connectionState)}`} />
           <span
             className="text-jarvis-primary/70"
-            style={{ fontSize: '9px', letterSpacing: '2px' }}
+            style={{ fontSize: '14px', letterSpacing: '2px' }}
           >
             {connectionLabel(connectionState)}
           </span>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="text-jarvis-primary/40" style={{ fontSize: '9px', letterSpacing: '2px' }}>
+          <div className="text-jarvis-primary/40" style={{ fontSize: '14px', letterSpacing: '2px' }}>
             SESSION {sessionId.slice(0, 8).toUpperCase()}
           </div>
           {role === 'observer' && (
             <span
               className="text-jarvis-warning font-bold"
-              style={{ fontSize: '9px', letterSpacing: '2px' }}
+              style={{ fontSize: '14px', letterSpacing: '2px' }}
             >
               OBSERVER
             </span>
           )}
           {observerCount > 0 && (
-            <span style={{ fontSize: '8px', letterSpacing: '1px', color: 'rgba(0,212,255,0.4)' }}>
+            <span style={{ fontSize: '12px', letterSpacing: '1px', color: 'rgba(0,212,255,0.4)' }}>
               {observerCount} OBSERVER{observerCount !== 1 ? 'S' : ''}
             </span>
           )}
@@ -166,14 +166,14 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
       {(connectionState === 'connecting' || connectionState === 'offline') && !sessionEnded && (
         <div
           className="col-span-3 text-center text-jarvis-accent/40 animate-pulse"
-          style={{ fontSize: '8px', letterSpacing: '3px', padding: '4px 0' }}
+          style={{ fontSize: '14px', letterSpacing: '3px', padding: '4px 0' }}
         >
           AWAITING TELEMETRY...
         </div>
       )}
 
-      {/* Left column — telemetry grid (spans middle + bottom rows) */}
-      <div className="overflow-auto" style={{ gridRow: '2 / 4' }}>
+      {/* Left column — telemetry grid */}
+      <div className="overflow-auto">
         <TrainerTelemetryGrid
           telemetry={telemetry}
           alerts={alerts}
@@ -184,28 +184,28 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
         />
       </div>
 
-      {/* Center column — Tactical Situation Display */}
-      <div className="jarvis-panel flex flex-col min-h-0 p-1">
-        <TrainerTSD
-          telemetry={telemetry}
-          tactical={tactical}
-          onCanvasClick={tsdClickHandler ?? undefined}
-        />
+      {/* Center column — TSD (top 1fr) + Comm panel (bottom 3fr) */}
+      <div className="flex flex-col min-h-0 gap-2">
+        <div className="jarvis-panel flex flex-col min-h-0 p-1" style={{ flex: '1 1 0' }}>
+          <TrainerTSD
+            telemetry={telemetry}
+            tactical={tactical}
+            onCanvasClick={tsdClickHandler ?? undefined}
+          />
+        </div>
+        <div style={{ flex: '3 1 0', minHeight: 0 }}>
+          <TrainerCommPanel
+            sessionId={sessionId}
+            telemetry={telemetry}
+            flightPhase={flightPhase.phase}
+            onSetTsdClickHandler={setTsdClickHandler}
+          />
+        </div>
       </div>
 
       {/* Right column — mission log */}
       <div className="flex flex-col min-h-0 overflow-hidden">
         <TrainerLogPanel entries={logEntries} />
-      </div>
-
-      {/* Bottom row — comm panel spanning center + right columns */}
-      <div className="col-span-2">
-        <TrainerCommPanel
-          sessionId={sessionId}
-          telemetry={telemetry}
-          flightPhase={flightPhase.phase}
-          onSetTsdClickHandler={setTsdClickHandler}
-        />
       </div>
     </div>
     </div>

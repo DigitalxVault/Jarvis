@@ -103,7 +103,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
                 key={cat}
                 onClick={() => { setActiveCategory(cat); setShowAddForm(true) }}
                 style={{
-                  fontSize: '10px',
+                  fontSize: '14px',
                   letterSpacing: '2px',
                   background: 'none',
                   border: 'none',
@@ -124,7 +124,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
               key={cat}
               onClick={() => setActiveCategory(cat)}
               style={{
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '2px',
                 background: 'none',
                 border: 'none',
@@ -158,7 +158,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
         {activeCategory === 'CUSTOM' && visibleTemplates.length === 0 && !showAddForm && (
           <div
             style={{
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '2px',
               color: 'rgba(0, 212, 255, 0.3)',
               textAlign: 'center',
@@ -186,7 +186,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
                     onClick={() => { void handleTemplateClick(template) }}
                     disabled={stage !== 'idle'}
                     style={{
-                      fontSize: '10px',
+                      fontSize: '14px',
                       letterSpacing: '1px',
                       fontFamily: 'Courier New, monospace',
                       background: isActive
@@ -225,7 +225,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
                     <button
                       onClick={() => handleDeleteCustom(template.id)}
                       style={{
-                        fontSize: '10px',
+                        fontSize: '14px',
                         background: 'none',
                         border: '1px solid rgba(255, 68, 68, 0.2)',
                         borderLeft: 'none',
@@ -258,7 +258,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
               background: 'rgba(0, 13, 26, 0.6)',
             }}
           >
-            <div style={{ fontSize: '10px', letterSpacing: '2px', color: 'rgba(0, 212, 255, 0.6)' }}>
+            <div style={{ fontSize: '14px', letterSpacing: '2px', color: 'rgba(0, 212, 255, 0.6)' }}>
               NEW TEMPLATE
             </div>
 
@@ -266,7 +266,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
               value={newCategory}
               onChange={e => setNewCategory(e.target.value as TemplateCategory)}
               style={{
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '1px',
                 fontFamily: 'Courier New, monospace',
                 background: 'rgba(0, 13, 26, 0.9)',
@@ -288,7 +288,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
               value={newLabel}
               onChange={e => setNewLabel(e.target.value)}
               style={{
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '1px',
                 fontFamily: 'Courier New, monospace',
                 background: 'rgba(0, 13, 26, 0.9)',
@@ -306,7 +306,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
               onChange={e => setNewTemplate(e.target.value)}
               rows={2}
               style={{
-                fontSize: '10px',
+                fontSize: '14px',
                 letterSpacing: '1px',
                 fontFamily: 'Courier New, monospace',
                 background: 'rgba(0, 13, 26, 0.9)',
@@ -323,7 +323,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
                 onClick={handleSaveCustom}
                 disabled={!newLabel.trim() || !newTemplate.trim()}
                 style={{
-                  fontSize: '10px',
+                  fontSize: '14px',
                   letterSpacing: '2px',
                   fontFamily: 'Courier New, monospace',
                   background: newLabel.trim() && newTemplate.trim()
@@ -341,7 +341,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
               <button
                 onClick={() => { setShowAddForm(false); setNewLabel(''); setNewTemplate('') }}
                 style={{
-                  fontSize: '10px',
+                  fontSize: '14px',
                   letterSpacing: '2px',
                   fontFamily: 'Courier New, monospace',
                   background: 'none',
@@ -362,7 +362,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
           <button
             onClick={() => setShowAddForm(true)}
             style={{
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '2px',
               fontFamily: 'Courier New, monospace',
               background: 'none',
@@ -402,7 +402,7 @@ export function TrainerTemplatesTab({ stage, telemetry, onSendText }: TrainerTem
           />
           <span
             style={{
-              fontSize: '10px',
+              fontSize: '14px',
               letterSpacing: '2px',
               color: stage === 'error' ? '#ff4444' : '#00ffff',
             }}

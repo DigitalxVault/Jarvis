@@ -60,7 +60,7 @@ const INPUT_STYLE: React.CSSProperties = {
   border: '1px solid rgba(0,212,255,0.2)',
   color: '#00d4ff',
   fontFamily: 'Courier New, monospace',
-  fontSize: '11px',
+  fontSize: '14px',
   letterSpacing: '1px',
   padding: '3px 4px',
   outline: 'none',
@@ -69,7 +69,7 @@ const INPUT_STYLE: React.CSSProperties = {
 }
 
 const LABEL_STYLE: React.CSSProperties = {
-  fontSize: '11px',
+  fontSize: '14px',
   letterSpacing: '2px',
   color: 'rgba(0,212,255,0.5)',
   marginBottom: '2px',
@@ -245,7 +245,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
     background: 'none',
     border: 'none',
     cursor: 'pointer',
-    fontSize: '10px',
+    fontSize: '14px',
     letterSpacing: '2px',
     color: active ? '#00ffff' : 'rgba(0,212,255,0.4)',
     padding: '3px 8px',
@@ -267,7 +267,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
       border: `1px solid ${c.border}`,
       color: c.color,
       fontFamily: 'Courier New, monospace',
-      fontSize: '10px',
+      fontSize: '14px',
       letterSpacing: '1.5px',
       padding: '3px 8px',
       cursor: 'pointer',
@@ -373,7 +373,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
                     style={{
                       ...ACTION_BTN(quick.objectiveType === ot ? 'accent' : 'dim'),
                       padding: '2px 6px',
-                      fontSize: '11px',
+                      fontSize: '14px',
                     }}
                   >
                     {ot}
@@ -445,7 +445,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
                 >
                   {/* Header row */}
                   <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <span style={{ fontSize: '11px', color: 'rgba(0,212,255,0.5)', width: '14px' }}>
+                    <span style={{ fontSize: '14px', color: 'rgba(0,212,255,0.5)', width: '14px' }}>
                       {idx + 1}
                     </span>
                     <input
@@ -460,14 +460,14 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
                     <button
                       onClick={() => moveWaypoint(wp.id, 'up')}
                       disabled={idx === 0}
-                      style={{ ...ACTION_BTN('dim'), padding: '1px 4px', fontSize: '11px', opacity: idx === 0 ? 0.3 : 1 }}
+                      style={{ ...ACTION_BTN('dim'), padding: '1px 4px', fontSize: '14px', opacity: idx === 0 ? 0.3 : 1 }}
                     >
                       ↑
                     </button>
                     <button
                       onClick={() => moveWaypoint(wp.id, 'down')}
                       disabled={idx === waypoints.length - 1}
-                      style={{ ...ACTION_BTN('dim'), padding: '1px 4px', fontSize: '11px', opacity: idx === waypoints.length - 1 ? 0.3 : 1 }}
+                      style={{ ...ACTION_BTN('dim'), padding: '1px 4px', fontSize: '14px', opacity: idx === waypoints.length - 1 ? 0.3 : 1 }}
                     >
                       ↓
                     </button>
@@ -515,7 +515,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
                         style={{
                           ...ACTION_BTN(wp.objectiveType === ot ? 'accent' : 'dim'),
                           padding: '1px 5px',
-                          fontSize: '11px',
+                          fontSize: '14px',
                         }}
                       >
                         {ot.slice(0, 3)}
@@ -528,7 +528,7 @@ export function TrainerMissionTab({ sessionId, telemetry, onSetTsdClickHandler }
                       style={{
                         ...ACTION_BTN(isWpPlacing ? 'accent' : 'dim'),
                         padding: '1px 6px',
-                        fontSize: '11px',
+                        fontSize: '14px',
                         opacity: noTelemetry ? 0.4 : 1,
                         cursor: noTelemetry ? 'not-allowed' : 'pointer',
                       }}

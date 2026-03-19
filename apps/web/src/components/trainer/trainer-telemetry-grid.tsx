@@ -85,7 +85,7 @@ function TelemetryCard({ title, children }: CardProps) {
     <div className="jarvis-panel">
       <div
         className="text-jarvis-accent mb-3"
-        style={{ fontSize: '9px', letterSpacing: '3px' }}
+        style={{ fontSize: '14px', letterSpacing: '3px' }}
       >
         {title}
       </div>
@@ -106,21 +106,21 @@ function TelemetryRow({ label, value, unit, colorClass = 'text-jarvis-primary' }
     <div className="flex items-baseline justify-between">
       <span
         className="text-jarvis-primary/50"
-        style={{ fontSize: '8px', letterSpacing: '2px', minWidth: '56px' }}
+        style={{ fontSize: '14px', letterSpacing: '2px', minWidth: '56px' }}
       >
         {label}
       </span>
       <div className="flex items-baseline gap-1">
         <span
           className={`${colorClass} tabular-nums`}
-          style={{ fontSize: '20px', lineHeight: 1 }}
+          style={{ fontSize: '22px', lineHeight: 1 }}
         >
           {value}
         </span>
         {unit && (
           <span
             className="text-jarvis-primary/40"
-            style={{ fontSize: '8px', letterSpacing: '1px' }}
+            style={{ fontSize: '14px', letterSpacing: '1px' }}
           >
             {unit}
           </span>
