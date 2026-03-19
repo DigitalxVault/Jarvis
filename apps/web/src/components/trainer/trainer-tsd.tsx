@@ -21,20 +21,6 @@ export function TrainerTSD({ telemetry, tactical, onCanvasClick }: TrainerTSDPro
         rangeOptions={TRAINER_RANGE_OPTIONS}
         onCanvasClick={onCanvasClick}
       />
-      {/* Overlay when no player telemetry available */}
-      {!telemetry && (
-        <div
-          className="absolute inset-0 flex items-center justify-center pointer-events-none"
-          style={{ zIndex: 1 }}
-        >
-          <span
-            className="text-jarvis-accent"
-            style={{ fontSize: '14px', letterSpacing: '3px', opacity: 0.3 }}
-          >
-            AWAITING PLAYER POSITION
-          </span>
-        </div>
-      )}
     </div>
   )
 }
