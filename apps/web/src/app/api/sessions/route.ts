@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { auth } from '@/auth'
 import { createServerSupabase } from '@/lib/supabase-server'
 import {
   PAIRING_CHARSET,
@@ -18,9 +17,11 @@ function generatePairingCode(): string {
 
 /** POST /api/sessions — Create a new session with a pairing code */
 export async function POST() {
-  // Auth is optional — anonymous sessions use placeholder user_id
+  // Auth is optional — dynamic import so the route doesn't crash
+  // if NextAuth env vars (AUTH_SECRET etc.) are missing.
   let userId = 'anonymous'
   try {
+    const { auth } = await import('@/auth')
     const session = await auth()
     if (session?.user?.id) userId = session.user.id
   } catch {
@@ -52,23 +53,28 @@ export async function POST() {
 
 /** GET /api/sessions — List current user's sessions */
 export async function GET() {
-  const session = await auth()
-  if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  try {
+    const { auth } = await import('@/auth')
+    const session = await auth()
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const supabase = createServerSupabase()
+
+    const { data, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false })
+      .limit(20)
+
+    if (error) {
+      return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 })
+    }
+
+    return NextResponse.json(data)
+  } catch {
+    return NextResponse.json({ error: 'Auth not configured' }, { status: 401 })
   }
-
-  const supabase = createServerSupabase()
-
-  const { data, error } = await supabase
-    .from('sessions')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .order('created_at', { ascending: false })
-    .limit(20)
-
-  if (error) {
-    return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 })
-  }
-
-  return NextResponse.json(data)
 }
