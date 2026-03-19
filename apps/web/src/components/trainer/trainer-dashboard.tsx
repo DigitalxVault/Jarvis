@@ -162,16 +162,6 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
         </div>
       </div>
 
-      {/* Awaiting telemetry banner — shown while connecting before first packet */}
-      {(connectionState === 'connecting' || connectionState === 'offline') && !sessionEnded && (
-        <div
-          className="col-span-3 text-center text-jarvis-accent/40 animate-pulse"
-          style={{ fontSize: '14px', letterSpacing: '3px', padding: '4px 0' }}
-        >
-          AWAITING TELEMETRY...
-        </div>
-      )}
-
       {/* Left column — telemetry grid */}
       <div className="overflow-auto">
         <TrainerTelemetryGrid
@@ -186,7 +176,16 @@ export function TrainerDashboard({ sessionId, role = 'controller', onExit }: Tra
 
       {/* Center column — TSD (top 1fr) + Comm panel (bottom 3fr) */}
       <div className="flex flex-col min-h-0 gap-2">
-        <div className="jarvis-panel flex flex-col min-h-0 p-1" style={{ flex: '1 1 0' }}>
+        <div className="jarvis-panel flex flex-col min-h-0 p-1 relative" style={{ flex: '1 1 0' }}>
+          {/* Awaiting telemetry banner — overlay on TSD */}
+          {(connectionState === 'connecting' || connectionState === 'offline') && !sessionEnded && (
+            <div
+              className="absolute inset-0 z-10 flex items-center justify-center text-jarvis-accent/40 animate-pulse"
+              style={{ fontSize: '14px', letterSpacing: '3px' }}
+            >
+              AWAITING TELEMETRY...
+            </div>
+          )}
           <TrainerTSD
             telemetry={telemetry}
             tactical={tactical}
