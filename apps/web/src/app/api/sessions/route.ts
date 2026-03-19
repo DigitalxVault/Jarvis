@@ -19,8 +19,13 @@ function generatePairingCode(): string {
 /** POST /api/sessions — Create a new session with a pairing code */
 export async function POST() {
   // Auth is optional — anonymous sessions use placeholder user_id
-  const session = await auth()
-  const userId = session?.user?.id ?? 'anonymous'
+  let userId = 'anonymous'
+  try {
+    const session = await auth()
+    if (session?.user?.id) userId = session.user.id
+  } catch {
+    // Auth not configured or failed — proceed anonymously
+  }
 
   const supabase = createServerSupabase()
   const pairingCode = generatePairingCode()
@@ -39,7 +44,7 @@ export async function POST() {
 
   if (error) {
     console.error('[API] Session creation failed:', error)
-    return NextResponse.json({ error: 'Failed to create session' }, { status: 500 })
+    return NextResponse.json({ error: error.message || 'Failed to create session' }, { status: 500 })
   }
 
   return NextResponse.json(data)
