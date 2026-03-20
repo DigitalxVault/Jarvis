@@ -9,14 +9,14 @@ See: .planning/PROJECT.md (updated 2026-03-14)
 
 ## Current Position
 
-Phase: 26 of 27 (Observer Role) — IN PROGRESS
-Plan: 1 of 2
-Status: 26-01 complete; 26-02 next
-Last activity: 2026-03-18 — Completed 26-01-PLAN.md (observer role foundation)
+Phase: 26 of 27 (Observer Role) — COMPLETE
+Plan: 2 of 2
+Status: Phase 26 complete; Phase 27 next
+Last activity: 2026-03-18 — Completed 26-02-PLAN.md (observer role UI wire-up)
 
 Progress: v1.0 [##########] 100% SHIPPED
 Progress: v2.0 [##########] 100% COMPLETE (Phases 8-14 all done)
-Progress: v3.0 [#########-] 91% Phases 15-25 complete + 26-01; Phases 26-02 + 27 pending
+Progress: v3.0 [##########] 96% Phases 15-26 complete; Phase 27 pending
 
 ## Performance Metrics
 
@@ -210,6 +210,12 @@ Amendment decisions (2026-03-13):
 | D-2602 | trainer_role stores only 'controller' | Observer status derived at join time; no extra DB write for observers |
 | D-2603 | ObserverGuard uses overlay not unmount | Observers see controls but cannot click — transparency over hiding |
 | D-2604 | Idempotent observer-link | Reuses existing token; repeated calls don't invalidate existing links |
+| D-2605 | Wrap entire component return in ObserverGuard | Minimal code change, uniform dimming across all 6 tab components |
+| D-2606 | Only settings gear wrapped in comm panel | Tab navigation remains usable for observers to browse read-only content |
+| D-2607 | Keyboard shortcut guards in handlers + DOM | Defense-in-depth: pointer-events:none + handler isObserver check |
+| D-2608 | Observer link shown only after trainer code exists | Logical flow; trainer code required first |
+| D-2609 | 'joining' PageState for observer validation | Clean UX with intermediate loading state instead of spinner on entry form |
+| D-2610 | observerJoinError passed to TrainerEntry | Familiar error context in entry UI; no extra error page needed |
 
 ### Pending Todos
 
@@ -239,6 +245,6 @@ Amendment decisions (2026-03-13):
 
 ## Session Continuity
 
-Last session: 2026-03-18T08:46:54Z
-Stopped at: Completed 26-01-PLAN.md (observer role foundation). 26-02 (wire ObserverGuard into trainer components) next.
+Last session: 2026-03-18T09:00:20Z
+Stopped at: Completed 26-02-PLAN.md (observer role UI wire-up). Phase 26 complete. Phase 27 next.
 Resume file: None

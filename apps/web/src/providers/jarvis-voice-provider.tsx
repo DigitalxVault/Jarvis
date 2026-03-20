@@ -58,6 +58,9 @@ function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
   // Track whether we're currently processing a command
   const isProcessingRef = useRef(false)
 
+  // Track what JARVIS just said — used for echo detection
+  const lastJarvisSpeechRef = useRef<string>('')
+
   // Conversation window: after JARVIS speaks, auto-listen for follow-ups
   const conversationWindowRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inConversationRef = useRef(false)
@@ -106,6 +109,7 @@ function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
       const text = msg.payload?.text
       if (text && typeof text === 'string') {
         console.log('[JARVIS] Trainer message received:', text)
+        lastJarvisSpeechRef.current = text
         speakRef.current(text, 'P1')
         broadcastConversationRef.current('jarvis', text)
         // Open conversation window so pilot can reply naturally
@@ -160,25 +164,25 @@ function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
         // Mark that we're in the cooldown phase
         pendingCooldownRef.current = true
 
-        // Wait 1s after TTS stops so the mic doesn't pick up speaker echo
+        // Wait 1.5s after TTS stops so the mic doesn't pick up speaker echo
         setTimeout(() => {
           // Bail if conversation was cancelled during the cooldown
           if (!pendingCooldownRef.current) return
           pendingCooldownRef.current = false
 
           inConversationRef.current = true
-          console.log('[JARVIS] Conversation window opened (after 1s cooldown)')
+          console.log('[JARVIS] Conversation window opened (after 1.5s cooldown)')
 
-          // Auto-start recording with longer silence timeout (6s) and higher noise floor
+          // Auto-start recording with longer silence timeout (6s) and higher noise floor (30)
           // so the pilot has time to think and ambient noise doesn't trigger false positives
-          startRecordingRef.current({ silenceTimeout: 6000, maxDuration: 20000, noiseFloor: 25 })
+          startRecordingRef.current({ silenceTimeout: 6000, maxDuration: 20000, noiseFloor: 30 })
 
           // Safety timeout: if the recorder's silence detection doesn't fire,
           // close the window after CONVERSATION_WINDOW_MS
           conversationWindowRef.current = setTimeout(() => {
             clearConversationWindow()
           }, CONVERSATION_WINDOW_MS)
-        }, 1000)
+        }, 1500)
       }
     }, 100)
   }, [isSpeaking, clearConversationWindow])
@@ -219,16 +223,47 @@ function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
         return
       }
 
-      // During conversation window, discard very short transcriptions (likely speaker echo)
-      if (wasInConversation && text.trim().split(/\s+/).length <= 2) {
-        console.log('[JARVIS] Discarding short echo in conversation window:', text)
-        return
+      // During conversation window, apply 3-layer echo filter
+      if (wasInConversation) {
+        const trimmed = text.trim().toLowerCase()
+        const words = trimmed.split(/\s+/)
+
+        // Layer 1 — Similarity check: compare against what JARVIS just said
+        if (lastJarvisSpeechRef.current) {
+          const jarvisWords = lastJarvisSpeechRef.current.toLowerCase().split(/\s+/)
+          const overlap = words.filter((w: string) => jarvisWords.includes(w)).length
+          const similarity = overlap / Math.max(words.length, 1)
+          if (similarity > 0.4) {
+            console.log('[JARVIS] Discarding echo (similarity %.0f%):', similarity * 100, text)
+            return
+          }
+        }
+
+        // Layer 2 — Common Whisper hallucination phrases
+        const hallucinations = [
+          'thank you for watching', 'bye bye', 'subscribe',
+          'see you next time', 'thank you for listening',
+          'thanks for watching', 'like and subscribe',
+          'see you in the next', 'we are here to help',
+        ]
+        if (hallucinations.some((h) => trimmed.includes(h))) {
+          console.log('[JARVIS] Discarding hallucination phrase:', text)
+          return
+        }
+
+        // Layer 3 — Short + not a question = likely noise/echo
+        const isQuestion = /\?/.test(trimmed) || /^(what|where|how|why|when|who|can|could|should|is|are|do|does|will|would)\b/.test(trimmed)
+        if (words.length <= 4 && !isQuestion) {
+          console.log('[JARVIS] Discarding short non-question in conversation window:', text)
+          return
+        }
       }
 
       console.log('[JARVIS] Transcribed:', text)
       broadcastConversation('player', text)
       const reply = await processTranscript(text)
       if (reply) {
+        lastJarvisSpeechRef.current = reply
         broadcastConversation('jarvis', reply)
         gotReply = true
       }

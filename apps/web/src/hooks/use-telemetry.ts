@@ -111,7 +111,7 @@ export function useTelemetry(sessionId: string | null): TelemetryState {
   const handleStatus = useCallback((status: string) => {
     setSubscriptionStatus(status)
     if (status === 'SUBSCRIBED') {
-      setConnectionState((prev) => (prev === 'connecting' ? 'connecting' : prev))
+      setConnectionState((prev) => (prev === 'connecting' ? 'dcs_offline' : prev))
     }
     if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') {
       setConnectionState('reconnecting')

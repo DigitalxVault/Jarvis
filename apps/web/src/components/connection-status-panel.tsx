@@ -22,14 +22,14 @@ const STATUS_CONFIG: Record<UIConnectionState, {
 }> = {
   INITIALIZING: {
     label: 'INITIALIZING',
-    subText: 'Connecting to bridge...',
+    subText: 'Subscribing to channel...',
     color: 'text-jarvis-accent',
     dotColor: 'bg-jarvis-accent',
     spinning: true,
   },
   SYSTEM_INITIALIZED: {
     label: 'SYSTEM INITIALIZED',
-    subText: 'Awaiting DCS launch...',
+    subText: 'Awaiting bridge telemetry...',
     color: 'text-jarvis-warning',
     dotColor: 'bg-jarvis-warning',
     spinning: false,

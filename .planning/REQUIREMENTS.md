@@ -157,64 +157,64 @@
 
 **Milestone:** v3.0
 **Created:** 2026-03-14
-**Status:** Defined (awaiting v2.0 completion)
+**Status:** Active (Phases 15-24 complete; integration fixes applied 2026-03-18)
 
 ---
 
 ## Prerequisites (PREREQ)
 
-- [ ] **REQ-300** — DCS-gRPC server mod installed and verified in DCS World
-- [ ] **REQ-301** — API accounts created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine wake word)
-- [ ] **REQ-302** — Python bridge project scaffold (pyproject.toml, virtual env, project structure)
+- [x] **REQ-300** — DCS-gRPC server mod installed and verified in DCS World
+- [x] **REQ-301** — API accounts created: OpenAI (Whisper + GPT-4o), ElevenLabs (TTS), Picovoice (Porcupine wake word)
+- [x] **REQ-302** — Python bridge project scaffold (pyproject.toml, virtual env, project structure)
 
 ## Python Bridge (BRIDGE)
 
-- [ ] **REQ-303** — Python bridge connects to DCS via DCS-gRPC and receives telemetry (position, attitude, speed, fuel, engine, weapons)
-- [ ] **REQ-304** — Python bridge publishes telemetry to Supabase REST broadcast (same channel format as v1.0: `session:{id}`)
+- [x] **REQ-303** — Python bridge connects to DCS via DCS-gRPC and receives telemetry (position, attitude, speed, fuel, engine, weapons)
+- [x] **REQ-304** — Python bridge publishes telemetry to Supabase REST broadcast (same channel format as v1.0: `session:{id}`)
 - [x] **REQ-305** — Python bridge receives commands from Supabase Realtime (trainer actions) and executes via DCS-gRPC
-- [ ] **REQ-306** — Python bridge handles DCS disconnect with auto-retry and status reporting
-- [ ] **REQ-307** — Python bridge auto-opens browser to Jarvis web URL on startup
-- [ ] **REQ-308** — Heartbeat system (1 Hz) with DCS active/inactive status, packet count, queue depth
+- [x] **REQ-306** — Python bridge handles DCS disconnect with auto-retry and status reporting
+- [x] **REQ-307** — Python bridge auto-opens browser to Jarvis web URL on startup
+- [x] **REQ-308** — Heartbeat system (1 Hz) with DCS active/inactive status, packet count, queue depth
 
 ## Session & Connection (SESSION)
 
-- [ ] **REQ-309** — 4-digit numeric session codes (generated on player button press, not automatic)
-- [ ] **REQ-310** — Connection state machine: LAUNCHING → INITIALIZING → READY → SESSION_CREATED → CONNECTED → DCS_LINKED → IN_FLIGHT → DCS_DISCONNECTED (with auto-retry)
-- [ ] **REQ-311** — Player/trainer role routing on web app landing page
-- [ ] **REQ-312** — Session code registered in Supabase with metadata (player ID, timestamp, status)
-- [ ] **REQ-313** — Trainer joins session via 4-digit code; first trainer = controller, additional = observers
+- [x] **REQ-309** — 4-digit numeric session codes (generated on player button press, not automatic)
+- [x] **REQ-310** — Connection state machine: LAUNCHING → INITIALIZING → READY → SESSION_CREATED → CONNECTED → DCS_LINKED → IN_FLIGHT → DCS_DISCONNECTED (with auto-retry)
+- [x] **REQ-311** — Player/trainer role routing on web app landing page
+- [x] **REQ-312** — Session code registered in Supabase with metadata (player ID, timestamp, status)
+- [x] **REQ-313** — Trainer joins session via 4-digit code; first trainer = controller, additional = observers
 
 ## TTS & Voice Output (TTS)
 
-- [ ] **REQ-314** — ElevenLabs TTS integration with streaming API for low-latency speech
-- [ ] **REQ-315** — Voice cues for all connection state transitions (welcome, system init, session code readout, DCS connected, DCS disconnected/reconnected)
-- [ ] **REQ-316** — Speech priority queue: P1 (safety-critical) interrupts, P2 (warnings) queues, P3 (info) waits for silence
-- [ ] **REQ-317** — Browser audio playback management (play through default audio device)
+- [x] **REQ-314** — ElevenLabs TTS integration with streaming API for low-latency speech
+- [x] **REQ-315** — Voice cues for all connection state transitions (welcome, system init, session code readout, DCS connected, DCS disconnected/reconnected)
+- [x] **REQ-316** — Speech priority queue: P1 (safety-critical) interrupts, P2 (warnings) queues, P3 (info) waits for silence
+- [x] **REQ-317** — Browser audio playback management (play through default audio device)
 
 ## Wake Word & STT (STT)
 
-- [ ] **REQ-318** — Picovoice Porcupine wake word detection ("Jarvis") running in-browser via WebAssembly
-- [ ] **REQ-319** — Audio buffering via Web Audio API after wake word detection (buffer until silence/timeout)
-- [ ] **REQ-320** — OpenAI Whisper API transcription of buffered audio clips
-- [ ] **REQ-321** — Voice input UI feedback (listening indicator, transcription display)
+- [x] **REQ-318** — Picovoice Porcupine wake word detection ("Jarvis") running in-browser via WebAssembly
+- [x] **REQ-319** — Audio buffering via Web Audio API after wake word detection (buffer until silence/timeout)
+- [x] **REQ-320** — OpenAI Whisper API transcription of buffered audio clips
+- [x] **REQ-321** — Voice input UI feedback (listening indicator, transcription display)
 
 ## Command Processing (CMD)
 
-- [ ] **REQ-322** — Rule engine for known commands: altitude, fuel, heading, airspeed, systems status (instant response from telemetry, no LLM call)
-- [ ] **REQ-323** — GPT-4o integration for complex/contextual queries with current DCS state as context
-- [ ] **REQ-324** — Response routing: rule engine gets first pass, LLM fallback for unmatched commands
+- [x] **REQ-322** — Rule engine for known commands: altitude, fuel, heading, airspeed, systems status (instant response from telemetry, no LLM call)
+- [x] **REQ-323** — GPT-4o integration for complex/contextual queries with current DCS state as context
+- [x] **REQ-324** — Response routing: rule engine gets first pass, LLM fallback for unmatched commands
 
 ## Flight Phase & Personality (PHASE)
 
-- [ ] **REQ-325** — Flight phase detection from telemetry: STARTUP, TAXI, CRUISE, COMBAT, LANDING
-- [ ] **REQ-326** — Personality adapter: tone/brevity adjusts per flight phase (relaxed cruise, sharp combat, focused landing)
-- [ ] **REQ-327** — Phase tag passed to rule engine (response templates) and GPT-4o (system prompt)
+- [x] **REQ-325** — Flight phase detection from telemetry: STARTUP, TAXI, CRUISE, COMBAT, LANDING
+- [x] **REQ-326** — Personality adapter: tone/brevity adjusts per flight phase (relaxed cruise, sharp combat, focused landing)
+- [x] **REQ-327** — Phase tag passed to rule engine (response templates) and GPT-4o (system prompt)
 
 ## Proactive Alerts (ALERT)
 
-- [ ] **REQ-328** — Threshold monitoring system with configurable limits (altitude, fuel, stall, RWR, engine temp, waypoint, phase change)
-- [ ] **REQ-329** — Alert generation with flight-phase-aware personality (casual cruise vs urgent combat callouts)
-- [ ] **REQ-330** — Priority queue integration: P1 alerts interrupt speech, P2 queue behind, P3 wait for silence
+- [x] **REQ-328** — Threshold monitoring system with configurable limits (altitude, fuel, stall, RWR, engine temp, waypoint, phase change)
+- [x] **REQ-329** — Alert generation with flight-phase-aware personality (casual cruise vs urgent combat callouts)
+- [x] **REQ-330** — Priority queue integration: P1 alerts interrupt speech, P2 queue behind, P3 wait for silence
 
 ## Trainer Visibility (TVIEW)
 
@@ -239,8 +239,8 @@
 
 ## Trainer Roles (TROLE)
 
-- [ ] **REQ-343** — Controller role (first to join): full dashboard + communication + DCS controls
-- [ ] **REQ-344** — Observer role (additional trainers): read-only view of all panels, no controls
+- [x] **REQ-343** — Controller role (first to join): full dashboard + communication + DCS controls
+- [x] **REQ-344** — Observer role (additional trainers): read-only view of all panels, no controls
 
 ---
 
@@ -258,37 +258,37 @@
 
 | REQ-ID | Category | Phase | Status |
 |--------|----------|-------|--------|
-| REQ-300 | Prerequisites | 15 | Pending |
-| REQ-301 | Prerequisites | 17, 18 | Pending |
-| REQ-302 | Prerequisites | 15 | Pending |
-| REQ-303 | Python Bridge | 15 | Pending |
-| REQ-304 | Python Bridge | 15 | Pending |
+| REQ-300 | Prerequisites | 15 | Complete |
+| REQ-301 | Prerequisites | 17, 18 | Complete |
+| REQ-302 | Prerequisites | 15 | Complete |
+| REQ-303 | Python Bridge | 15 | Complete |
+| REQ-304 | Python Bridge | 15 | Complete |
 | REQ-305 | Python Bridge | 23 | Complete |
-| REQ-306 | Python Bridge | 15 | Pending |
-| REQ-307 | Python Bridge | 15 | Pending |
-| REQ-308 | Python Bridge | 15 | Pending |
-| REQ-309 | Session & Connection | 16 | Pending |
-| REQ-310 | Session & Connection | 16 | Pending |
-| REQ-311 | Session & Connection | 16 | Pending |
-| REQ-312 | Session & Connection | 16 | Pending |
-| REQ-313 | Session & Connection | 16 | Pending |
-| REQ-314 | TTS & Voice Output | 17 | Pending |
-| REQ-315 | TTS & Voice Output | 17 | Pending |
-| REQ-316 | TTS & Voice Output | 17 | Pending |
-| REQ-317 | TTS & Voice Output | 17 | Pending |
-| REQ-318 | Wake Word & STT | 18 | Pending |
-| REQ-319 | Wake Word & STT | 18 | Pending |
-| REQ-320 | Wake Word & STT | 18 | Pending |
-| REQ-321 | Wake Word & STT | 18 | Pending |
-| REQ-322 | Command Processing | 19 | Pending |
-| REQ-323 | Command Processing | 19 | Pending |
-| REQ-324 | Command Processing | 19 | Pending |
-| REQ-325 | Flight Phase & Personality | 20 | Pending |
-| REQ-326 | Flight Phase & Personality | 20 | Pending |
-| REQ-327 | Flight Phase & Personality | 20 | Pending |
-| REQ-328 | Proactive Alerts | 20 | Pending |
-| REQ-329 | Proactive Alerts | 20 | Pending |
-| REQ-330 | Proactive Alerts | 20 | Pending |
+| REQ-306 | Python Bridge | 15 | Complete |
+| REQ-307 | Python Bridge | 15 | Complete |
+| REQ-308 | Python Bridge | 15 | Complete |
+| REQ-309 | Session & Connection | 16 | Complete |
+| REQ-310 | Session & Connection | 16 | Complete |
+| REQ-311 | Session & Connection | 16 | Complete |
+| REQ-312 | Session & Connection | 16 | Complete |
+| REQ-313 | Session & Connection | 16 | Complete |
+| REQ-314 | TTS & Voice Output | 17 | Complete |
+| REQ-315 | TTS & Voice Output | 17 | Complete |
+| REQ-316 | TTS & Voice Output | 17 | Complete |
+| REQ-317 | TTS & Voice Output | 17 | Complete |
+| REQ-318 | Wake Word & STT | 18 | Complete |
+| REQ-319 | Wake Word & STT | 18 | Complete |
+| REQ-320 | Wake Word & STT | 18 | Complete |
+| REQ-321 | Wake Word & STT | 18 | Complete |
+| REQ-322 | Command Processing | 19 | Complete |
+| REQ-323 | Command Processing | 19 | Complete |
+| REQ-324 | Command Processing | 19 | Complete |
+| REQ-325 | Flight Phase & Personality | 20 | Complete |
+| REQ-326 | Flight Phase & Personality | 20 | Complete |
+| REQ-327 | Flight Phase & Personality | 20 | Complete |
+| REQ-328 | Proactive Alerts | 20 | Complete |
+| REQ-329 | Proactive Alerts | 20 | Complete |
+| REQ-330 | Proactive Alerts | 20 | Complete |
 | REQ-331 | Trainer Visibility | 21 | Complete |
 | REQ-332 | Trainer Visibility | 21 | Complete |
 | REQ-333 | Trainer Visibility | 21 | Complete |
@@ -301,5 +301,5 @@
 | REQ-340 | Trainer DCS Controls | 23 | Complete |
 | REQ-341 | Trainer DCS Controls | 23 | Complete |
 | REQ-342 | Trainer DCS Controls | 23 | Complete |
-| REQ-343 | Trainer Roles | 24 | Pending |
-| REQ-344 | Trainer Roles | 24 | Pending |
+| REQ-343 | Trainer Roles | 24 | Complete |
+| REQ-344 | Trainer Roles | 26 | Complete |

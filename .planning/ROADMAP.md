@@ -176,7 +176,7 @@ Plans:
 **Requirements:**
 - REQ-218 -- Breakpoint system: mobile (<640px), tablet (640-1024px), desktop (>1024px)
 - REQ-219 -- Mobile layout: single-column stack of key instruments
-- REQ-220 -- Tablet layout: 3-column grid (scaled proportionally from desktop — D-1301)
+- REQ-220 -- Tablet layout: 3-column grid (scaled proportionally from desktop -- D-1301)
 - REQ-221 -- Desktop layout: existing 3-column grid preserved with custom drag system
 - REQ-222 -- Touch-friendly controls (44px minimum tap targets)
 - REQ-223 -- Safe area insets for notched devices
@@ -257,7 +257,7 @@ Plans:
 4. Heartbeat at 1 Hz with DCS status, packet count, queue depth
 5. Browser auto-opens to Jarvis web URL on bridge startup
 
-**Key Risk:** DCS-gRPC API surface — needs validation against actual mod
+**Key Risk:** DCS-gRPC API surface -- needs validation against actual mod
 
 ---
 
@@ -271,7 +271,7 @@ Plans:
 
 Plans:
 - [x] 16-01-PLAN.md -- Session overhaul (4-digit codes, player-initiated, Supabase metadata)
-- [x] 16-02-PLAN.md -- Role routing + connection state machine (LAUNCHING → IN_FLIGHT → DCS_DISCONNECTED)
+- [x] 16-02-PLAN.md -- Role routing + connection state machine (LAUNCHING -> IN_FLIGHT -> DCS_DISCONNECTED)
 
 **Requirements:**
 - REQ-309 -- 4-digit numeric session codes
@@ -290,7 +290,7 @@ Plans:
 
 #### Phase 17: TTS Foundation + Voice Cues
 
-**Goal:** Jarvis speaks — connection state voice cues, streaming TTS, priority queue.
+**Goal:** Jarvis speaks -- connection state voice cues, streaming TTS, priority queue.
 
 **Dependencies:** Phase 16 (connection states defined for voice cues)
 
@@ -298,7 +298,7 @@ Plans:
 
 Plans:
 - [x] 17-01-PLAN.md -- ElevenLabs TTS client (streaming API, browser audio playback)
-- [x] 17-02-PLAN.md -- Voice cue system (connection state transitions → speech)
+- [x] 17-02-PLAN.md -- Voice cue system (connection state transitions -> speech)
 - [x] 17-03-PLAN.md -- Speech priority queue (P1 interrupt, P2 queue, P3 wait)
 
 **Requirements:**
@@ -352,7 +352,7 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [x] 19-01-PLAN.md -- Rule engine (known commands → telemetry lookup → instant response)
+- [x] 19-01-PLAN.md -- Rule engine (known commands -> telemetry lookup -> instant response)
 - [x] 19-02-PLAN.md -- GPT-4o integration (complex queries with DCS state context)
 
 **Requirements:**
@@ -378,7 +378,7 @@ Plans:
 
 Plans:
 - [x] 20-01-PLAN.md -- Flight phase detection + personality adapter
-- [x] 20-02-PLAN.md -- Proactive alert system (thresholds → phase-aware callouts → priority queue)
+- [x] 20-02-PLAN.md -- Proactive alert system (thresholds -> phase-aware callouts -> priority queue)
 
 **Requirements:**
 - REQ-325 -- Flight phase detection (STARTUP, TAXI, CRUISE, COMBAT, LANDING)
@@ -425,20 +425,20 @@ Plans:
 
 #### Phase 22: Trainer Communication
 
-**Goal:** Trainer speaks through Jarvis — PTT voice, templates, text — player can't tell the difference.
+**Goal:** Trainer speaks through Jarvis -- PTT voice, templates, text -- player can't tell the difference.
 
 **Dependencies:** Phase 21 (trainer dashboard provides the UI context)
 
 **Plans:** 2 plans
 
 Plans:
-- [x] 22-01-PLAN.md -- PTT voice + text input → GPT-4o rephrase → ElevenLabs TTS
+- [x] 22-01-PLAN.md -- PTT voice + text input -> GPT-4o rephrase -> ElevenLabs TTS
 - [x] 22-02-PLAN.md -- Template button system (categorized library)
 
 **Requirements:**
-- REQ-335 -- PTT voice → Whisper → GPT-4o rephrase → ElevenLabs as Jarvis
+- REQ-335 -- PTT voice -> Whisper -> GPT-4o rephrase -> ElevenLabs as Jarvis
 - REQ-336 -- Template buttons (SA, approach, combat, mission, encouragement)
-- REQ-337 -- Text box → GPT-4o rephrase → ElevenLabs as Jarvis
+- REQ-337 -- Text box -> GPT-4o rephrase -> ElevenLabs as Jarvis
 - REQ-338 -- Player cannot distinguish trainer speech from AI speech
 
 **Success Criteria:**
@@ -458,20 +458,20 @@ Plans:
 **Plans:** 2 plans
 
 Plans:
-- [x] 23-01-PLAN.md -- Spawn units + set AI objectives (UI → bridge → gRPC)
+- [x] 23-01-PLAN.md -- Spawn units + set AI objectives (UI -> bridge -> gRPC)
 - [x] 23-02-PLAN.md -- Alert threshold config + mission injection (waypoints, objectives)
 
 **Requirements:**
-- REQ-305 -- Python bridge receives commands from Supabase Realtime → DCS-gRPC
+- REQ-305 -- Python bridge receives commands from Supabase Realtime -> DCS-gRPC
 - REQ-339 -- Spawn enemy units (type, count, distance, bearing, altitude)
 - REQ-340 -- Set AI objectives (CAP, fighter sweep, idle)
 - REQ-341 -- Alert threshold configuration
 - REQ-342 -- Mission injection (waypoint coordinates, objective description)
 
 **Success Criteria:**
-1. Trainer spawns 2x MiG-29 at 20nm, bearing 090, angels 20 — units appear in DCS within 2s
-2. Trainer sets fighter sweep objective — AI units begin engagement
-3. Trainer adjusts altitude floor alert — player gets new callout at configured threshold
+1. Trainer spawns 2x MiG-29 at 20nm, bearing 090, angels 20 -- units appear in DCS within 2s
+2. Trainer sets fighter sweep objective -- AI units begin engagement
+3. Trainer adjusts altitude floor alert -- player gets new callout at configured threshold
 4. Mission waypoints appear on player's navigation system via DCS-gRPC
 
 ---
@@ -494,7 +494,7 @@ Plans:
 
 **Success Criteria:**
 1. Observer sees all trainer panels but cannot send commands, speak, or modify alerts
-2. Full end-to-end flow works: player flies → trainer observes → trainer speaks through Jarvis → trainer spawns enemies → alerts fire → player responds
+2. Full end-to-end flow works: player flies -> trainer observes -> trainer speaks through Jarvis -> trainer spawns enemies -> alerts fire -> player responds
 3. All error paths handled gracefully (DCS disconnect, API timeout, mic permission denied)
 4. No memory leaks in 30-minute trainer session
 
@@ -502,15 +502,15 @@ Plans:
 
 #### Phase 25: Supabase Schema & RLS
 
-**Goal:** Add missing `trainer_code` column to sessions table and enable Row Level Security with proper policies — closing the schema gap and the security debt carried since v1.0.
+**Goal:** Add missing `trainer_code` column to sessions table and enable Row Level Security with proper policies -- closing the schema gap and the security debt carried since v1.0.
 
 **Dependencies:** Phase 24 (all features complete; schema and security are prerequisites for production testing)
 
 **Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 25-01-PLAN.md — trainer_code column migration + sessions table schema alignment
-- [ ] 25-02-PLAN.md — RLS policies for sessions table (NextAuth-compatible, unauthenticated endpoints safe)
+- [x] 25-01-PLAN.md -- trainer_code column migration + sessions table schema alignment
+- [x] 25-02-PLAN.md -- RLS policies for sessions table (NextAuth-compatible, unauthenticated endpoints safe)
 
 **Requirements:**
 - Tech debt: trainer_code column missing from sessions table (blocks trainer flow in production)
@@ -526,30 +526,30 @@ Plans:
 
 ---
 
-#### Phase 26: Observer Role (REQ-344)
+#### Phase 26: Observer Role (REQ-344) — COMPLETE ✓
 
-**Goal:** Implement the observer trainer role — additional trainers joining a session see all dashboard panels but cannot send commands, speak, or modify alerts.
+**Goal:** Implement the observer trainer role -- additional trainers joining a session see all dashboard panels but cannot send commands, speak, or modify alerts.
 
 **Dependencies:** Phase 25 (schema migrations applied; observer needs trainer_role column)
 
-**Plans:** TBD
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 26-01-PLAN.md — trainer_role column, role assignment in claim API, role context in trainer dashboard
-- [ ] 26-02-PLAN.md — Observer UI restrictions (disable controls, PTT, text input, template buttons, DCS commands)
+- [x] 26-01-PLAN.md -- DB migration (trainer_role + observer_token), claim API role assignment, observe/observer-link API endpoints, TrainerRoleContext + ObserverGuard components
+- [x] 26-02-PLAN.md -- Observer URL entry flow, dashboard role provider, ObserverGuard on all 6 tab components + settings, presence hook, observer badge, player observer link generation
 
 **Requirements:**
-- REQ-344 — Observer role (read-only view of all panels, no controls)
+- REQ-344 -- Observer role (read-only view of all panels, no controls)
 
 **Gap Closure:** Closes deferred requirement from v3.0 milestone audit
 
 **Success Criteria:**
-1. First trainer to claim a session is assigned `controller` role with full access
-2. Additional trainers are assigned `observer` role with read-only access
-3. Observer sees all trainer panels (telemetry, TSD, events, conversation) updating live
-4. Observer cannot: send PTT/text messages, use template buttons, spawn units, set objectives, configure alerts, inject missions, end session
-5. Observer UI clearly indicates read-only state (disabled controls, visual indicator)
-6. `pnpm typecheck` passes clean
+1. First trainer to claim a session is assigned `controller` role with full access ✓
+2. Additional trainers are assigned `observer` role with read-only access ✓
+3. Observer sees all trainer panels (telemetry, TSD, events, conversation) updating live ✓
+4. Observer cannot: send PTT/text messages, use template buttons, spawn units, set objectives, configure alerts, inject missions, end session ✓
+5. Observer UI clearly indicates read-only state (disabled controls, visual indicator) ✓
+6. `pnpm typecheck` passes clean ✓
 
 ---
 
@@ -559,11 +559,11 @@ Plans:
 
 **Dependencies:** Phase 26 (all feature work complete; this phase is cleanup only)
 
-**Plans:** TBD
+**Plans:** 2 plans in 2 waves
 
 Plans:
-- [ ] 27-01-PLAN.md — Dead code removal + missing VERIFICATION.md generation for phases 15-20
-- [ ] 27-02-PLAN.md — Final milestone audit (re-run to confirm zero gaps and zero tech debt)
+- [ ] 27-01-PLAN.md -- Lint fixes, dead code scan, retroactive VERIFICATION.md for phases 15-20
+- [ ] 27-02-PLAN.md -- Final milestone audit (re-run to confirm zero gaps and zero tech debt)
 
 **Requirements:**
 - Tech debt: `'connecting'` PageState dead code in trainer/page.tsx
@@ -607,10 +607,10 @@ Plans:
 | 22. Trainer Communication | v3.0 | 2/2 | Complete | 2026-03-18 |
 | 23. Trainer DCS Controls | v3.0 | 2/2 | Complete | 2026-03-18 |
 | 24. Roles, Integration & Polish | v3.0 | 2/2 | Complete | 2026-03-18 |
-| 25. Supabase Schema & RLS | v3.0 | 0/2 | Not Started | — |
-| 26. Observer Role (REQ-344) | v3.0 | 0/2 | Not Started | — |
-| 27. Code Cleanup & Verification | v3.0 | 0/2 | Not Started | — |
+| 25. Supabase Schema & RLS | v3.0 | 2/2 | Complete | 2026-03-18 |
+| 26. Observer Role (REQ-344) | v3.0 | 2/2 | Complete | 2026-03-18 |
+| 27. Code Cleanup & Verification | v3.0 | 0/2 | Not Started | -- |
 
 ---
 *Roadmap created: 2026-02-25*
-*Last updated: 2026-03-18 -- Gap closure phases 25-27 added to close tech debt from v3.0 audit*
+*Last updated: 2026-03-18 -- Phase 27 planned (2 plans in 2 waves)*

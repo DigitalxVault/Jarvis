@@ -24,7 +24,7 @@ from dcs.mission.v0 import mission_pb2, mission_pb2_grpc  # noqa: E402
 
 log = logging.getLogger(__name__)
 
-_GRPC_TARGET = os.environ.get("DCS_GRPC_HOST", "localhost:50051")
+_GRPC_TARGET = os.environ.get("DCS_GRPC_HOST", "localhost:50051")  # Override for remote DCS hosts
 
 
 @dataclass
