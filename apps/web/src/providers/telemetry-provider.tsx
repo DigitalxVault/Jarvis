@@ -54,8 +54,8 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
   const [isCreating, setIsCreating] = useState(false)
   const [sessionError, setSessionError] = useState<string | null>(null)
 
-  // Auto-connect to session:dev when no explicit session exists
-  const sessionId = currentSession?.id ?? 'dev'
+  // Telemetry always flows on session:dev — database sessions are for trainer codes only
+  const sessionId = 'dev'
   const {
     telemetry,
     tactical,

@@ -55,9 +55,9 @@ function connectionLabel(state: ConnectionState): string {
 }
 
 export function TrainerDashboard({ sessionId, role = 'controller', onExit }: TrainerDashboardProps) {
-  // Call useTelemetry directly — NOT useTelemetryContext() — so the trainer
-  // gets its own independent subscription to the player's session channel.
-  const { telemetry, tactical, connectionState, sessionEnded } = useTelemetry(sessionId)
+  // Telemetry always flows on session:dev — decoupled from trainer DB session.
+  // sessionId prop is still used for trainer commands/role management.
+  const { telemetry, tactical, connectionState, sessionEnded } = useTelemetry('dev')
   const { rules: configuredRules } = useAlertConfig(sessionId)
   const { alerts, hasCritical, hasWarning } = useAlerts(telemetry, { rules: configuredRules })
 

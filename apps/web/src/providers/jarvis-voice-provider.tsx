@@ -94,9 +94,8 @@ function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
   const broadcastConversationRef = useRef<(role: 'player' | 'jarvis', text: string) => void>(() => {})
 
   useEffect(() => {
-    const sessionId = currentSession?.id
-    if (!sessionId) return
-    const channelName = getChannelName(sessionId)
+    // Always broadcast on session:dev — telemetry channel is decoupled from DB sessions
+    const channelName = getChannelName('dev')
     // Use base channel name so conversation events reach useTrainerLog
     // on the trainer side. Multiple objects on same topic is fine.
     const ch = supabase.channel(channelName, {
@@ -123,7 +122,7 @@ function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
       supabase.removeChannel(ch)
       broadcastChannelRef.current = null
     }
-  }, [currentSession?.id])
+  }, [])
 
   // Broadcast a conversation entry to the session channel for the trainer
   const broadcastConversation = useCallback((role: 'player' | 'jarvis', text: string) => {
