@@ -11,7 +11,7 @@ interface ConnectionStatusPanelProps {
   sessionError?: string | null
 }
 
-type UIConnectionState = 'INITIALIZING' | 'SYSTEM_INITIALIZED' | 'DCS_ONLINE' | 'DCS_OFFLINE'
+type UIConnectionState = 'CONNECTING' | 'AWAITING_DCS' | 'DCS_ONLINE' | 'DCS_OFFLINE'
 
 const STATUS_CONFIG: Record<UIConnectionState, {
   label: string
@@ -20,16 +20,16 @@ const STATUS_CONFIG: Record<UIConnectionState, {
   dotColor: string
   spinning: boolean
 }> = {
-  INITIALIZING: {
-    label: 'INITIALIZING',
-    subText: 'Subscribing to channel...',
+  CONNECTING: {
+    label: 'CONNECTING',
+    subText: 'Linking JARVIS to server...',
     color: 'text-jarvis-accent',
     dotColor: 'bg-jarvis-accent',
     spinning: true,
   },
-  SYSTEM_INITIALIZED: {
-    label: 'SYSTEM INITIALIZED',
-    subText: 'Awaiting bridge telemetry...',
+  AWAITING_DCS: {
+    label: 'AWAITING DCS',
+    subText: 'Bridge linked, launch DCS to begin',
     color: 'text-jarvis-warning',
     dotColor: 'bg-jarvis-warning',
     spinning: false,
@@ -55,16 +55,16 @@ function deriveUIState(
   hadTelemetry: boolean
 ): UIConnectionState {
   if (connectionState === 'connecting' || connectionState === 'reconnecting') {
-    return 'INITIALIZING'
+    return 'CONNECTING'
   }
   if (connectionState === 'connected') {
     return 'DCS_ONLINE'
   }
   if (connectionState === 'dcs_offline') {
-    return hadTelemetry ? 'DCS_OFFLINE' : 'SYSTEM_INITIALIZED'
+    return hadTelemetry ? 'DCS_OFFLINE' : 'AWAITING_DCS'
   }
-  // connectionState === 'offline' — show as initializing (auto-connect pending)
-  return 'INITIALIZING'
+  // connectionState === 'offline' — show as connecting (auto-connect pending)
+  return 'CONNECTING'
 }
 
 export function ConnectionStatusPanel({

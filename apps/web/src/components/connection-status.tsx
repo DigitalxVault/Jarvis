@@ -4,19 +4,19 @@ import type { ConnectionState } from '@/hooks/use-telemetry'
 
 const STATUS_CONFIG: Record<ConnectionState, { label: string; color: string; dotClass: string; spinning: boolean }> = {
   connecting: {
-    label: 'INITIALIZING',
+    label: 'CONNECTING',
     color: 'text-jarvis-accent',
     dotClass: 'bg-jarvis-accent',
     spinning: true,
   },
   reconnecting: {
-    label: 'INITIALIZING',
+    label: 'RECONNECTING',
     color: 'text-jarvis-accent',
     dotClass: 'bg-jarvis-accent',
     spinning: true,
   },
   dcs_offline: {
-    label: 'SYSTEM INIT',
+    label: 'AWAITING DCS',
     color: 'text-jarvis-warning',
     dotClass: 'bg-jarvis-warning',
     spinning: false,

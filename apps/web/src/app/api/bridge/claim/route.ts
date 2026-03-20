@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase-server'
 import { getChannelName } from '@jarvis-dcs/shared'
 
+/** Max age for unclaimed sessions (minutes). Older ones are auto-expired. */
+const STALE_SESSION_MINUTES = 10
+
 /** POST /api/bridge/claim — Bridge claims a session.
  *  Body: {}              → auto-discover latest unclaimed session
  *  Body: { code: "X" }   → find by pairing code (legacy compat)
@@ -9,6 +12,15 @@ import { getChannelName } from '@jarvis-dcs/shared'
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}))
   const supabase = createServerSupabase()
+
+  // --- Cleanup stale unclaimed sessions (older than 10 min) ---
+  const staleCutoff = new Date(Date.now() - STALE_SESSION_MINUTES * 60 * 1000).toISOString()
+  await supabase
+    .from('sessions')
+    .update({ status: 'expired' })
+    .eq('bridge_claimed', false)
+    .eq('status', 'active')
+    .lt('created_at', staleCutoff)
 
   let session: Record<string, unknown> | null = null
 
@@ -52,6 +64,8 @@ export async function POST(req: NextRequest) {
     session = data
   }
 
+  const sessionId = (session as { id: string }).id
+
   // Claim the session (single-use)
   const { error: claimErr } = await supabase
     .from('sessions')
@@ -59,7 +73,7 @@ export async function POST(req: NextRequest) {
       bridge_claimed: true,
       pairing_code: null,
     })
-    .eq('id', (session as { id: string }).id)
+    .eq('id', sessionId)
     .eq('bridge_claimed', false) // Optimistic lock
 
   if (claimErr) {
@@ -67,7 +81,7 @@ export async function POST(req: NextRequest) {
   }
 
   return NextResponse.json({
-    channelName: getChannelName((session as { id: string }).id),
-    sessionId: (session as { id: string }).id,
+    channelName: getChannelName(sessionId),
+    sessionId,
   })
 }

@@ -1,10 +1,19 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase-server'
 
-/** POST /api/sessions — Create a new session (bridge auto-discovers it) */
+/** POST /api/sessions — Create a new session (bridge auto-discovers it).
+ *  Expires any previous unclaimed sessions so the bridge always claims the fresh one.
+ */
 export async function POST() {
   try {
     const supabase = createServerSupabase()
+
+    // Expire any previous unclaimed sessions — only one should exist at a time
+    await supabase
+      .from('sessions')
+      .update({ status: 'expired' })
+      .eq('bridge_claimed', false)
+      .eq('status', 'active')
 
     const { data, error } = await supabase
       .from('sessions')
