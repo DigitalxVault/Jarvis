@@ -6,13 +6,13 @@
 
 let _sharedAudioCtx: AudioContext | null = null
 
-function getAudioContext(): AudioContext {
+async function getAudioContext(): Promise<AudioContext> {
   if (!_sharedAudioCtx || _sharedAudioCtx.state === 'closed') {
     _sharedAudioCtx = new AudioContext()
   }
-  // Resume if suspended (browser auto-suspends without user gesture)
+  // Resume if suspended (browser auto-suspends when tab loses focus)
   if (_sharedAudioCtx.state === 'suspended') {
-    _sharedAudioCtx.resume()
+    await _sharedAudioCtx.resume()
   }
   return _sharedAudioCtx
 }
@@ -26,6 +26,16 @@ if (typeof document !== 'undefined') {
   }
   document.addEventListener('click', warmUp, { once: true })
   document.addEventListener('keydown', warmUp, { once: true })
+
+  // Re-resume AudioContext whenever the tab regains focus.
+  // Browsers suspend AudioContext when the tab is backgrounded (e.g. DCS
+  // is fullscreen). Without this, TTS audio queued while backgrounded
+  // never actually plays through the speakers.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && _sharedAudioCtx && _sharedAudioCtx.state === 'suspended') {
+      _sharedAudioCtx.resume()
+    }
+  })
 }
 
 export interface TTSOptions {
@@ -98,8 +108,9 @@ export function speakWithElevenLabs(
       offset += chunk.length
     }
 
-    // Decode and play using shared AudioContext
-    const audioCtx = getAudioContext()
+    // Decode and play using shared AudioContext — await resume to ensure
+    // the context is actually running before we start playback
+    const audioCtx = await getAudioContext()
     const audioBuffer = await audioCtx.decodeAudioData(combined.buffer.slice(0))
 
     if (aborted) return

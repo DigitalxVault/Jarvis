@@ -3,10 +3,9 @@
 Wires all components (gRPC client, UDP listener, normalizer, publisher,
 heartbeat, TUI) into a single asyncio application.
 
-CLI interface matches the Node.js bridge (packages/bridge/src/index.ts):
-  jarvis-bridge                      # dev channel (session:dev)
-  jarvis-bridge --channel session:X  # direct channel mode
-  jarvis-bridge --code ABC123        # pairing code mode
+CLI interface:
+  jarvis-bridge                      # auto-claim session from web app
+  jarvis-bridge --channel session:X  # direct channel mode (dev/manual)
 """
 from __future__ import annotations
 
@@ -55,6 +54,35 @@ def _resolve_credentials() -> tuple[str, str]:
         or _DEFAULT_SUPABASE_KEY
     )
     return url, key
+
+
+# ---------------------------------------------------------------------------
+# Auto-claim
+# ---------------------------------------------------------------------------
+
+async def _auto_claim_session(web_url: str) -> tuple[str, str]:
+    """Poll /api/bridge/claim until a session is available.
+
+    Returns (channel_topic, session_id).
+    """
+    import httpx
+
+    claim_url = f"{web_url}/api/bridge/claim"
+    print("[BRIDGE] Auto-claim: waiting for session...")
+    async with httpx.AsyncClient(timeout=10) as client:
+        while True:
+            try:
+                resp = await client.post(claim_url, json={})
+                if resp.status_code == 200:
+                    data = resp.json()
+                    channel = data["channelName"]
+                    session_id = data["sessionId"]
+                    print(f"[BRIDGE] Claimed session {session_id} → {channel}")
+                    return channel, session_id
+                # 404 = no session yet, keep polling
+            except httpx.RequestError:
+                pass  # network error, keep retrying
+            await asyncio.sleep(5)
 
 
 # ---------------------------------------------------------------------------
@@ -240,30 +268,27 @@ def main() -> None:
     parser.add_argument(
         "--channel",
         metavar="CHANNEL",
-        help='Direct channel (e.g. "session:dev")',
-    )
-    parser.add_argument(
-        "--code",
-        metavar="CODE",
-        help="6-char pairing code (e.g. ABC123)",
+        help='Direct channel override (e.g. "session:dev") — skips auto-claim',
     )
     args = parser.parse_args()
 
     # --- Credential resolution ---
     supabase_url, api_key = _resolve_credentials()
 
-    # --- Channel resolution ---
-    if args.channel:
-        channel_topic = args.channel
-    elif args.code:
-        channel_topic = f"session:{args.code}"
-    else:
-        channel_topic = "session:dev"
-
     # --- Auto-open browser ---
     web_url = os.environ.get("JARVIS_WEB_URL", "https://jarvis-web-ecru.vercel.app")
     webbrowser.open(web_url)
 
+    # --- Channel resolution ---
+    if args.channel:
+        channel_topic = args.channel
+    else:
+        # Auto-claim: poll the web app until a session is available
+        loop = asyncio.new_event_loop()
+        channel_topic, _session_id = loop.run_until_complete(
+            _auto_claim_session(web_url)
+        )
+        loop.close()
 
     # --- Run asyncio event loop ---
     loop = asyncio.new_event_loop()

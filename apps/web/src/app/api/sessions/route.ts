@@ -1,34 +1,18 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabase } from '@/lib/supabase-server'
-import {
-  PAIRING_CHARSET,
-  PAIRING_CODE_LENGTH,
-  PAIRING_CODE_TTL_MINUTES,
-} from '@jarvis-dcs/shared'
 
-function generatePairingCode(): string {
-  let code = ''
-  const bytes = crypto.getRandomValues(new Uint8Array(PAIRING_CODE_LENGTH))
-  for (let i = 0; i < PAIRING_CODE_LENGTH; i++) {
-    code += PAIRING_CHARSET[bytes[i] % PAIRING_CHARSET.length]
-  }
-  return code
-}
-
-/** POST /api/sessions — Create a new session with a pairing code */
+/** POST /api/sessions — Create a new session (bridge auto-discovers it) */
 export async function POST() {
   try {
     const supabase = createServerSupabase()
-    const pairingCode = generatePairingCode()
-    const expiresAt = new Date(Date.now() + PAIRING_CODE_TTL_MINUTES * 60 * 1000).toISOString()
 
     const { data, error } = await supabase
       .from('sessions')
       .insert({
         user_id: 'anonymous',
         status: 'active',
-        pairing_code: pairingCode,
-        pairing_expires_at: expiresAt,
+        pairing_code: null,
+        pairing_expires_at: null,
       })
       .select()
       .single()
