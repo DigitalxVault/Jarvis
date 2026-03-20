@@ -14,6 +14,7 @@ import asyncio
 import logging
 import os
 import signal
+import webbrowser
 
 from dotenv import load_dotenv
 
@@ -247,6 +248,10 @@ def main() -> None:
 
     # --- Channel resolution ---
     channel_topic = args.channel or "session:dev"
+
+    # --- Auto-open web dashboard ---
+    web_url = os.environ.get("JARVIS_WEB_URL", "https://jarvis-web-ecru.vercel.app")
+    webbrowser.open(web_url)
 
     # --- Run asyncio event loop ---
     loop = asyncio.new_event_loop()
