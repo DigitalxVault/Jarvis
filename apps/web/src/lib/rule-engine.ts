@@ -1,4 +1,4 @@
-import type { TelemetryPacket } from '@jarvis-dcs/shared'
+import type { TelemetryPacket, TacticalPacket } from '@jarvis-dcs/shared'
 
 interface RuleResult {
   matched: boolean
@@ -119,7 +119,8 @@ const rules: RuleFn[] = [
 export function processWithRuleEngine(
   transcript: string,
   telemetry: TelemetryPacket | null,
-  flightPhase?: string
+  flightPhase?: string,
+  _tactical?: TacticalPacket | null,
 ): string | null {
   // Flight phase query
   if (/(phase|what phase|flight phase|mode)/i.test(transcript)) {

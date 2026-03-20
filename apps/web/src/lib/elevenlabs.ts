@@ -1,42 +1,8 @@
 /**
  * ElevenLabs TTS client — calls our /api/tts proxy route (server-side key).
- * Plays audio via Web Audio API. Reuses a single AudioContext to avoid
- * browser gesture restrictions.
+ * Plays audio via HTMLAudioElement (new Audio()) which is exempt from
+ * background tab throttling — audio plays even when DCS is focused.
  */
-
-let _sharedAudioCtx: AudioContext | null = null
-
-async function getAudioContext(): Promise<AudioContext> {
-  if (!_sharedAudioCtx || _sharedAudioCtx.state === 'closed') {
-    _sharedAudioCtx = new AudioContext()
-  }
-  // Resume if suspended (browser auto-suspends when tab loses focus)
-  if (_sharedAudioCtx.state === 'suspended') {
-    await _sharedAudioCtx.resume()
-  }
-  return _sharedAudioCtx
-}
-
-// Pre-warm AudioContext on first user gesture
-if (typeof document !== 'undefined') {
-  const warmUp = () => {
-    getAudioContext()
-    document.removeEventListener('click', warmUp)
-    document.removeEventListener('keydown', warmUp)
-  }
-  document.addEventListener('click', warmUp, { once: true })
-  document.addEventListener('keydown', warmUp, { once: true })
-
-  // Re-resume AudioContext whenever the tab regains focus.
-  // Browsers suspend AudioContext when the tab is backgrounded (e.g. DCS
-  // is fullscreen). Without this, TTS audio queued while backgrounded
-  // never actually plays through the speakers.
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && _sharedAudioCtx && _sharedAudioCtx.state === 'suspended') {
-      _sharedAudioCtx.resume()
-    }
-  })
-}
 
 export interface TTSOptions {
   text: string
@@ -63,12 +29,19 @@ export function speakWithElevenLabs(
   } = options
 
   let aborted = false
-  let sourceNode: AudioBufferSourceNode | null = null
+  let audio: HTMLAudioElement | null = null
+  let blobUrl: string | null = null
 
   const abort = () => {
     aborted = true
-    if (sourceNode) {
-      try { sourceNode.stop() } catch { /* already stopped */ }
+    if (audio) {
+      audio.pause()
+      audio.src = ''
+      audio = null
+    }
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl)
+      blobUrl = null
     }
   }
 
@@ -99,7 +72,7 @@ export function speakWithElevenLabs(
 
     if (aborted) return
 
-    // Combine chunks
+    // Combine chunks into a single buffer, then create a Blob
     const totalLength = chunks.reduce((sum, c) => sum + c.length, 0)
     const combined = new Uint8Array(totalLength)
     let offset = 0
@@ -107,23 +80,39 @@ export function speakWithElevenLabs(
       combined.set(chunk, offset)
       offset += chunk.length
     }
-
-    // Decode and play using shared AudioContext — await resume to ensure
-    // the context is actually running before we start playback
-    const audioCtx = await getAudioContext()
-    const audioBuffer = await audioCtx.decodeAudioData(combined.buffer.slice(0))
+    const blob = new Blob([combined.buffer], { type: 'audio/mpeg' })
+    blobUrl = URL.createObjectURL(blob)
 
     if (aborted) return
 
-    sourceNode = audioCtx.createBufferSource()
-    sourceNode.buffer = audioBuffer
-    sourceNode.connect(audioCtx.destination)
+    // Play via HTMLAudioElement — works in background tabs
+    audio = new Audio(blobUrl)
 
-    return new Promise<void>((resolve) => {
-      sourceNode!.onended = () => {
+    return new Promise<void>((resolve, reject) => {
+      audio!.onended = () => {
+        if (blobUrl) {
+          URL.revokeObjectURL(blobUrl)
+          blobUrl = null
+        }
+        audio = null
         resolve()
       }
-      sourceNode!.start()
+      audio!.onerror = () => {
+        if (blobUrl) {
+          URL.revokeObjectURL(blobUrl)
+          blobUrl = null
+        }
+        audio = null
+        reject(new Error('Audio playback failed'))
+      }
+      audio!.play().catch((err) => {
+        if (blobUrl) {
+          URL.revokeObjectURL(blobUrl)
+          blobUrl = null
+        }
+        audio = null
+        reject(err)
+      })
     })
   })()
 

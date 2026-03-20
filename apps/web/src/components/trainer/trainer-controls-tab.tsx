@@ -1,7 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { useDcsCommands } from '@/hooks/use-dcs-commands'
+import { useBroadcastCoachingConfig, DEFAULT_COACHING_CONFIG } from '@/hooks/use-coaching-config'
+import type { CoachingConfig } from '@/hooks/use-coaching-config'
 import { useToast } from '@/components/toast-notification'
 import { ConfirmModal } from '@/components/confirm-modal'
 import { ObserverGuard } from './observer-guard'
@@ -141,6 +143,19 @@ const RADIO_OPTION_STYLE = (active: boolean): React.CSSProperties => ({
 export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabProps) {
   const { sendCommand } = useDcsCommands(sessionId)
   const { showToast } = useToast()
+  const broadcastCoaching = useBroadcastCoachingConfig()
+
+  // Coaching config state
+  const [coachingConfig, setCoachingConfig] = useState<CoachingConfig>(DEFAULT_COACHING_CONFIG)
+  const [coachingOpen, setCoachingOpen] = useState(false)
+
+  const updateCoaching = useCallback((update: Partial<CoachingConfig>) => {
+    setCoachingConfig(prev => {
+      const next = { ...prev, ...update }
+      broadcastCoaching(next)
+      return next
+    })
+  }, [broadcastCoaching])
 
   // Confirm modal state
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -372,6 +387,135 @@ export function TrainerControlsTab({ sessionId, telemetry }: TrainerControlsTabP
     >
       {/* Scrollable content */}
       <div style={{ flex: 1, overflowY: 'auto', padding: '6px 8px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+
+        {/* ---- COACHING TARGETS ---- */}
+        <div>
+          <button
+            onClick={() => setCoachingOpen(prev => !prev)}
+            style={{
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: 0,
+              width: '100%',
+            }}
+          >
+            <span style={LABEL_STYLE}>COACHING TARGETS</span>
+            <span
+              style={{
+                fontSize: '9px',
+                color: 'rgba(0, 212, 255, 0.3)',
+                transform: coachingOpen ? 'rotate(90deg)' : 'none',
+                transition: 'transform 0.15s',
+                display: 'inline-block',
+              }}
+            >
+              ▶
+            </span>
+          </button>
+
+          {coachingOpen && (
+            <div style={{ marginTop: '6px', display: 'flex', flexDirection: 'column', gap: '5px' }}>
+              {/* Speed */}
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 2 }}>
+                  <div style={LABEL_STYLE}>SPD (KTS)</div>
+                  <input
+                    type="number"
+                    step="10"
+                    value={coachingConfig.targetSpeedKnots}
+                    onChange={e => updateCoaching({ targetSpeedKnots: parseFloat(e.target.value) || 0 })}
+                    style={INPUT_STYLE}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={LABEL_STYLE}>±</div>
+                  <input
+                    type="number"
+                    step="10"
+                    value={coachingConfig.speedTolerance}
+                    onChange={e => updateCoaching({ speedTolerance: parseFloat(e.target.value) || 0 })}
+                    style={INPUT_STYLE}
+                  />
+                </div>
+              </div>
+
+              {/* Altitude */}
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 2 }}>
+                  <div style={LABEL_STYLE}>ALT (FT)</div>
+                  <input
+                    type="number"
+                    step="1000"
+                    value={coachingConfig.targetAltFt}
+                    onChange={e => updateCoaching({ targetAltFt: parseFloat(e.target.value) || 0 })}
+                    style={INPUT_STYLE}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={LABEL_STYLE}>±</div>
+                  <input
+                    type="number"
+                    step="100"
+                    value={coachingConfig.altTolerance}
+                    onChange={e => updateCoaching({ altTolerance: parseFloat(e.target.value) || 0 })}
+                    style={INPUT_STYLE}
+                  />
+                </div>
+              </div>
+
+              {/* Heading */}
+              <div style={{ display: 'flex', gap: '4px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 2 }}>
+                  <div style={LABEL_STYLE}>HDG (°)</div>
+                  <input
+                    type="number"
+                    min="0"
+                    max="360"
+                    value={coachingConfig.targetHeadingDeg}
+                    onChange={e => updateCoaching({ targetHeadingDeg: parseFloat(e.target.value) || 0 })}
+                    style={INPUT_STYLE}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={LABEL_STYLE}>±</div>
+                  <input
+                    type="number"
+                    step="5"
+                    value={coachingConfig.headingTolerance}
+                    onChange={e => updateCoaching({ headingTolerance: parseFloat(e.target.value) || 0 })}
+                    style={INPUT_STYLE}
+                  />
+                </div>
+              </div>
+
+              {/* Reset button */}
+              <button
+                onClick={() => {
+                  setCoachingConfig(DEFAULT_COACHING_CONFIG)
+                  broadcastCoaching(DEFAULT_COACHING_CONFIG)
+                }}
+                style={{
+                  background: 'transparent',
+                  border: '1px solid rgba(0, 212, 255, 0.2)',
+                  color: 'rgba(0, 212, 255, 0.5)',
+                  fontFamily: 'Courier New, monospace',
+                  fontSize: '14px',
+                  letterSpacing: '2px',
+                  textTransform: 'uppercase',
+                  padding: '3px 8px',
+                  cursor: 'pointer',
+                  alignSelf: 'flex-start',
+                }}
+              >
+                RESET DEFAULTS
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* ---- PRESETS ---- */}
         <div>

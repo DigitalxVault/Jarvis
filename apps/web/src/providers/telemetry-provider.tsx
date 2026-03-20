@@ -1,12 +1,13 @@
 'use client'
 
-import { createContext, useContext, useState, useCallback, useMemo } from 'react'
+import { createContext, useContext, useState, useCallback } from 'react'
 import { useTelemetry, type ConnectionState } from '@/hooks/use-telemetry'
 import { useAlerts } from '@/hooks/use-alerts'
 import { useAlertConfig } from '@/hooks/use-alert-config'
 import { useCoaching } from '@/hooks/use-coaching'
 import { useOnlineStatus } from '@/hooks/use-online-status'
 import { useFlightPhase } from '@/hooks/use-flight-phase'
+import { useCoachingConfig } from '@/hooks/use-coaching-config'
 import type { FlightPhaseState } from '@/lib/flight-phases'
 import type {
   Session,
@@ -70,16 +71,9 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
   const { rules: configuredRules } = useAlertConfig(sessionId)
   const { alerts, hasCritical, hasWarning } = useAlerts(telemetry, { rules: configuredRules })
 
-  const coachingOpts = useMemo(() => ({
-    targetSpeedKnots: 350,
-    speedTolerance: 50,
-    targetAltFt: 25000,
-    altTolerance: 200,
-    targetHeadingDeg: 270,
-    headingTolerance: 10,
-  }), [])
+  const coachingConfig = useCoachingConfig()
 
-  const coaching = useCoaching(telemetry, coachingOpts)
+  const coaching = useCoaching(telemetry, coachingConfig)
 
   const flightPhase = useFlightPhase(telemetry)
 

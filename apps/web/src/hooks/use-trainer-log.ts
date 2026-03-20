@@ -154,9 +154,8 @@ export function useTrainerLog(
   // broadcasts on. Supabase JS creates a distinct channel object per call,
   // so this won't conflict with useTelemetry's subscription.
   useEffect(() => {
-    if (!sessionId) return
-
-    const channelName = getChannelName(sessionId)
+    // Always use session:dev — telemetry channel is decoupled from DB sessions
+    const channelName = getChannelName('dev')
     const channel = supabase.channel(channelName)
 
     channel
@@ -174,7 +173,7 @@ export function useTrainerLog(
     return () => {
       supabase.removeChannel(channel)
     }
-  }, [sessionId, appendEntry])
+  }, [appendEntry])
 
   return entries
 }

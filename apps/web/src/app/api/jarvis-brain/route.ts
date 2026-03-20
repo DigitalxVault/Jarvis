@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import type { TacticalPacket } from '@jarvis-dcs/shared'
 
 export const runtime = 'nodejs'
 
@@ -11,9 +12,10 @@ Your personality:
 - Be direct and helpful. No filler words.
 - Address the pilot as "sir" — you are their trusted AI wingman.
 
-You have access to the current aircraft telemetry data provided in the user message.
+You have access to the current aircraft telemetry AND tactical situational awareness data.
 Answer questions about the aircraft state using the provided telemetry.
-For tactical advice, be practical and specific.
+When asked about enemies, bogeys, bandits, threats, or contacts — use the tactical SA data to give bearing, range, and altitude relative to the pilot. Use clock positions or compass bearings.
+For tactical advice, be practical and specific — recommend engagement or evasion based on the situation.
 
 Beyond flight operations, you are a highly capable AI assistant with broad general knowledge.
 When the pilot asks non-flight questions (science, history, math, time, weather, pop culture, or anything else):
@@ -45,7 +47,10 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const { transcript, telemetry, flightPhase } = await req.json()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const body = await req.json() as any
+    const { transcript, telemetry, flightPhase } = body
+    const tactical = (body.tactical ?? null) as TacticalPacket | null
 
     if (!transcript) {
       return NextResponse.json({ error: 'No transcript provided' }, { status: 400 })
@@ -73,6 +78,68 @@ export async function POST(req: NextRequest) {
 - Position: ${t.pos?.lat?.toFixed(4) ?? '?'}°N, ${t.pos?.lon?.toFixed(4) ?? '?'}°E`
     }
 
+    // Build tactical SA context
+    let tacticalContext = ''
+    if (tactical) {
+      const parts: string[] = []
+
+      // World objects (radar contacts)
+      if (tactical.objects?.length) {
+        const playerLat = telemetry?.pos?.lat
+        const playerLon = telemetry?.pos?.lon
+        const playerHdg = telemetry?.hdg_rad
+
+        parts.push(`Radar contacts: ${tactical.objects.length} objects detected`)
+        for (const obj of tactical.objects) {
+          let bearingRange = ''
+          if (playerLat != null && playerLon != null) {
+            const dLat = obj.lat - playerLat
+            const dLon = obj.lon - playerLon
+            const bearing = Math.round(((Math.atan2(dLon, dLat) * 180 / Math.PI) + 360) % 360)
+            const distNm = Math.round(Math.sqrt(dLat * dLat + dLon * dLon) * 60)
+            // Relative bearing (clock position) if we have heading
+            let relBearing = ''
+            if (playerHdg != null) {
+              const rel = ((bearing - (playerHdg * 180 / Math.PI) % 360) + 360) % 360
+              const clock = Math.round(rel / 30) || 12
+              relBearing = ` (${clock} o'clock)`
+            }
+            bearingRange = `bearing ${bearing.toString().padStart(3, '0')}°${relBearing}, ~${distNm}nm`
+          }
+          const altFt = Math.round(obj.alt * 3.28084)
+          const coal = obj.coal === 'Enemies' ? 'HOSTILE' : obj.coal === 'Allies' ? 'FRIENDLY' : obj.coal
+          parts.push(`  - ${coal}: ${obj.name}, ${bearingRange}, alt ${altFt.toLocaleString()}ft`)
+        }
+      }
+
+      // Locked targets
+      if (tactical.locked?.length) {
+        for (const tgt of tactical.locked) {
+          const distNm = Math.round(tgt.dist * 0.000539957)
+          parts.push(`LOCKED TARGET: range ${distNm}nm, Mach ${tgt.mach.toFixed(1)}`)
+        }
+      }
+
+      // Weapons loadout
+      if (tactical.weapons) {
+        const stationList = tactical.weapons.stations
+          .filter(s => s.count > 0)
+          .map(s => `${s.count}x ${s.name}`)
+          .join(', ')
+        const gunRounds = tactical.weapons.gun_rounds ?? 0
+        parts.push(`Weapons: ${stationList || 'none'}${gunRounds > 0 ? `, gun ${gunRounds} rounds` : ''}`)
+      }
+
+      // Countermeasures
+      if (tactical.countermeasures) {
+        parts.push(`Countermeasures: chaff ${tactical.countermeasures.chaff}, flare ${tactical.countermeasures.flare}`)
+      }
+
+      if (parts.length > 0) {
+        tacticalContext = '\n\nSituational awareness:\n' + parts.map(p => `- ${p}`).join('\n')
+      }
+    }
+
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -83,7 +150,7 @@ export async function POST(req: NextRequest) {
         model: 'gpt-4o',
         messages: [
           { role: 'system', content: basePrompt + phaseAddition },
-          { role: 'user', content: transcript + telemetryContext },
+          { role: 'user', content: transcript + telemetryContext + tacticalContext },
         ],
         max_tokens: 200,
         temperature: 0.7,

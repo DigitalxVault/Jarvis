@@ -48,10 +48,8 @@ export function useTrainerComm({
   const broadcastChannelRef = useRef<RealtimeChannel | null>(null)
 
   useEffect(() => {
-    if (!sessionId) return
-    const channelName = getChannelName(sessionId)
-    // Use the base channel name so broadcast events reach useTelemetry
-    // on the player side and useTrainerLog on the trainer side.
+    // Always use session:dev — telemetry channel is decoupled from DB sessions
+    const channelName = getChannelName('dev')
     // Multiple RealtimeChannel objects on the same topic are fine —
     // they are separate JS objects but share the underlying Supabase subscription.
     const ch = supabase.channel(channelName, {
@@ -63,7 +61,7 @@ export function useTrainerComm({
       supabase.removeChannel(ch)
       broadcastChannelRef.current = null
     }
-  }, [sessionId])
+  }, [])
 
   // Audio recording refs
   const analyserRef = useRef<AnalyserNode | null>(null)

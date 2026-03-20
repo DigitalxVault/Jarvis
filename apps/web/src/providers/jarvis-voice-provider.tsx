@@ -47,13 +47,13 @@ export function JarvisVoiceProvider({ children }: { children: React.ReactNode })
 }
 
 function JarvisVoiceProviderInner({ children }: { children: React.ReactNode }) {
-  const { telemetry, connectionState, alerts, flightPhase, currentSession } = useTelemetryContext()
+  const { telemetry, tactical, connectionState, alerts, flightPhase, currentSession } = useTelemetryContext()
 
   // TTS with priority queue
   const { speak, stop: stopSpeaking, isSpeaking } = useJarvisTTS()
 
   // Brain: rule engine + GPT-4o fallback (phase-aware)
-  const { processTranscript } = useJarvisBrain({ telemetry, speak, flightPhase: flightPhase.phase })
+  const { processTranscript } = useJarvisBrain({ telemetry, tactical, speak, flightPhase: flightPhase.phase })
 
   // Track whether we're currently processing a command
   const isProcessingRef = useRef(false)

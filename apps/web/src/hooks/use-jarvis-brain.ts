@@ -2,12 +2,13 @@
 
 import { useCallback, useRef } from 'react'
 import { processWithRuleEngine } from '@/lib/rule-engine'
-import type { TelemetryPacket } from '@jarvis-dcs/shared'
+import type { TelemetryPacket, TacticalPacket } from '@jarvis-dcs/shared'
 import type { SpeechPriority } from '@/hooks/use-jarvis-tts'
 import type { FlightPhase } from '@/lib/flight-phases'
 
 interface UseJarvisBrainOptions {
   telemetry: TelemetryPacket | null
+  tactical: TacticalPacket | null
   speak: (text: string, priority: SpeechPriority) => void
   flightPhase?: FlightPhase
 }
@@ -16,7 +17,7 @@ interface UseJarvisBrainOptions {
  * Jarvis brain: processes voice transcripts through rule engine first,
  * falls back to GPT-4o for complex queries.
  */
-export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrainOptions) {
+export function useJarvisBrain({ telemetry, tactical, speak, flightPhase }: UseJarvisBrainOptions) {
   const processingRef = useRef(false)
 
   const processTranscript = useCallback(async (transcript: string): Promise<string | undefined> => {
@@ -27,7 +28,7 @@ export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrain
 
     try {
       // Try rule engine first (instant, no API cost)
-      const ruleResponse = processWithRuleEngine(transcript, telemetry, flightPhase)
+      const ruleResponse = processWithRuleEngine(transcript, telemetry, flightPhase, tactical)
       if (ruleResponse) {
         console.log('[JARVIS] Rule engine match:', ruleResponse)
         speak(ruleResponse, 'P2')
@@ -41,7 +42,7 @@ export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrain
       const response = await fetch('/api/jarvis-brain', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ transcript, telemetry, flightPhase }),
+        body: JSON.stringify({ transcript, telemetry, tactical, flightPhase }),
       })
 
       if (!response.ok) {
@@ -59,7 +60,7 @@ export function useJarvisBrain({ telemetry, speak, flightPhase }: UseJarvisBrain
     } finally {
       processingRef.current = false
     }
-  }, [telemetry, speak, flightPhase])
+  }, [telemetry, tactical, speak, flightPhase])
 
   return { processTranscript }
 }
