@@ -18,7 +18,7 @@ export function StartCodeEntry({ onUnlocked }: StartCodeEntryProps) {
   // Listen for bridge_start broadcasts on session:dev
   useEffect(() => {
     const channelName = getChannelName('dev')
-    const ch = supabase.channel(`${channelName}:start_code`, {
+    const ch = supabase.channel(channelName, {
       config: { broadcast: { ack: false } },
     })
 
