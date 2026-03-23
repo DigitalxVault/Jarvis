@@ -13,8 +13,8 @@ import argparse
 import asyncio
 import logging
 import os
+import random
 import signal
-import webbrowser
 
 from dotenv import load_dotenv
 
@@ -60,7 +60,7 @@ def _resolve_credentials() -> tuple[str, str]:
 # Async application
 # ---------------------------------------------------------------------------
 
-async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
+async def _run(channel_topic: str, supabase_url: str, api_key: str, start_code: str) -> None:
     """Run all bridge components concurrently."""
 
     # --- Component construction ---
@@ -105,6 +105,7 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         grpc_client=grpc_client,
         udp_listener=udp_listener,
         publisher=publisher,
+        start_code=start_code,
     )
 
     # --- Supabase health check ---
@@ -183,6 +184,12 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
             await asyncio.sleep(backoff)
             backoff = min(backoff * 2, max_backoff)
 
+    # --- Start code broadcast loop (every 5s so late-joining browsers pick it up) ---
+    async def _start_code_loop() -> None:
+        while True:
+            await publisher.broadcast_start_code(start_code)
+            await asyncio.sleep(5)
+
     # --- Gather all tasks ---
     tasks = [
         asyncio.create_task(_grpc_loop(), name="grpc_loop"),
@@ -190,6 +197,7 @@ async def _run(channel_topic: str, supabase_url: str, api_key: str) -> None:
         asyncio.create_task(_sync_normalizer(), name="sync_normalizer"),
         asyncio.create_task(tui.run(), name="tui"),
         asyncio.create_task(_command_loop(), name="command_loop"),
+        asyncio.create_task(_start_code_loop(), name="start_code_loop"),
     ]
 
     try:
@@ -249,9 +257,8 @@ def main() -> None:
     # --- Channel resolution ---
     channel_topic = args.channel or "session:dev"
 
-    # --- Auto-open web dashboard ---
-    web_url = os.environ.get("JARVIS_WEB_URL", "https://jarvis-web-ecru.vercel.app")
-    webbrowser.open(web_url)
+    # --- Generate 4-digit START CODE (displayed in TUI, entered on web) ---
+    start_code = str(random.randint(1000, 9999))
 
     # --- Run asyncio event loop ---
     loop = asyncio.new_event_loop()
@@ -276,6 +283,7 @@ def main() -> None:
                 channel_topic=channel_topic,
                 supabase_url=supabase_url,
                 api_key=api_key,
+                start_code=start_code,
             )
         )
     except (KeyboardInterrupt, asyncio.CancelledError):

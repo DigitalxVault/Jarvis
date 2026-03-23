@@ -18,6 +18,9 @@ import type {
 import type { ActiveAlert } from '@jarvis-dcs/shared'
 
 interface TelemetryContextValue {
+  // Unlock gate
+  isUnlocked: boolean
+  setUnlocked: (v: boolean) => void
   // Session
   currentSession: Session | null
   isCreating: boolean
@@ -51,12 +54,29 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
   const isOnline = useOnlineStatus()
   const isNetworkOffline = !isOnline
 
+  // Unlock gate: check sessionStorage on mount
+  const [isUnlocked, setIsUnlockedState] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('jarvis_unlocked') === '1'
+    }
+    return false
+  })
+
+  const setUnlocked = useCallback((v: boolean) => {
+    setIsUnlockedState(v)
+    if (v) {
+      sessionStorage.setItem('jarvis_unlocked', '1')
+    } else {
+      sessionStorage.removeItem('jarvis_unlocked')
+    }
+  }, [])
+
   const [currentSession, setCurrentSession] = useState<Session | null>(null)
   const [isCreating, setIsCreating] = useState(false)
   const [sessionError, setSessionError] = useState<string | null>(null)
 
-  // Telemetry always flows on session:dev — database sessions are for trainer codes only
-  const sessionId = 'dev'
+  // Only subscribe to telemetry after START CODE is validated
+  const sessionId = isUnlocked ? 'dev' : null
   const {
     telemetry,
     tactical,
@@ -100,6 +120,8 @@ export function TelemetryProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <TelemetryContext.Provider value={{
+      isUnlocked,
+      setUnlocked,
       currentSession,
       isCreating,
       sessionError,

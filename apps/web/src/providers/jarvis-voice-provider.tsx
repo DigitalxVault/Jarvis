@@ -28,9 +28,10 @@ const JarvisVoiceContext = createContext<JarvisVoiceContextValue | null>(null)
 export function JarvisVoiceProvider({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const isTrainerRoute = pathname?.startsWith('/trainer')
+  const { isUnlocked } = useTelemetryContext()
 
-  // On trainer route, skip all voice logic — trainer has its own comm system
-  if (isTrainerRoute) {
+  // On trainer route or before START CODE unlock, skip all voice logic
+  if (isTrainerRoute || !isUnlocked) {
     return (
       <JarvisVoiceContext.Provider value={{
         voiceState: 'idle',

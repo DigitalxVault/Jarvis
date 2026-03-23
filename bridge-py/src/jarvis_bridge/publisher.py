@@ -165,6 +165,17 @@ class SupabasePublisher:
             self._total_errors += 1
 
     # ------------------------------------------------------------------
+    # Start code broadcast
+    # ------------------------------------------------------------------
+
+    async def broadcast_start_code(self, code: str) -> None:
+        """Broadcast the START CODE so web clients can validate it."""
+        try:
+            await self.broadcast("bridge_start", {"code": code})
+        except Exception:
+            pass  # Non-critical — will retry in 5s
+
+    # ------------------------------------------------------------------
     # Health check
     # ------------------------------------------------------------------
 

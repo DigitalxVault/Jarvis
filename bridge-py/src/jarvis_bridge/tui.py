@@ -60,6 +60,7 @@ def _build_panel(
     buffer_size: int,
     is_backing_off: bool,
     udp_fallback: bool = False,
+    start_code: str = "",
 ) -> Panel:
     t = Table.grid(padding=(0, 2))
     t.add_column(style="cyan", no_wrap=True)
@@ -67,6 +68,11 @@ def _build_panel(
 
     mins, secs = divmod(int(uptime_s), 60)
     hrs, mins = divmod(mins, 60)
+
+    if start_code:
+        t.add_row("START CODE", Text(f"  {start_code}  ", style="bold white on blue"))
+        t.add_row("", Text("Enter this code on the JARVIS web dashboard", style="dim italic"))
+        t.add_row("", "")
 
     t.add_row("Channel", Text(channel, style="bold white"))
     t.add_row("Uptime", f"{hrs:02d}:{mins:02d}:{secs:02d}")
@@ -103,11 +109,13 @@ class BridgeTUI:
         grpc_client: "GrpcClient | None",
         udp_listener: "UdpListener",
         publisher: "SupabasePublisher",
+        start_code: str = "",
     ) -> None:
         self._channel = channel
         self._grpc = grpc_client
         self._udp = udp_listener
         self._publisher = publisher
+        self._start_code = start_code
         self._start_time = time.monotonic()
         self._console = Console(highlight=False)
 
@@ -131,6 +139,7 @@ class BridgeTUI:
             buffer_size=self._publisher.buffer_size,
             is_backing_off=self._publisher.is_backing_off,
             udp_fallback=udp_fallback,
+            start_code=self._start_code,
         )
 
     async def run(self) -> None:
